@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-// StrictEqual verifica se dois valores são a mesma instância
+// StrictEqual verifica se dois valores são a mesma instância ou se têm propriedades iguais
 func StrictEqual(t *testing.T, result, shouldBe interface{}, msg ...string) {
-	if result != shouldBe {
-		message := "Expected values to be the same instance"
+	if !reflect.DeepEqual(result, shouldBe) {
+		message := "Expected values to have the same properties and values"
 		if len(msg) > 0 {
 			message = msg[0]
 		}
@@ -34,6 +34,28 @@ func NotEqual(t *testing.T, result, shouldNotBe interface{}, msg ...string) {
 			message = msg[0]
 		}
 		t.Errorf("%s: expected different from %v (type %T), but got %v (type %T)", message, shouldNotBe, shouldNotBe, result, result)
+	}
+}
+
+// NotEmpty verifica se uma string não está vazia
+func NotEmpty(t *testing.T, str string, msg ...string) {
+	if str == "" {
+		message := "Expected string to be not empty"
+		if len(msg) > 0 {
+			message = msg[0]
+		}
+		t.Errorf("%s: string is empty", message)
+	}
+}
+
+// Empty verifica se uma string está vazia
+func Empty(t *testing.T, str string, msg ...string) {
+	if str != "" {
+		message := "Expected string to be empty"
+		if len(msg) > 0 {
+			message = msg[0]
+		}
+		t.Errorf("%s: string is not empty", message)
 	}
 }
 
