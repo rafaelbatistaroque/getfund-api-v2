@@ -1,7 +1,7 @@
 package signoutfixture
 
 import (
-	"bytes"
+	"context"
 	"errors"
 	authadapter "getfund-api-v2/internal/domain/auth/port/adapter"
 	"getfund-api-v2/internal/domain/auth/usecase/signout"
@@ -31,11 +31,19 @@ func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *res
 }
 
 func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.Request) {
-	body := bytes.NewBufferString(GetSignoutInputSerialized())
-	if bodyString != "" {
-		body = bytes.NewBufferString(bodyString)
+	session := ""
+
+	switch {
+	case bodyString == "":
+		session = GetSignoutHeaderSerialized()
+	case bodyString == "not-found":
+		session = ""
+	default:
+		session = bodyString
 	}
-	req := httptest.NewRequest("FAKE", "/", body)
+
+	ctx := context.WithValue(context.Background(), "session", session)
+	req := httptest.NewRequest("FAKE", "/", nil).WithContext(ctx)
 	res := httptest.NewRecorder()
 
 	return res, req
@@ -45,8 +53,8 @@ func GetSignoutInput() *signout.Input {
 	return &signout.Input{Token: "fake-token"}
 }
 
-func GetSignoutInputSerialized() string {
-	return `{"token": "fake-token"}`
+func GetSignoutHeaderSerialized() string {
+	return "{\"token\": \"fake-token\", \"session\": {\"id\":\"fake-id\",\"first_name\":\"fake-firstname\",\"is_admin\":true}}"
 }
 
 func (s *signoutUsecaseSpy) DefineError() {

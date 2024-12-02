@@ -9,10 +9,23 @@ import (
 	"testing"
 )
 
-func Test_GivenSignout_WhenDecodeError_ThenEnsureReturnStatusBadRequestWithError(t *testing.T) {
+func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnStatus500WithError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("body-with-error")
+	res, req := fixture.GetHttpRequestResponse("not-found")
+
+	// Act
+	_, code, err := sut.Signout(res, req)
+
+	// Assert
+	verify.Should(t, code).Be(http.StatusInternalServerError)
+	verify.Should(t, err).NotNil()
+}
+
+func Test_GivenSignout_WhenSessionDeserializeFail_ThenEnsureReturn400WithErrorFrom(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	res, req := fixture.GetHttpRequestResponse("invalid-session")
 
 	// Act
 	_, code, err := sut.Signout(res, req)
@@ -22,7 +35,7 @@ func Test_GivenSignout_WhenDecodeError_ThenEnsureReturnStatusBadRequestWithError
 	verify.Should(t, err).NotNil()
 }
 
-func Test_GivenSignout_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
+func Test_GivenSignout_WhenDeserializeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedInput := fixture.GetSignoutInput()
 	sut, signoutSpy := fixture.NewSut()
