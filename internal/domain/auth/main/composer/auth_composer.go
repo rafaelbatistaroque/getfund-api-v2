@@ -35,7 +35,8 @@ func GetHandlers(settings settings.ApplicationSettings, cache cacheservice.Cache
 	signin := signinApplication.New(authService, sessionServive, mapper)
 
 	//composer
-	composer := adapter.New(signin)
+	//TODO: add signout composer
+	composer := adapter.New(signin, nil)
 
 	return AuthComposer{
 		Signin: proxy.New(composer.Signin),
