@@ -1,6 +1,6 @@
 package signin
 
-import appErr "getfund-api-v2/internal/pkg/applicationerror"
+import appErr "getfund-api-v2/internal/shared/applicationerror"
 
 type UseCase = signin
 
