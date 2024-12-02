@@ -5,13 +5,14 @@ import (
 	"errors"
 	"getfund-api-v2/internal/domain/auth/usecase/signout"
 	"getfund-api-v2/internal/shared/resultapp"
+	"getfund-api-v2/internal/shared/service/sessionservice"
 	"net/http"
 )
 
 func (h *authAdapter) Signout(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var input signout.Input
 
-	session := r.Context().Value("session").(string)
+	session := r.Context().Value(sessionservice.SessionKey{}).(string)
 	if session == "" {
 		return nil, http.StatusInternalServerError, errors.New("session not found")
 	}

@@ -6,6 +6,7 @@ import (
 	authadapter "getfund-api-v2/internal/domain/auth/port/adapter"
 	"getfund-api-v2/internal/domain/auth/usecase/signout"
 	"getfund-api-v2/internal/shared/resultapp"
+	"getfund-api-v2/internal/shared/service/sessionservice"
 	"net/http"
 	"net/http/httptest"
 )
@@ -42,7 +43,7 @@ func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.R
 		session = bodyString
 	}
 
-	ctx := context.WithValue(context.Background(), "session", session)
+	ctx := context.WithValue(context.Background(), sessionservice.SessionKey{}, session)
 	req := httptest.NewRequest("FAKE", "/", nil).WithContext(ctx)
 	res := httptest.NewRecorder()
 

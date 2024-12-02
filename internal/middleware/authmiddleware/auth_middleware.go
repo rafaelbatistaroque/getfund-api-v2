@@ -36,7 +36,7 @@ func (a *authMiddleware) Authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), "session", string(sessionSerialized))
+		ctx := context.WithValue(r.Context(), sessionservice.SessionKey{}, sessionSerialized)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

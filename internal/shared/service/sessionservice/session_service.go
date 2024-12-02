@@ -11,6 +11,8 @@ var (
 	time_24_HOURS = 24 * time.Hour
 )
 
+type SessionKey struct{}
+
 type SessionService interface {
 	SaveSession(session string) (string, error)
 	GetSession(token string) (string, error)
