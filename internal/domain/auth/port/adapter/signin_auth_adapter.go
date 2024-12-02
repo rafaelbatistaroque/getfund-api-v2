@@ -7,21 +7,7 @@ import (
 	"net/http"
 )
 
-type SigninAdapter interface {
-	Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
-}
-
-type signinAdapter struct {
-	signin signin.UseCase
-}
-
-func New(usecase signin.UseCase) SigninAdapter {
-	return &signinAdapter{
-		signin: usecase,
-	}
-}
-
-func (h *signinAdapter) Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+func (h *authAdapter) Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var input signin.Input
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {

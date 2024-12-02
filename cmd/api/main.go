@@ -25,8 +25,6 @@ func main() {
 
 	defer cache.Close()
 
-	authMiddleware.New(session)
-
 	r := chi.NewRouter()
 
 	notificationComposer.SubscribeEventHandlers(appSettings, eventBus)
@@ -34,6 +32,8 @@ func main() {
 	r.Route("/api/v2", func(api chi.Router) {
 		api.Get("/", HelloWorld)
 
+		//Auth
+		authMiddleware.New(session)
 		authHandlers := authComposer.GetHandlers(appSettings, cache, session, db)
 		api.Post("/sign-in", authHandlers.Signin)
 	})

@@ -15,7 +15,7 @@ type signinApplication struct {
 	mapper         mapper.SigninMapper
 }
 
-func NewUseCase(authService authservice.AuthService, sessionService sessionServ.SessionService, mapper mapper.SigninMapper) signin.UseCase {
+func New(authService authservice.AuthService, sessionService sessionServ.SessionService, mapper mapper.SigninMapper) signin.UseCase {
 	return &signinApplication{
 		authService:    authService,
 		sessionService: sessionService,

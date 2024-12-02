@@ -17,7 +17,7 @@ func NewSut() (signin.UseCase, *authServiceSpy, *sessionServiceSpy, *signinmappe
 	authServiceSpy := &authServiceSpy{Params: make(map[string]string), CallsCount: 0}
 	sessionServiceSpy := &sessionServiceSpy{CallsCount: make(map[string]int), Params: make(map[string]string), SuccessResult: make(map[string]interface{}), ErrorResult: make(map[string]error)}
 
-	return sut.NewUseCase(authServiceSpy, sessionServiceSpy, mapperSpy), authServiceSpy, sessionServiceSpy, mapperSpy
+	return sut.New(authServiceSpy, sessionServiceSpy, mapperSpy), authServiceSpy, sessionServiceSpy, mapperSpy
 }
 
 func GetValidInput() *signin.Input {
