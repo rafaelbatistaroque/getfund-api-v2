@@ -5,7 +5,7 @@ import (
 	"errors"
 	authmodel "getfund-api-v2/internal/domain/auth/model"
 	"getfund-api-v2/internal/pkg/verify"
-	appCode "getfund-api-v2/internal/shared/applicationcode"
+	"getfund-api-v2/internal/shared/resultapp"
 	fixture "getfund-api-v2/test/domain/auth/domainservice/authservice/authservicefixture"
 	"testing"
 )
@@ -85,7 +85,7 @@ func Test_GivenAuthenticate_WhenGetByUserNameError_ThenEnsureReturnUnauthorizedE
 	// Assert
 	verify.Should(t, err).NotNil()
 	verify.Should(t, userRepo.ErrorResult["GetByUserName"]).Be(err.Message)
-	verify.Should(t, appCode.CODE_UNAUTHORIZED).Be(err.Code)
+	verify.Should(t, resultapp.CODE_UNAUTHORIZED).Be(err.Code)
 }
 
 func Test_GivenAuthenticate_WhenGetByUserNameSuccess_ThenCallIsMatchWithCorrectParameter(t *testing.T) {
@@ -128,7 +128,7 @@ func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(appCode.CODE_UNAUTHORIZED)
+	verify.Should(t, err.Code).Be(resultapp.CODE_UNAUTHORIZED)
 	verify.Should(t, err.Message).StrictEqual(expectedPasswordError)
 }
 

@@ -3,7 +3,7 @@ package authadapter
 import (
 	"encoding/json"
 	signin "getfund-api-v2/internal/domain/auth/usecase/signin"
-	"getfund-api-v2/internal/shared/applicationcode"
+	"getfund-api-v2/internal/shared/resultapp"
 	"net/http"
 )
 
@@ -19,5 +19,5 @@ func (h *authAdapter) Signin(w http.ResponseWriter, r *http.Request) (interface{
 		return nil, err.Code, err.Message
 	}
 
-	return output, applicationcode.CODE_SUCCESS, nil
+	return output, resultapp.CODE_SUCCESS, nil
 }

@@ -5,14 +5,13 @@ import (
 	auth_contract "getfund-api-v2/internal/domain/auth/contract"
 	"getfund-api-v2/internal/domain/auth/main/mapper/signinmapper"
 	authmodel "getfund-api-v2/internal/domain/auth/model"
-	appCode "getfund-api-v2/internal/shared/applicationcode"
-	appErr "getfund-api-v2/internal/shared/applicationerror"
 	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/shared/resultapp"
 	"getfund-api-v2/internal/shared/security"
 )
 
 type AuthService interface {
-	Authenticate(username string, password string) (*authmodel.SessionModel, *appErr.ApplicationError)
+	Authenticate(username string, password string) (*authmodel.SessionModel, *resultapp.ApplicationError)
 }
 
 type authService struct {
@@ -36,19 +35,19 @@ func New(
 	}
 }
 
-func (a *authService) Authenticate(username string, password string) (*authmodel.SessionModel, *appErr.ApplicationError) {
+func (a *authService) Authenticate(username string, password string) (*authmodel.SessionModel, *resultapp.ApplicationError) {
 	usernameHashed, err := a.hasher.HashWithSalt(username, a.settings.GetServerSalt())
 	if err != nil {
-		return nil, appErr.New(appCode.CODE_SERVER_ERROR, err)
+		return nil, resultapp.New(resultapp.CODE_SERVER_ERROR, err)
 	}
 
 	user, repoErr := a.userRepository.GetByUserName(usernameHashed)
 	if repoErr != nil {
-		return nil, appErr.New(appCode.CODE_UNAUTHORIZED, repoErr)
+		return nil, resultapp.New(resultapp.CODE_UNAUTHORIZED, repoErr)
 	}
 
 	if !a.hasher.IsMatch(user.Password, password, a.settings.GetServerSalt()) {
-		return nil, appErr.New(appCode.CODE_UNAUTHORIZED, errors.New("invalid password"))
+		return nil, resultapp.New(resultapp.CODE_UNAUTHORIZED, errors.New("invalid password"))
 	}
 
 	return a.mapper.ToSessionModel(user), nil

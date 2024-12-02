@@ -3,7 +3,7 @@ package authadapter
 import (
 	"getfund-api-v2/internal/domain/auth/usecase/signin"
 	"getfund-api-v2/internal/pkg/verify"
-	"getfund-api-v2/internal/shared/applicationcode"
+	"getfund-api-v2/internal/shared/resultapp"
 	fixture "getfund-api-v2/test/domain/auth/port/adapter/authadapterfixture"
 	"net/http"
 	"testing"
@@ -68,11 +68,11 @@ func Test_GivenSignin_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
-	result, code, _ := sut.Signin(res, req)
+	signed, code, _ := sut.Signin(res, req)
 
 	// Assert
-	success := result.(*signin.Output)
-	verify.Should(t, code).Be(applicationcode.CODE_SUCCESS)
+	success := signed.(*signin.Output)
+	verify.Should(t, code).Be(resultapp.CODE_SUCCESS)
 	verify.Should(t, success.Token).Be(signinSpy.SuccessResult["Execute"].Token)
 	verify.Should(t, success.Session.ID).Be(signinSpy.SuccessResult["Execute"].Session.ID)
 	verify.Should(t, success.Session.FirstName).Be(signinSpy.SuccessResult["Execute"].Session.FirstName)

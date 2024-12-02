@@ -3,8 +3,8 @@ package authmiddleware
 import (
 	"context"
 	"errors"
-	"getfund-api-v2/internal/shared/applicationcode"
 	"getfund-api-v2/internal/shared/proxy"
+	"getfund-api-v2/internal/shared/resultapp"
 	"getfund-api-v2/internal/shared/service/sessionservice"
 	"net/http"
 	"strings"
@@ -26,13 +26,13 @@ func (a *authMiddleware) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := extractToken(r)
 		if token == "" {
-			proxy.SetError(w, applicationcode.CODE_UNAUTHORIZED, errors.New("unauthorized"))
+			proxy.SetError(w, resultapp.CODE_UNAUTHORIZED, errors.New("unauthorized"))
 			return
 		}
 
 		sessionSerialized, err := a.session.GetSession(token)
 		if err != nil || sessionSerialized == "" {
-			proxy.SetError(w, applicationcode.CODE_UNAUTHORIZED, errors.New("unauthorized"))
+			proxy.SetError(w, resultapp.CODE_UNAUTHORIZED, errors.New("unauthorized"))
 			return
 		}
 

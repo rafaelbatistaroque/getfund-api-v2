@@ -4,8 +4,7 @@ import (
 	"errors"
 	authmodel "getfund-api-v2/internal/domain/auth/model"
 	"getfund-api-v2/internal/pkg/verify"
-	appCode "getfund-api-v2/internal/shared/applicationcode"
-	appErr "getfund-api-v2/internal/shared/applicationerror"
+	"getfund-api-v2/internal/shared/resultapp"
 	fixtures "getfund-api-v2/test/domain/auth/usecase/signin/signinfixture"
 	"testing"
 )
@@ -65,7 +64,7 @@ func Test_GivenSigninExecute_WhenAuthenticateInvoke_ThenEnsureCallsOnce(t *testi
 func Test_GivenSigninExecute_WhenAuthenticateError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, authService, _, _ := fixtures.NewSut()
-	anyError := appErr.New(appCode.CODE_UNAUTHORIZED, errors.New("fake-message"))
+	anyError := resultapp.New(resultapp.CODE_UNAUTHORIZED, errors.New("fake-message"))
 	authService.DefineNotAuthenticate(anyError.Code, anyError.Message)
 
 	// Act
@@ -112,7 +111,7 @@ func Test_GivenSigninExecute_WhenMapperSessionToStringError_ThenEnsureReturnServ
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(appCode.CODE_SERVER_ERROR)
+	verify.Should(t, err.Code).Be(resultapp.CODE_SERVER_ERROR)
 	verify.Should(t, err.Message).NotNil()
 }
 
@@ -151,7 +150,7 @@ func Test_GivenSigninExecute_WhenSaveSessionError_ThenEnsureReturnServerError(t 
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(appCode.CODE_SERVER_ERROR)
+	verify.Should(t, err.Code).Be(resultapp.CODE_SERVER_ERROR)
 	verify.Should(t, err.Message).NotNil()
 }
 

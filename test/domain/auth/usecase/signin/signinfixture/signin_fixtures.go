@@ -7,8 +7,7 @@ import (
 	"getfund-api-v2/internal/domain/auth/usecase/signin"
 	sut "getfund-api-v2/internal/domain/auth/usecase/signin/application"
 	validation "getfund-api-v2/internal/pkg/inputvalidation"
-	appCode "getfund-api-v2/internal/shared/applicationcode"
-	appErr "getfund-api-v2/internal/shared/applicationerror"
+	"getfund-api-v2/internal/shared/resultapp"
 	"getfund-api-v2/test/spyshared/mapperspy/signinmapperspy"
 )
 
@@ -24,14 +23,14 @@ func GetValidInput() *signin.Input {
 	return &signin.Input{Password: "fake-password", UserName: "fake-username"}
 }
 
-func GetInputWithUserNameInvalid() (*signin.Input, *appErr.ApplicationError) {
+func GetInputWithUserNameInvalid() (*signin.Input, *resultapp.ApplicationError) {
 	return &signin.Input{UserName: "", Password: "fake-password"},
-		appErr.New(appCode.BAD_REQUEST, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "UserName"))
+		resultapp.New(resultapp.BAD_REQUEST, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "UserName"))
 }
 
-func GetInputWithPasswordInvalid() (*signin.Input, *appErr.ApplicationError) {
+func GetInputWithPasswordInvalid() (*signin.Input, *resultapp.ApplicationError) {
 	return &signin.Input{Password: "", UserName: "fake-username"},
-		appErr.New(appCode.BAD_REQUEST, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "Password"))
+		resultapp.New(resultapp.BAD_REQUEST, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "Password"))
 }
 
 type authServiceSpy struct {
@@ -40,10 +39,10 @@ type authServiceSpy struct {
 	CallsCount int
 
 	SuccessResult *authmodel.SessionModel
-	errorResult   *appErr.ApplicationError
+	errorResult   *resultapp.ApplicationError
 }
 
-func (a *authServiceSpy) Authenticate(username string, password string) (*authmodel.SessionModel, *appErr.ApplicationError) {
+func (a *authServiceSpy) Authenticate(username string, password string) (*authmodel.SessionModel, *resultapp.ApplicationError) {
 	a.Params["username"] = username
 	a.Params["password"] = password
 
@@ -53,7 +52,7 @@ func (a *authServiceSpy) Authenticate(username string, password string) (*authmo
 }
 
 func (a *authServiceSpy) DefineNotAuthenticate(code int, message error) {
-	a.errorResult = appErr.New(code, message)
+	a.errorResult = resultapp.New(code, message)
 }
 
 func (a *authServiceSpy) DefineAuthenticate() {

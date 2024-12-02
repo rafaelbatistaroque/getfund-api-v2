@@ -5,8 +5,7 @@ import (
 	"errors"
 	authadapter "getfund-api-v2/internal/domain/auth/port/adapter"
 	"getfund-api-v2/internal/domain/auth/usecase/signin"
-	"getfund-api-v2/internal/shared/applicationcode"
-	"getfund-api-v2/internal/shared/applicationerror"
+	"getfund-api-v2/internal/shared/resultapp"
 	"net/http"
 	"net/http/httptest"
 )
@@ -14,16 +13,16 @@ import (
 type signinSpy struct {
 	Params        map[string]*signin.Input
 	CallsCount    map[string]int
-	ErrorResult   map[string]*applicationerror.ApplicationError
+	ErrorResult   map[string]*resultapp.ApplicationError
 	SuccessResult map[string]*signin.Output
 }
 
 func NewSut() (authadapter.AuthAdapter, *signinSpy) {
-	signinSpy := &signinSpy{Params: make(map[string]*signin.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*applicationerror.ApplicationError), SuccessResult: make(map[string]*signin.Output)}
+	signinSpy := &signinSpy{Params: make(map[string]*signin.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*resultapp.ApplicationError), SuccessResult: make(map[string]*signin.Output)}
 	return authadapter.New(signinSpy), signinSpy
 }
 
-func (s *signinSpy) Execute(input *signin.Input) (*signin.Output, *applicationerror.ApplicationError) {
+func (s *signinSpy) Execute(input *signin.Input) (*signin.Output, *resultapp.ApplicationError) {
 	s.Params["Execute:input"] = input
 
 	s.CallsCount["Execute"]++
@@ -51,7 +50,7 @@ func GetSigninInputSerialized() string {
 }
 
 func (s *signinSpy) DefineError() {
-	s.ErrorResult["Execute"] = &applicationerror.ApplicationError{Code: applicationcode.CODE_SERVER_ERROR, Message: errors.New("fake-error")}
+	s.ErrorResult["Execute"] = &resultapp.ApplicationError{Code: resultapp.CODE_SERVER_ERROR, Message: errors.New("fake-error")}
 }
 
 func (s *signinSpy) DefineSuccess() {
