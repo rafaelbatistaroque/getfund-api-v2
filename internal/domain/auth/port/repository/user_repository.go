@@ -1,6 +1,7 @@
 package authuserrepository
 
 import (
+	"errors"
 	auth_contract "getfund-api-v2/internal/domain/auth/contract"
 	model "getfund-api-v2/internal/domain/auth/model"
 
@@ -27,7 +28,7 @@ func (r *userRepository) GetByUserName(username string) (*model.UserModel, error
 		First(&user)
 
 	if err.Error != nil {
-		return nil, err.Error
+		return nil, errors.New("user not found")
 	}
 
 	return &user, nil

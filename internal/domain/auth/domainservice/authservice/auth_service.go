@@ -48,7 +48,7 @@ func (a *authService) Authenticate(username string, password string) (*authmodel
 	}
 
 	if !a.hasher.IsMatch(user.Password, password, a.settings.GetServerSalt()) {
-		return nil, appErr.New(appCode.CODE_UNAUTHORIZED, errors.New("wrong password"))
+		return nil, appErr.New(appCode.CODE_UNAUTHORIZED, errors.New("invalid password"))
 	}
 
 	return a.mapper.ToSessionModel(user), nil
