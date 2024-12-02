@@ -2,6 +2,7 @@ package authadapter
 
 import (
 	"encoding/json"
+	"errors"
 	"getfund-api-v2/internal/domain/auth/usecase/signout"
 	"getfund-api-v2/internal/shared/resultapp"
 	"net/http"
@@ -10,7 +11,12 @@ import (
 func (h *authAdapter) Signout(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var input signout.Input
 
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+	session := r.Context().Value("session").(string)
+	if session == "" {
+		return nil, http.StatusInternalServerError, errors.New("session not found")
+	}
+
+	if err := json.Unmarshal([]byte(session), &input); err != nil {
 		return nil, http.StatusBadRequest, err
 	}
 
