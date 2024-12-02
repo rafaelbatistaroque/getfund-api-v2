@@ -118,7 +118,7 @@ func Test_GivenAuthenticate_WhenGetByUserNameSuccess_ThenCallIsMatchOnce(t *test
 
 func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t *testing.T) {
 	// Arrange
-	expectedPasswordError := errors.New("wrong password")
+	expectedPasswordError := errors.New("invalid password")
 	sut, _, userRepo, hasherSpy, _ := fixture.NewSut()
 	userRepo.DefineSuccess()
 	hasherSpy.DefineIsMatchError()
