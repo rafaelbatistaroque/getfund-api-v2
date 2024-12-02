@@ -34,9 +34,7 @@ func New(cache cacheservice.Cache, security security.Hasher, settings settings.A
 }
 
 func (s *sessionService) SaveSession(session string) (string, error) {
-	sessionEncrypted := s.security.Encrypt(session, s.settings.GetSecretKey())
-
-	token := s.security.HashAndMerge(sessionEncrypted, s.settings.GetServerSalt())
+	token, sessionEncrypted := encryptSession(s.security, s.settings, session)
 
 	errCache := s.cache.Set(token, sessionEncrypted, time_24_HOURS)
 	if errCache != nil {
@@ -44,6 +42,12 @@ func (s *sessionService) SaveSession(session string) (string, error) {
 	}
 
 	return token, nil
+}
+
+func encryptSession(security security.Hasher, settings settings.ApplicationSettings, session string) (string, string) {
+	sessionEncrypted := security.Encrypt(session, settings.GetSecretKey())
+
+	return security.HashAndMerge(sessionEncrypted, settings.GetServerSalt()), sessionEncrypted
 }
 
 func (s *sessionService) DeleteSession(token string) error {
