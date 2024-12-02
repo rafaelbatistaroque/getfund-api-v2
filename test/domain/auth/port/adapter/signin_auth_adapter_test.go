@@ -4,7 +4,7 @@ import (
 	"getfund-api-v2/internal/domain/auth/usecase/signin"
 	"getfund-api-v2/internal/pkg/verify"
 	"getfund-api-v2/internal/shared/resultapp"
-	fixture "getfund-api-v2/test/domain/auth/port/adapter/authadapterfixture"
+	fixture "getfund-api-v2/test/domain/auth/port/adapter/signinfixture"
 	"net/http"
 	"testing"
 )
