@@ -12,6 +12,7 @@ import (
 type Cache interface {
 	Set(key string, value string, time time.Duration) error
 	Get(key string) (string, error)
+	Delete(key string) (string, error)
 	Close() error
 }
 
@@ -50,6 +51,10 @@ func (c *redisCache) Get(key string) (string, error) {
 	}
 
 	return content, nil
+}
+
+func (c *redisCache) Delete(key string) (string, error) {
+	return "", nil
 }
 
 func (c *redisCache) Close() error {
