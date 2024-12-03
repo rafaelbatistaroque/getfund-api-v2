@@ -40,3 +40,15 @@ func Test_GivenDeleteSession_WhenCacheInvoked_ThenEnsureCallsOnce(t *testing.T) 
 	// Assert
 	verify.Should(t, redisSpy.CallsCount["Delete"]).Be(1)
 }
+
+func Test_GivenDeleteSession_WhenCacheDEleteError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _, _, redisSpy := fixture.NewSut()
+	redisSpy.DefineRedisDeleteError()
+
+	// Act
+	err := sut.DeleteSession(fixture.GetDeleteSessionInputValid())
+
+	// Assert
+	verify.Should(t, redisSpy.ErrorResult["Delete"]).Be(err)
+}

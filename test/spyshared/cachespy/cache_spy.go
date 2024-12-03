@@ -27,20 +27,19 @@ func (r *RedisCacheSpy) Set(key string, value string, time time.Duration) error 
 
 	return r.ErrorResult["Set"]
 }
-func (r *RedisCacheSpy) DefineRedisSetError() {
-	r.ErrorResult["Set"] = errors.New("fake-error")
-}
+func (r *RedisCacheSpy) DefineRedisSetError()    { r.ErrorResult["Set"] = errors.New("fake-error") }
+func (r *RedisCacheSpy) DefineRedisDeleteError() { r.ErrorResult["Delete"] = errors.New("fake-error") }
 
 func (r *RedisCacheSpy) Get(key string) (string, error) {
 	return "", nil
 }
 
-func (r *RedisCacheSpy) Delete(key string) (string, error) {
+func (r *RedisCacheSpy) Delete(key string) error {
 	r.Params["Delete:key"] = key
 
 	r.CallsCount["Delete"]++
 
-	return "", nil
+	return r.ErrorResult["Delete"]
 }
 
 func (r *RedisCacheSpy) Close() error {
