@@ -1,7 +1,6 @@
 package signinapplicationfixtures
 
 import (
-	"errors"
 	"fmt"
 	authmodel "getfund-api-v2/internal/domain/auth/model"
 	"getfund-api-v2/internal/domain/auth/usecase/signin"
@@ -9,12 +8,13 @@ import (
 	validation "getfund-api-v2/internal/pkg/inputvalidation"
 	"getfund-api-v2/internal/shared/resultapp"
 	"getfund-api-v2/test/spyshared/mapperspy/signinmapperspy"
+	"getfund-api-v2/test/spyshared/sessionspy"
 )
 
-func NewSut() (signin.UseCase, *authServiceSpy, *sessionServiceSpy, *signinmapperspy.SigninMapperSpy) {
+func NewSut() (signin.UseCase, *authServiceSpy, *sessionspy.SessionServiceSpy, *signinmapperspy.SigninMapperSpy) {
 	mapperSpy := signinmapperspy.New()
 	authServiceSpy := &authServiceSpy{Params: make(map[string]string), CallsCount: 0}
-	sessionServiceSpy := &sessionServiceSpy{CallsCount: make(map[string]int), Params: make(map[string]string), SuccessResult: make(map[string]interface{}), ErrorResult: make(map[string]error)}
+	sessionServiceSpy := sessionspy.New()
 
 	return sut.New(authServiceSpy, sessionServiceSpy, mapperSpy), authServiceSpy, sessionServiceSpy, mapperSpy
 }
@@ -57,45 +57,4 @@ func (a *authServiceSpy) DefineNotAuthenticate(code int, message error) {
 
 func (a *authServiceSpy) DefineAuthenticate() {
 	a.SuccessResult = &authmodel.SessionModel{ID: "fake-id", FirstName: "fake-first-name", IsAdmin: 0}
-}
-
-type sessionServiceSpy struct {
-	Params     map[string]string
-	CallsCount map[string]int
-
-	SuccessResult map[string]interface{}
-	ErrorResult   map[string]error
-}
-
-func (s *sessionServiceSpy) SaveSession(session string) (string, error) {
-	s.Params["SaveSession:session"] = session
-
-	s.CallsCount["SaveSession"]++
-
-	success := s.SuccessResult["SaveSession"]
-	if success != nil {
-		return s.SuccessResult["SaveSession"].(string), s.ErrorResult["SaveSession"]
-	}
-
-	return "", s.ErrorResult["SaveSession"]
-}
-
-func (s *sessionServiceSpy) DeleteSession(session string) error {
-	s.Params["DeleteSession:session"] = session
-
-	s.CallsCount["DeleteSession"]++
-
-	return s.ErrorResult["DeleteSession"]
-}
-
-func (s *sessionServiceSpy) GetSession(session string) (string, error) {
-	return "", nil
-}
-
-func (s *sessionServiceSpy) DefineError() {
-	s.ErrorResult["SaveSession"] = errors.New("any-error")
-}
-
-func (s *sessionServiceSpy) DefineSuccess() {
-	s.SuccessResult["SaveSession"] = "fake-success"
 }
