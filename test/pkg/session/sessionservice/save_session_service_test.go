@@ -8,10 +8,22 @@ import (
 	"time"
 )
 
+func Test_GivenSaveSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _, _, _ := fixture.NewSut()
+
+	// Act
+	_, err := sut.SaveSession(fixture.GetSaveSessionInputInvalid())
+
+	// Assert
+	verify.Should(t, err).NotNil()
+	verify.Should(t, err.Error()).Be("save-session: parameter cannot be null or empty")
+}
+
 func Test_GivenSaveSession_WhenEncryptInvoked_ThenEnsureCallWithCorrectParams(t *testing.T) {
 	// Arrange
 	sut, hasherSpy, settingsSpy, _ := fixture.NewSut()
-	expectedInputValue := fixture.GetInputValid()
+	expectedInputValue := fixture.GetSaveSessionInputValid()
 
 	// Act
 	sut.SaveSession(expectedInputValue)
@@ -26,7 +38,7 @@ func Test_GivenSaveSession_WhenEncryptInvoked_ThenEnsureCallOnce(t *testing.T) {
 	sut, hasherSpy, _, _ := fixture.NewSut()
 
 	// Act
-	sut.SaveSession(fixture.GetInputValid())
+	sut.SaveSession(fixture.GetSaveSessionInputValid())
 
 	// Assert
 	verify.Should(t, hasherSpy.CallsCount["Encrypt"]).Be(1)
@@ -38,7 +50,7 @@ func Test_GivenSaveSession_WhenEncryptSuccess_ThenEnsureCallHashAndMergeWithCorr
 	hasherSpy.DefineEncryptSuccess()
 
 	// Act
-	sut.SaveSession(fixture.GetInputValid())
+	sut.SaveSession(fixture.GetSaveSessionInputValid())
 
 	// Assert
 	verify.Should(t, hasherSpy.Params["HashAndMerge:input"]).Be(hasherSpy.SuccessResult["Encrypt"])
@@ -51,7 +63,7 @@ func Test_GivenSaveSession_WhenHashAndMergeInvoke_ThenEnsureCallsOnce(t *testing
 	hasherSpy.DefineEncryptSuccess()
 
 	// Act
-	sut.SaveSession(fixture.GetInputValid())
+	sut.SaveSession(fixture.GetSaveSessionInputValid())
 
 	// Assert
 	verify.Should(t, hasherSpy.CallsCount["HashAndMerge"]).Be(1)
@@ -64,7 +76,7 @@ func Test_GivenSaveSession_WhenHashAndMergeSuccess_ThenEnsureCallsRedisSetWithCo
 	hasherSpy.DefineHashAndMergeSuccess("any-token")
 
 	// Act
-	sut.SaveSession(fixture.GetInputValid())
+	sut.SaveSession(fixture.GetSaveSessionInputValid())
 
 	// Assert
 	verify.Should(t, redisSpy.Params["Set:key"]).Be(hasherSpy.SuccessResult["HashAndMerge"])
@@ -77,7 +89,7 @@ func Test_GivenSaveSession_WhenRedisSetInvoke_ThenEnsureCallsOnce(t *testing.T) 
 	sut, _, _, redisSpy := fixture.NewSut()
 
 	// Act
-	sut.SaveSession(fixture.GetInputValid())
+	sut.SaveSession(fixture.GetSaveSessionInputValid())
 
 	// Assert
 	verify.Should(t, redisSpy.CallsCount["Set"]).Be(1)
@@ -89,7 +101,7 @@ func Test_GivenSaveSession_WhenRedisSetError_ThenEnsureReturnError(t *testing.T)
 	redisSpy.DefineRedisSetError()
 
 	// Act
-	_, err := sut.SaveSession(fixture.GetInputValid())
+	_, err := sut.SaveSession(fixture.GetSaveSessionInputValid())
 
 	// Assert
 	verify.Should(t, err).Be(redisSpy.ErrorResult["Set"])
@@ -101,7 +113,7 @@ func Test_GivenSaveSession_WhenRedisSetSuccess_ThenEnsureReturnToken(t *testing.
 	hasherSpy.DefineHashAndMergeSuccess("any-token")
 
 	// Act
-	result, _ := sut.SaveSession(fixture.GetInputValid())
+	result, _ := sut.SaveSession(fixture.GetSaveSessionInputValid())
 
 	// Assert
 	verify.Should(t, result).Be(hasherSpy.SuccessResult["HashAndMerge"])

@@ -18,4 +18,7 @@ func NewSut() (sessionservice.SessionService, *securityspy.HasherSpy, *settingss
 		redisSpy
 }
 
-func GetInputValid() string { return `{"fakeField": "fake-value"}` }
+func GetSaveSessionInputInvalid() string { return "" }
+func GetSaveSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
+
+func GetDeleteSessionInputValid() string { return `{"fakeField": "fake-value"}` }
