@@ -1,6 +1,7 @@
 package sessionservice
 
 import (
+	"errors"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cacheservice"
@@ -34,6 +35,10 @@ func New(cache cacheservice.Cache, security security.Hasher, settings settings.A
 }
 
 func (s *sessionService) SaveSession(session string) (string, error) {
+	if session == "" {
+		return "", errors.New("save-session: parameter cannot be null or empty")
+	}
+
 	token, sessionEncrypted := encryptSession(s.security, s.settings, session)
 
 	errCache := s.cache.Set(token, sessionEncrypted, time_24_HOURS)
