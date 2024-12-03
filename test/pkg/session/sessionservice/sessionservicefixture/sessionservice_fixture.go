@@ -21,4 +21,5 @@ func NewSut() (sessionservice.SessionService, *securityspy.HasherSpy, *settingss
 func GetSaveSessionInputInvalid() string { return "" }
 func GetSaveSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
 
-func GetDeleteSessionInputValid() string { return `{"fakeField": "fake-value"}` }
+func GetDeleteSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
+func GetDeleteSessionInputInvalid() string { return "" }
