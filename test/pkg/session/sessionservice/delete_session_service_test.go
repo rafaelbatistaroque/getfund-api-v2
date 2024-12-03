@@ -29,3 +29,14 @@ func Test_GivenDeleteSession_WhenInputValid_ThenEnsureCallDeleteWithCorrectParam
 	// Assert
 	verify.Should(t, redisSpy.Params["Delete:key"]).Be(validInput)
 }
+
+func Test_GivenDeleteSession_WhenCacheInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, _, _, redisSpy := fixture.NewSut()
+
+	// Act
+	sut.DeleteSession(fixture.GetDeleteSessionInputValid())
+
+	// Assert
+	verify.Should(t, redisSpy.CallsCount["Delete"]).Be(1)
+}

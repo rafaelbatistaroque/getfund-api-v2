@@ -38,6 +38,8 @@ func (r *RedisCacheSpy) Get(key string) (string, error) {
 func (r *RedisCacheSpy) Delete(key string) (string, error) {
 	r.Params["Delete:key"] = key
 
+	r.CallsCount["Delete"]++
+
 	return "", nil
 }
 
