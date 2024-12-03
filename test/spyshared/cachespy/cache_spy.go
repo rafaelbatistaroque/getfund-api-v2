@@ -35,6 +35,12 @@ func (r *RedisCacheSpy) Get(key string) (string, error) {
 	return "", nil
 }
 
+func (r *RedisCacheSpy) Delete(key string) (string, error) {
+	r.Params["Delete:key"] = key
+
+	return "", nil
+}
+
 func (r *RedisCacheSpy) Close() error {
 	return nil
 }

@@ -17,3 +17,15 @@ func Test_GivenDeleteSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T
 	verify.Should(t, err).NotNil()
 	verify.Should(t, err.Error()).Be("delete-session: parameter cannot be null or empty")
 }
+
+func Test_GivenDeleteSession_WhenInputValid_ThenEnsureCallDeleteWithCorrectParameter(t *testing.T) {
+	// Arrange
+	validInput := fixture.GetDeleteSessionInputValid()
+	sut, _, _, redisSpy := fixture.NewSut()
+
+	// Act
+	sut.DeleteSession(validInput)
+
+	// Assert
+	verify.Should(t, redisSpy.Params["Delete:key"]).Be(validInput)
+}
