@@ -65,7 +65,6 @@ func (s *sessionService) DeleteSession(token string) error {
 		return err
 	}
 
-	//deletar sessão em cache by token
 	return nil
 }
 
