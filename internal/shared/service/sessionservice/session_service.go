@@ -56,6 +56,9 @@ func encryptSession(security security.Hasher, settings settings.ApplicationSetti
 }
 
 func (s *sessionService) DeleteSession(token string) error {
+	if token == "" {
+		return errors.New("delete-session: parameter cannot be null or empty")
+	}
 	//deletar sessão em cache by token
 	return nil
 }
