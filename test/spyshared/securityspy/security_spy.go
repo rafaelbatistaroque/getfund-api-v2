@@ -30,6 +30,8 @@ func (h *HasherSpy) DecryptMerged(mergedEncryptedData string, secretKey []byte) 
 	h.Params["DecryptMerged:mergedEncryptedData"] = mergedEncryptedData
 	h.Params["DecryptMerged:secretKey"] = secretKey
 
+	h.CallsCount["DecryptMerged"]++
+
 	success := h.SuccessResult["DecryptMerged"]
 	if success != nil {
 		return success.(string)

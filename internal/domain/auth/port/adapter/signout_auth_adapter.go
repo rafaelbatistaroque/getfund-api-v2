@@ -1,7 +1,6 @@
 package authadapter
 
 import (
-	"encoding/json"
 	"errors"
 	"getfund-api-v2/internal/domain/auth/usecase/signout"
 	"getfund-api-v2/internal/shared/resultapp"
@@ -10,18 +9,13 @@ import (
 )
 
 func (h *authAdapter) Signout(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	var input signout.Input
-
-	session := r.Context().Value(sessionservice.SessionKey{}).(string)
-	if session == "" {
-		return nil, http.StatusInternalServerError, errors.New("session not found")
+	token := r.Context().Value(sessionservice.TokenKey{})
+	if token == nil || token == "" {
+		return nil, http.StatusInternalServerError, errors.New("token not found")
 	}
 
-	if err := json.Unmarshal([]byte(session), &input); err != nil {
-		return nil, http.StatusBadRequest, err
-	}
-
-	output, err := h.signout.Execute(&input)
+	input := &signout.Input{Token: token.(string)}
+	output, err := h.signout.Execute(input)
 	if err != nil {
 		return nil, err.Code, err.Message
 	}

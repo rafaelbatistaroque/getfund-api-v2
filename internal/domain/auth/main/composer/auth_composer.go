@@ -6,6 +6,7 @@ import (
 	adapter "getfund-api-v2/internal/domain/auth/port/adapter"
 	userRepository "getfund-api-v2/internal/domain/auth/port/repository"
 	signinApplication "getfund-api-v2/internal/domain/auth/usecase/signin/application"
+	signoutapplication "getfund-api-v2/internal/domain/auth/usecase/signout/application"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/proxy"
 	"getfund-api-v2/internal/shared/security"
@@ -17,7 +18,8 @@ import (
 )
 
 type AuthComposer struct {
-	Signin http.HandlerFunc
+	Signin  http.HandlerFunc
+	Signout http.HandlerFunc
 }
 
 func GetHandlers(settings settings.ApplicationSettings, cache cacheservice.Cache, sessionServive sessionService.SessionService, db *gorm.DB) AuthComposer {
@@ -33,12 +35,13 @@ func GetHandlers(settings settings.ApplicationSettings, cache cacheservice.Cache
 
 	//applications
 	signin := signinApplication.New(authService, sessionServive, mapper)
+	signout := signoutapplication.New(sessionServive)
 
 	//composer
-	//TODO: add signout composer
-	composer := adapter.New(signin, nil)
+	composer := adapter.New(signin, signout)
 
 	return AuthComposer{
-		Signin: proxy.New(composer.Signin),
+		Signin:  proxy.New(composer.Signin),
+		Signout: proxy.New(composer.Signout),
 	}
 }

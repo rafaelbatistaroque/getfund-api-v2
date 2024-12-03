@@ -32,18 +32,18 @@ func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *res
 }
 
 func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.Request) {
-	session := ""
+	token := ""
 
 	switch {
 	case bodyString == "":
-		session = GetSignoutHeaderSerialized()
+		token = GetSignoutHeaderToken()
 	case bodyString == "not-found":
-		session = ""
+		token = ""
 	default:
-		session = bodyString
+		token = bodyString
 	}
 
-	ctx := context.WithValue(context.Background(), sessionservice.SessionKey{}, session)
+	ctx := context.WithValue(context.Background(), sessionservice.TokenKey{}, token)
 	req := httptest.NewRequest("FAKE", "/", nil).WithContext(ctx)
 	res := httptest.NewRecorder()
 
@@ -54,8 +54,8 @@ func GetSignoutInput() *signout.Input {
 	return &signout.Input{Token: "fake-token"}
 }
 
-func GetSignoutHeaderSerialized() string {
-	return "{\"token\": \"fake-token\", \"session\": {\"id\":\"fake-id\",\"first_name\":\"fake-firstname\",\"is_admin\":true}}"
+func GetSignoutHeaderToken() string {
+	return "fake-token"
 }
 
 func (s *signoutUsecaseSpy) DefineError() {

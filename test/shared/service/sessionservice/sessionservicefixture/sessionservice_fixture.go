@@ -23,3 +23,6 @@ func GetSaveSessionInputValid() string   { return `{"fakeField": "fake-value"}` 
 
 func GetDeleteSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
 func GetDeleteSessionInputInvalid() string { return "" }
+
+func GetGetSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
+func GetGetSessionInputInvalid() string { return "" }

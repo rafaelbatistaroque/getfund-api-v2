@@ -12,6 +12,7 @@ import (
 
 type AuthMiddleware interface {
 	Authenticate(next http.Handler) http.Handler
+	AuthenticateAdmin(next http.Handler) http.Handler
 }
 
 type authMiddleware struct {
@@ -36,7 +37,32 @@ func (a *authMiddleware) Authenticate(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), sessionservice.SessionKey{}, sessionSerialized)
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, sessionservice.TokenKey{}, token)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func (a *authMiddleware) AuthenticateAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token := extractToken(r)
+		if token == "" {
+			proxy.SetError(w, resultapp.CODE_UNAUTHORIZED, errors.New("unauthorized"))
+			return
+		}
+
+		//TODO: deserialize and validate if it is admin (1)
+		sessionSerialized, err := a.session.GetSession(token)
+		if err != nil || sessionSerialized == "" {
+			proxy.SetError(w, resultapp.CODE_UNAUTHORIZED, errors.New("unauthorized"))
+			return
+		}
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, sessionservice.SessionKey{}, sessionSerialized)
+		ctx = context.WithValue(ctx, sessionservice.TokenKey{}, token)
+
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }

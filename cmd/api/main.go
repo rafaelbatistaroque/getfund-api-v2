@@ -21,7 +21,7 @@ func main() {
 	eventBus := eventbus.New()
 	cache := cacheservice.New(context.Background(), appSettings)
 	db := db.New()
-	session := sessionservice.New(cache, security.New(), appSettings)
+	sessionService := sessionservice.New(cache, security.New(), appSettings)
 
 	defer cache.Close()
 
@@ -33,9 +33,10 @@ func main() {
 		api.Get("/", HelloWorld)
 
 		//Auth
-		authMiddleware.New(session)
-		authHandlers := authComposer.GetHandlers(appSettings, cache, session, db)
+		authMiddleware := authMiddleware.New(sessionService)
+		authHandlers := authComposer.GetHandlers(appSettings, cache, sessionService, db)
 		api.Post("/sign-in", authHandlers.Signin)
+		api.With(authMiddleware.Authenticate).Get("/sign-out", authHandlers.Signout)
 	})
 
 	http.ListenAndServe(appSettings.GetPort(), r)

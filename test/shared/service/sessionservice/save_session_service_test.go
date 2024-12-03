@@ -98,7 +98,7 @@ func Test_GivenSaveSession_WhenRedisSetInvoke_ThenEnsureCallsOnce(t *testing.T) 
 func Test_GivenSaveSession_WhenRedisSetError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _, _, redisSpy := fixture.NewSut()
-	redisSpy.DefineRedisSetError()
+	redisSpy.DefineCacheSetError()
 
 	// Act
 	_, err := sut.SaveSession(fixture.GetSaveSessionInputValid())

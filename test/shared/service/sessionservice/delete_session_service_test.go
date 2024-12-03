@@ -18,7 +18,7 @@ func Test_GivenDeleteSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T
 	verify.Should(t, err.Error()).Be("delete-session: parameter cannot be null or empty")
 }
 
-func Test_GivenDeleteSession_WhenValidInput_ThenEnsureCallDeleteWithCorrectParameter(t *testing.T) {
+func Test_GivenDeleteSession_WhenValidInput_ThenEnsureCallCacheDeleteWithCorrectParameter(t *testing.T) {
 	// Arrange
 	validInput := fixture.GetDeleteSessionInputValid()
 	sut, _, _, redisSpy := fixture.NewSut()
@@ -44,7 +44,7 @@ func Test_GivenDeleteSession_WhenCacheDeleteInvoked_ThenEnsureCallsOnce(t *testi
 func Test_GivenDeleteSession_WhenCacheDeleteError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _, _, redisSpy := fixture.NewSut()
-	redisSpy.DefineRedisDeleteError()
+	redisSpy.DefineCacheDeleteError()
 
 	// Act
 	err := sut.DeleteSession(fixture.GetDeleteSessionInputValid())

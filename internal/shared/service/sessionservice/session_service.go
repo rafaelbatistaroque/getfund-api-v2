@@ -13,6 +13,7 @@ var (
 )
 
 type SessionKey struct{}
+type TokenKey struct{}
 
 type SessionService interface {
 	SaveSession(session string) (string, error)
@@ -69,8 +70,14 @@ func (s *sessionService) DeleteSession(token string) error {
 }
 
 func (s *sessionService) GetSession(token string) (string, error) {
-	//obter sessão do cache
-	//decriptar
-	//retornar session serializada
-	return "", nil
+	if token == "" {
+		return "", errors.New("get-session: parameter cannot be null or empty")
+	}
+
+	sessionEncrypted, err := s.cache.Get(token)
+	if err != nil {
+		return "", err
+	}
+
+	return s.security.DecryptMerged(sessionEncrypted, s.settings.GetSecretKey()), nil
 }
