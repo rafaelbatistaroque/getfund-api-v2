@@ -54,6 +54,11 @@ func (c *redisCache) Get(key string) (string, error) {
 }
 
 func (c *redisCache) Delete(key string) error {
+	_, err := c.redis.Del(c.context, key).Result()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
