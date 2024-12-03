@@ -39,10 +39,18 @@ func (s *SessionServiceSpy) GetSession(session string) (string, error) {
 	return "", nil
 }
 
-func (s *SessionServiceSpy) DefineError() {
+func (s *SessionServiceSpy) DefineSaveSessionError() {
 	s.ErrorResult["SaveSession"] = errors.New("any-error")
 }
 
-func (s *SessionServiceSpy) DefineSuccess() {
+func (s *SessionServiceSpy) DefineSaveSessionSuccess() {
 	s.SuccessResult["SaveSession"] = "fake-success"
+}
+
+func (s *SessionServiceSpy) DefineDeleteSessionError() {
+	s.ErrorResult["DeleteSession"] = errors.New("any-error")
+}
+
+func (s *SessionServiceSpy) DefineDeleteSessionSuccess() {
+	s.SuccessResult["DeleteSession"] = "fake-success"
 }

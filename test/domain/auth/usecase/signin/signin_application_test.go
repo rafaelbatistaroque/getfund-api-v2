@@ -143,7 +143,7 @@ func Test_GivenSigninExecute_WhenSaveSessionInvoke_ThenEnsureCallsOnce(t *testin
 func Test_GivenSigninExecute_WhenSaveSessionError_ThenEnsureReturnServerError(t *testing.T) {
 	// Arrange
 	sut, _, sessionService, _ := fixtures.NewSut()
-	sessionService.DefineError()
+	sessionService.DefineSaveSessionError()
 
 	// Act
 	_, err := sut.Execute(fixtures.GetValidInput())
@@ -157,7 +157,7 @@ func Test_GivenSigninExecute_WhenSaveSessionError_ThenEnsureReturnServerError(t 
 func Test_GivenSigninExecute_WhenSaveSessionSuccess_ThenEnsureCallsMapperWithCorrectParameters(t *testing.T) {
 	// Arrange
 	sut, authService, sessionService, mapper := fixtures.NewSut()
-	sessionService.DefineSuccess()
+	sessionService.DefineSaveSessionSuccess()
 	authService.DefineAuthenticate()
 
 	// Act
@@ -184,7 +184,7 @@ func Test_GivenSigninExecute_WhenMapperInvoke_ThenEnsureReturnOutputWithSession(
 	sut, authService, sessionService, mapper := fixtures.NewSut()
 	mapper.ForceReturn = false
 	authService.DefineAuthenticate()
-	sessionService.DefineSuccess()
+	sessionService.DefineSaveSessionSuccess()
 
 	// Act
 	result, _ := sut.Execute(fixtures.GetValidInput())
