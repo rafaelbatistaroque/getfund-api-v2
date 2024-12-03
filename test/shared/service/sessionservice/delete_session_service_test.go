@@ -2,7 +2,7 @@ package sessionservice
 
 import (
 	"getfund-api-v2/internal/pkg/verify"
-	fixture "getfund-api-v2/test/pkg/session/sessionservice/sessionservicefixture"
+	fixture "getfund-api-v2/test/shared/service/sessionservice/sessionservicefixture"
 	"testing"
 )
 
