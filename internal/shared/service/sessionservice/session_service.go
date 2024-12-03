@@ -60,7 +60,10 @@ func (s *sessionService) DeleteSession(token string) error {
 		return errors.New("delete-session: parameter cannot be null or empty")
 	}
 
-	s.cache.Delete(token)
+	err := s.cache.Delete(token)
+	if err != nil {
+		return err
+	}
 
 	//deletar sessão em cache by token
 	return nil
