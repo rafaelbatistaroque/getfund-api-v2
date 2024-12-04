@@ -11,7 +11,7 @@ func (h *authAdapter) Signin(w http.ResponseWriter, r *http.Request) (interface{
 	var input signin.Input
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return nil, http.StatusBadRequest, err
+		return nil, resultapp.BAD_REQUEST, err
 	}
 
 	output, err := h.signin.Execute(&input)
