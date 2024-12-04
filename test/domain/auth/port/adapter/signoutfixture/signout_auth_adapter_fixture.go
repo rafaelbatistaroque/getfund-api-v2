@@ -20,7 +20,7 @@ type signoutUsecaseSpy struct {
 
 func NewSut() (authadapter.AuthAdapter, *signoutUsecaseSpy) {
 	signoutSpy := &signoutUsecaseSpy{Params: make(map[string]*signout.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*resultapp.ApplicationError), SuccessResult: make(map[string]*signout.Output)}
-	return authadapter.New(nil, signoutSpy), signoutSpy
+	return authadapter.New(nil, signoutSpy, nil), signoutSpy
 }
 
 func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *resultapp.ApplicationError) {

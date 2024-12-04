@@ -19,7 +19,7 @@ type signinUsecaseSpy struct {
 
 func NewSut() (adapter.AuthAdapter, *signinUsecaseSpy) {
 	signinSpy := &signinUsecaseSpy{Params: make(map[string]*signin.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*resultapp.ApplicationError), SuccessResult: make(map[string]*signin.Output)}
-	return adapter.New(signinSpy, nil), signinSpy
+	return adapter.New(signinSpy, nil, nil), signinSpy
 }
 
 func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *resultapp.ApplicationError) {
