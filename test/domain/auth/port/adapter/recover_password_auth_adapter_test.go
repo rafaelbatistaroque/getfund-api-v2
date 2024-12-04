@@ -2,8 +2,8 @@ package authadapter
 
 import (
 	"getfund-api-v2/internal/pkg/verify"
+	"getfund-api-v2/internal/shared/resultapp"
 	fixture "getfund-api-v2/test/domain/auth/port/adapter/recoverpasswordfixture"
-	"net/http"
 	"testing"
 )
 
@@ -16,7 +16,7 @@ func Test_GivenRecoverPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestW
 	_, code, err := sut.RecoverPassword(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(http.StatusBadRequest)
+	verify.Should(t, code).Be(resultapp.BAD_REQUEST)
 	verify.Should(t, err).NotNil()
 }
 
@@ -43,4 +43,18 @@ func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallOnce(t *testing.T
 
 	// Assert
 	verify.Should(t, recoverPasswordSpy.CallsCount["Execute"]).Be(1)
+}
+
+func Test_GivenRecoverPassword_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *testing.T) {
+	// Arrange
+	sut, recoverPasswordSpy := fixture.NewSut()
+	recoverPasswordSpy.DefineError()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	_, code, err := sut.RecoverPassword(res, req)
+
+	// Assert
+	verify.Should(t, code).Be(recoverPasswordSpy.ErrorResult["Execute"].Code)
+	verify.Should(t, err).Be(recoverPasswordSpy.ErrorResult["Execute"].Message)
 }

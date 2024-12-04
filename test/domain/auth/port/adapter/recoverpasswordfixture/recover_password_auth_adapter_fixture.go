@@ -2,6 +2,7 @@ package recoverpasswordfixture
 
 import (
 	"bytes"
+	"errors"
 	adapter "getfund-api-v2/internal/domain/auth/port/adapter"
 	"getfund-api-v2/internal/domain/auth/usecase/recoverpassword"
 	"getfund-api-v2/internal/shared/resultapp"
@@ -46,4 +47,12 @@ func GetRecoverPasswordInputSerialized() string {
 
 func GetRecoverPasswordInput() *recoverpassword.Input {
 	return &recoverpassword.Input{UserName: "fake-username"}
+}
+
+func (s *recoverPasswordUsecaseSpy) DefineError() {
+	s.ErrorResult["Execute"] = &resultapp.ApplicationError{Code: resultapp.CODE_SERVER_ERROR, Message: errors.New("fake-error")}
+}
+
+func (s *recoverPasswordUsecaseSpy) DefineSuccess() {
+	s.SuccessResult["Execute"] = &recoverpassword.Output{Message: "fake-message"}
 }
