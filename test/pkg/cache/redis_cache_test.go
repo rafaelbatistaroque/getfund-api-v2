@@ -1,8 +1,8 @@
-package cacheservice
+package cache
 
 import (
 	"getfund-api-v2/internal/pkg/verify"
-	fixture "getfund-api-v2/test/shared/service/cacheservice/rediscachefixture"
+	fixture "getfund-api-v2/test/pkg/cache/rediscachefixture"
 	"testing"
 	"time"
 

@@ -2,6 +2,7 @@ package authmiddleware
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"getfund-api-v2/internal/shared/proxy"
 	"getfund-api-v2/internal/shared/resultapp"
@@ -9,6 +10,10 @@ import (
 	"net/http"
 	"strings"
 )
+
+type sessionModel struct {
+	IdAdmin int `json:"is_admin"`
+}
 
 type AuthMiddleware interface {
 	Authenticate(next http.Handler) http.Handler
@@ -52,9 +57,15 @@ func (a *authMiddleware) AuthenticateAdmin(next http.Handler) http.Handler {
 			return
 		}
 
-		//TODO: deserialize and validate if it is admin (1)
 		sessionSerialized, err := a.session.GetSession(token)
 		if err != nil || sessionSerialized == "" {
+			proxy.SetError(w, resultapp.CODE_UNAUTHORIZED, errors.New("unauthorized"))
+			return
+		}
+
+		session := &sessionModel{}
+		errSession := json.Unmarshal([]byte(sessionSerialized), &session)
+		if errSession != nil || session.IdAdmin == 1 {
 			proxy.SetError(w, resultapp.CODE_UNAUTHORIZED, errors.New("unauthorized"))
 			return
 		}

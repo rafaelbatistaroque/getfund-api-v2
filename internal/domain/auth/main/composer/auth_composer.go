@@ -7,10 +7,11 @@ import (
 	userRepository "getfund-api-v2/internal/domain/auth/port/repository"
 	signinApplication "getfund-api-v2/internal/domain/auth/usecase/signin/application"
 	signoutapplication "getfund-api-v2/internal/domain/auth/usecase/signout/application"
+	"getfund-api-v2/internal/pkg/cache"
+	"getfund-api-v2/internal/pkg/eventbus"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/proxy"
 	"getfund-api-v2/internal/shared/security"
-	"getfund-api-v2/internal/shared/service/cacheservice"
 	sessionService "getfund-api-v2/internal/shared/service/sessionservice"
 	"net/http"
 
@@ -22,16 +23,18 @@ type AuthComposer struct {
 	Signout http.HandlerFunc
 }
 
-func GetHandlers(settings settings.ApplicationSettings, cache cacheservice.Cache, sessionServive sessionService.SessionService, db *gorm.DB) AuthComposer {
+func GetHandlers(
+	settings settings.ApplicationSettings,
+	cache cache.Cache,
+	sessionServive sessionService.SessionService,
+	db *gorm.DB,
+	eventBus eventbus.EventBus) AuthComposer {
+
 	//dependencies
 	hasher := security.New()
 	mapper := mapper.New(hasher, settings)
 	userRepository := userRepository.New(db)
-	authService := authService.New(
-		userRepository,
-		settings,
-		hasher,
-		mapper)
+	authService := authService.New(userRepository, settings, hasher, mapper)
 
 	//applications
 	signin := signinApplication.New(authService, sessionServive, mapper)

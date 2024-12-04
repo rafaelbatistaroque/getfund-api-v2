@@ -1,7 +1,17 @@
 package eventbus
 
-type ModelEvent struct{}
+type UserSignedEvent struct {
+	payload []byte
+}
 
-func (e *ModelEvent) GetName() string {
-	return "ModelEvent"
+func (e *UserSignedEvent) GetName() string {
+	return "UserSignedEvent"
+}
+
+func (e *UserSignedEvent) GetPayload() []byte {
+	return e.payload
+}
+
+func (e *UserSignedEvent) SetPayload(payload []byte) {
+	e.payload = payload
 }

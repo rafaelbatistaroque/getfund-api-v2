@@ -1,9 +1,9 @@
-package cacheservice
+package cache
 
 import (
 	"context"
+	applog "getfund-api-v2/internal/log"
 	"getfund-api-v2/internal/shared/contract/settings"
-	"log"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -28,10 +28,10 @@ func New(context context.Context, settings settings.ApplicationSettings) Cache {
 	})
 
 	if _, err := client.Ping(context).Result(); err != nil {
-		log.Fatalf("Can't get Redis connection: %v", err)
+		applog.Error.Fatalf("Can't get Redis connection: %v", err)
 	}
 
-	log.Printf("Redis connected")
+	applog.Info.Print("Redis connected")
 
 	return &redisCache{
 		context:  context,

@@ -2,9 +2,9 @@ package sessionservice
 
 import (
 	"errors"
+	"getfund-api-v2/internal/pkg/cache"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
-	"getfund-api-v2/internal/shared/service/cacheservice"
 	"time"
 )
 
@@ -22,12 +22,12 @@ type SessionService interface {
 }
 
 type sessionService struct {
-	cache    cacheservice.Cache
+	cache    cache.Cache
 	security security.Hasher
 	settings settings.ApplicationSettings
 }
 
-func New(cache cacheservice.Cache, security security.Hasher, settings settings.ApplicationSettings) SessionService {
+func New(cache cache.Cache, security security.Hasher, settings settings.ApplicationSettings) SessionService {
 	return &sessionService{
 		cache:    cache,
 		security: security,
