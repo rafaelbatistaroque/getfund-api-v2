@@ -32,3 +32,15 @@ func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrec
 	// Assert
 	verify.Should(t, recoverPasswordSpy.Params["Execute:input"]).Be(expectedInput)
 }
+
+func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallOnce(t *testing.T) {
+	// Arrange
+	sut, recoverPasswordSpy := fixture.NewSut()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	sut.RecoverPassword(res, req)
+
+	// Assert
+	verify.Should(t, recoverPasswordSpy.CallsCount["Execute"]).Be(1)
+}
