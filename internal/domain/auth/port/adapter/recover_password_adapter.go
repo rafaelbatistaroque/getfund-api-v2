@@ -14,10 +14,10 @@ func (h *authAdapter) RecoverPassword(w http.ResponseWriter, r *http.Request) (i
 		return nil, resultapp.BAD_REQUEST, err
 	}
 
-	_, err := h.recoverPassword.Execute(&input)
+	result, err := h.recoverPassword.Execute(&input)
 	if err != nil {
 		return nil, err.Code, err.Message
 	}
 
-	return nil, 0, nil
+	return result, resultapp.CODE_SUCCESS, nil
 }
