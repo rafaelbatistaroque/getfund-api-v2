@@ -4,7 +4,7 @@ import (
 	validation "getfund-api-v2/internal/pkg/inputvalidation"
 )
 
-type Input = recoverPassword
+type Input = recoverPasswordInput
 
 type recoverPasswordInput struct {
 	validation.InputValidation

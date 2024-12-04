@@ -13,5 +13,7 @@ func (h *authAdapter) RecoverPassword(w http.ResponseWriter, r *http.Request) (i
 		return nil, http.StatusBadRequest, err
 	}
 
+	h.recoverPassword.Execute(&input)
+
 	return nil, 0, nil
 }
