@@ -5,11 +5,10 @@ import (
 	"getfund-api-v2/internal/pkg/verify"
 	"getfund-api-v2/internal/shared/resultapp"
 	fixture "getfund-api-v2/test/domain/auth/port/adapter/signoutfixture"
-	"net/http"
 	"testing"
 )
 
-func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnStatus500WithError(t *testing.T) {
+func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnServerErrorWithError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("not-found")
@@ -18,7 +17,7 @@ func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnStatus500WithError(t 
 	_, code, err := sut.Signout(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(http.StatusInternalServerError)
+	verify.Should(t, code).Be(resultapp.CODE_UNAUTHORIZED)
 	verify.Should(t, err).NotNil()
 }
 

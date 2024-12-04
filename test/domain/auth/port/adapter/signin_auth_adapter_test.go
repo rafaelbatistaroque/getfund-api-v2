@@ -5,11 +5,10 @@ import (
 	"getfund-api-v2/internal/pkg/verify"
 	"getfund-api-v2/internal/shared/resultapp"
 	fixture "getfund-api-v2/test/domain/auth/port/adapter/signinfixture"
-	"net/http"
 	"testing"
 )
 
-func Test_GivenSignin_WhenDecodeError_ThenEnsureReturnStatusBadRequestWithError(t *testing.T) {
+func Test_GivenSignin_WhenDecodeError_ThenEnsureReturnBadRequestWithError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("body-with-error")
@@ -18,7 +17,7 @@ func Test_GivenSignin_WhenDecodeError_ThenEnsureReturnStatusBadRequestWithError(
 	_, code, err := sut.Signin(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(http.StatusBadRequest)
+	verify.Should(t, code).Be(resultapp.BAD_REQUEST)
 	verify.Should(t, err).NotNil()
 }
 
