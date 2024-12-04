@@ -41,7 +41,7 @@ func GetHandlers(
 	signout := signoutapplication.New(sessionServive)
 
 	//composer
-	composer := adapter.New(signin, signout)
+	composer := adapter.New(signin, signout, nil)
 
 	return AuthComposer{
 		Signin:  proxy.New(composer.Signin),
