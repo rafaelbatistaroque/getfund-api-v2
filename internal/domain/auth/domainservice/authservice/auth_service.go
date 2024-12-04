@@ -38,16 +38,16 @@ func New(
 func (a *authService) Authenticate(username string, password string) (*authmodel.SessionModel, *resultapp.ApplicationError) {
 	usernameHashed, err := a.hasher.HashWithSalt(username, a.settings.GetServerSalt())
 	if err != nil {
-		return nil, resultapp.New(resultapp.CODE_SERVER_ERROR, err)
+		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, err)
 	}
 
 	user, repoErr := a.userRepository.GetByUserName(usernameHashed)
 	if repoErr != nil {
-		return nil, resultapp.New(resultapp.CODE_UNAUTHORIZED, repoErr)
+		return nil, resultapp.New(resultapp.UNAUTHORIZED_CODE, repoErr)
 	}
 
 	if !a.hasher.IsMatch(user.Password, password, a.settings.GetServerSalt()) {
-		return nil, resultapp.New(resultapp.CODE_UNAUTHORIZED, errors.New("invalid password"))
+		return nil, resultapp.New(resultapp.UNAUTHORIZED_CODE, errors.New("invalid password"))
 	}
 
 	return a.mapper.ToSessionModel(user), nil

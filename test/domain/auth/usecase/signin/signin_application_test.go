@@ -64,7 +64,7 @@ func Test_GivenSigninExecute_WhenAuthenticateInvoke_ThenEnsureCallsOnce(t *testi
 func Test_GivenSigninExecute_WhenAuthenticateError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, authService, _, _ := fixtures.NewSut()
-	anyError := resultapp.New(resultapp.CODE_UNAUTHORIZED, errors.New("fake-message"))
+	anyError := resultapp.New(resultapp.UNAUTHORIZED_CODE, errors.New("fake-message"))
 	authService.DefineNotAuthenticate(anyError.Code, anyError.Message)
 
 	// Act
@@ -111,7 +111,7 @@ func Test_GivenSigninExecute_WhenMapperSessionToStringError_ThenEnsureReturnServ
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(resultapp.CODE_SERVER_ERROR)
+	verify.Should(t, err.Code).Be(resultapp.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).NotNil()
 }
 
@@ -150,7 +150,7 @@ func Test_GivenSigninExecute_WhenSaveSessionError_ThenEnsureReturnServerError(t 
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(resultapp.CODE_SERVER_ERROR)
+	verify.Should(t, err.Code).Be(resultapp.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).NotNil()
 }
 

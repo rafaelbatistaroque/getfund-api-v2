@@ -19,12 +19,12 @@ func New(sessionService sessionservice.SessionService) signout.UseCase {
 func (u *signoutApplication) Execute(input *signout.Input) (*signout.Output, *resultapp.ApplicationError) {
 	input.Validate()
 	if input.IsInvalid() {
-		return nil, resultapp.New(resultapp.CODE_UNAUTHORIZED, input.GetErrors())
+		return nil, resultapp.New(resultapp.UNAUTHORIZED_CODE, input.GetErrors())
 	}
 
 	err := u.sessionService.DeleteSession(input.Token)
 	if err != nil {
-		return nil, resultapp.New(resultapp.CODE_SERVER_ERROR, err)
+		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, err)
 	}
 
 	return &signout.SignoutOutput{Message: "user disconnected"}, nil

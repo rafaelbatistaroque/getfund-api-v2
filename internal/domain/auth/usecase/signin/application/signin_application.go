@@ -25,7 +25,7 @@ func New(authService authservice.AuthService, sessionService sessionServ.Session
 func (uc *signinApplication) Execute(input *signin.Input) (*signin.Output, *resultapp.ApplicationError) {
 	input.Validate()
 	if input.IsInvalid() {
-		return nil, resultapp.New(resultapp.BAD_REQUEST, input.GetErrors())
+		return nil, resultapp.New(resultapp.BAD_REQUEST_CODE, input.GetErrors())
 	}
 
 	session, authErr := uc.authService.Authenticate(input.UserName, input.Password)
@@ -35,12 +35,12 @@ func (uc *signinApplication) Execute(input *signin.Input) (*signin.Output, *resu
 
 	sessionSerialized, toStringErr := uc.mapper.SessionToString(session)
 	if toStringErr != nil {
-		return nil, resultapp.New(resultapp.CODE_SERVER_ERROR, toStringErr)
+		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, toStringErr)
 	}
 
 	token, saveSessionErr := uc.sessionService.SaveSession(sessionSerialized)
 	if saveSessionErr != nil {
-		return nil, resultapp.New(resultapp.CODE_SERVER_ERROR, saveSessionErr)
+		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, saveSessionErr)
 	}
 
 	return uc.mapper.ToOutput(token, session), nil

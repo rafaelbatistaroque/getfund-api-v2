@@ -25,12 +25,12 @@ func GetValidInput() *signin.Input {
 
 func GetInputWithUserNameInvalid() (*signin.Input, *resultapp.ApplicationError) {
 	return &signin.Input{UserName: "", Password: "fake-password"},
-		resultapp.New(resultapp.BAD_REQUEST, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "UserName"))
+		resultapp.New(resultapp.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "UserName"))
 }
 
 func GetInputWithPasswordInvalid() (*signin.Input, *resultapp.ApplicationError) {
 	return &signin.Input{Password: "", UserName: "fake-username"},
-		resultapp.New(resultapp.BAD_REQUEST, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "Password"))
+		resultapp.New(resultapp.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "Password"))
 }
 
 type authServiceSpy struct {

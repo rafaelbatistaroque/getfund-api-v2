@@ -85,7 +85,7 @@ func Test_GivenAuthenticate_WhenGetByUserNameError_ThenEnsureReturnUnauthorizedE
 	// Assert
 	verify.Should(t, err).NotNil()
 	verify.Should(t, userRepo.ErrorResult["GetByUserName"]).Be(err.Message)
-	verify.Should(t, resultapp.CODE_UNAUTHORIZED).Be(err.Code)
+	verify.Should(t, resultapp.UNAUTHORIZED_CODE).Be(err.Code)
 }
 
 func Test_GivenAuthenticate_WhenGetByUserNameSuccess_ThenCallIsMatchWithCorrectParameter(t *testing.T) {
@@ -128,7 +128,7 @@ func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(resultapp.CODE_UNAUTHORIZED)
+	verify.Should(t, err.Code).Be(resultapp.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message).StrictEqual(expectedPasswordError)
 }
 

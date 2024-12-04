@@ -3,15 +3,15 @@ package resultapp
 import "fmt"
 
 var (
-	CODE_SUCCESS             = 0
-	CODE_UNAUTHORIZED        = 1
-	CODE_DUPLICATED_ENTRY    = 2
-	CODE_NOT_FOUND           = 3
-	CODE_SERVER_ERROR        = 4
-	CODE_CONSTRAINT_VIOLATED = 5
-	BAD_REQUEST              = 6
-	CODE_UNAVAILABLE         = 7
-	CODE_UNMODIFIED          = 8
+	SUCCESS_CODE             = 0
+	UNAUTHORIZED_CODE        = 1
+	DUPLICATED_ENTRY_CODE    = 2
+	NOT_FOUND_CODE           = 3
+	SERVER_ERROR_CODE        = 4
+	CONSTRAINT_VIOLATED_CODE = 5
+	BAD_REQUEST_CODE         = 6
+	UNAVAILABLE_CODE         = 7
+	UNMODIFIED_CODE          = 8
 )
 
 type ApplicationError struct {

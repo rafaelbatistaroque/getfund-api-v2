@@ -17,7 +17,7 @@ func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnServerErrorWithError(
 	_, code, err := sut.Signout(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(resultapp.CODE_UNAUTHORIZED)
+	verify.Should(t, code).Be(resultapp.UNAUTHORIZED_CODE)
 	verify.Should(t, err).NotNil()
 }
 
@@ -59,6 +59,6 @@ func Test_GivenSignout_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(
 
 	// Assert
 	success := result.(*signout.Output)
-	verify.Should(t, code).Be(resultapp.CODE_SUCCESS)
+	verify.Should(t, code).Be(resultapp.SUCCESS_CODE)
 	verify.Should(t, success.Message).Be(signoutSpy.SuccessResult["Execute"].Message)
 }

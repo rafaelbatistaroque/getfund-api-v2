@@ -11,7 +11,7 @@ func (h *authAdapter) RecoverPassword(w http.ResponseWriter, r *http.Request) (i
 	var input recoverpassword.Input
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return nil, resultapp.BAD_REQUEST, err
+		return nil, resultapp.BAD_REQUEST_CODE, err
 	}
 
 	result, err := h.recoverPassword.Execute(&input)
@@ -19,5 +19,5 @@ func (h *authAdapter) RecoverPassword(w http.ResponseWriter, r *http.Request) (i
 		return nil, err.Code, err.Message
 	}
 
-	return result, resultapp.CODE_SUCCESS, nil
+	return result, resultapp.SUCCESS_CODE, nil
 }

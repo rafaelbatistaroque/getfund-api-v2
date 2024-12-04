@@ -17,7 +17,7 @@ func Test_GivenRecoverPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestW
 	_, code, err := sut.RecoverPassword(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(resultapp.BAD_REQUEST)
+	verify.Should(t, code).Be(resultapp.BAD_REQUEST_CODE)
 	verify.Should(t, err).NotNil()
 }
 
@@ -71,6 +71,6 @@ func Test_GivenRecoverPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSucc
 
 	// Assert
 	success := result.(*recoverpassword.Output)
-	verify.Should(t, code).Be(resultapp.CODE_SUCCESS)
+	verify.Should(t, code).Be(resultapp.SUCCESS_CODE)
 	verify.Should(t, success.Message).Be(recoverPasswordSpy.SuccessResult["Execute"].Message)
 }

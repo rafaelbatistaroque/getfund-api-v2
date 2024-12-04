@@ -11,7 +11,7 @@ import (
 func (h *authAdapter) Signout(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	token := r.Context().Value(sessionservice.TokenKey{})
 	if token == nil || token == "" {
-		return nil, resultapp.CODE_UNAUTHORIZED, errors.New("token not found")
+		return nil, resultapp.UNAUTHORIZED_CODE, errors.New("token not found")
 	}
 
 	input := &signout.Input{Token: token.(string)}
@@ -20,5 +20,5 @@ func (h *authAdapter) Signout(w http.ResponseWriter, r *http.Request) (interface
 		return nil, err.Code, err.Message
 	}
 
-	return output, resultapp.CODE_SUCCESS, nil
+	return output, resultapp.SUCCESS_CODE, nil
 }

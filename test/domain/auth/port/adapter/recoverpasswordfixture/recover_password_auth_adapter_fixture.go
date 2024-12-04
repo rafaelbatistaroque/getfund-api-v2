@@ -50,7 +50,7 @@ func GetRecoverPasswordInput() *recoverpassword.Input {
 }
 
 func (s *recoverPasswordUsecaseSpy) DefineError() {
-	s.ErrorResult["Execute"] = &resultapp.ApplicationError{Code: resultapp.CODE_SERVER_ERROR, Message: errors.New("fake-error")}
+	s.ErrorResult["Execute"] = &resultapp.ApplicationError{Code: resultapp.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
 }
 
 func (s *recoverPasswordUsecaseSpy) DefineSuccess() {

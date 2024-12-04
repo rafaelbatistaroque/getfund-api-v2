@@ -17,7 +17,7 @@ func Test_GivenSignoutExecute_WhenInputInvalid_ThenEnsureReturnErro(t *testing.T
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(resultapp.CODE_UNAUTHORIZED)
+	verify.Should(t, err.Code).Be(resultapp.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message).Be(invalidInput.GetErrors())
 }
 
@@ -53,7 +53,7 @@ func Test_GivenSignoutExecute_WhenDeleteSessionError_ThenEnsureReturnError(t *te
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(resultapp.CODE_SERVER_ERROR)
+	verify.Should(t, err.Code).Be(resultapp.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(sessionSpy.ErrorResult["DeleteSession"])
 }
 

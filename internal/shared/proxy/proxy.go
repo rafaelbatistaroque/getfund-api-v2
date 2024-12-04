@@ -7,15 +7,15 @@ import (
 )
 
 var httpCodeMap = map[int]int{
-	resultapp.CODE_SUCCESS:             http.StatusOK,                  // 200
-	resultapp.CODE_UNAUTHORIZED:        http.StatusUnauthorized,        // 401
-	resultapp.CODE_DUPLICATED_ENTRY:    http.StatusConflict,            // 409
-	resultapp.CODE_NOT_FOUND:           http.StatusNotFound,            // 404
-	resultapp.CODE_SERVER_ERROR:        http.StatusInternalServerError, // 500
-	resultapp.CODE_CONSTRAINT_VIOLATED: http.StatusBadRequest,          // 400
-	resultapp.BAD_REQUEST:              http.StatusBadRequest,          // 400
-	resultapp.CODE_UNAVAILABLE:         http.StatusServiceUnavailable,  // 503
-	resultapp.CODE_UNMODIFIED:          http.StatusNotModified,         // 304
+	resultapp.SUCCESS_CODE:             http.StatusOK,                  // 200
+	resultapp.UNAUTHORIZED_CODE:        http.StatusUnauthorized,        // 401
+	resultapp.DUPLICATED_ENTRY_CODE:    http.StatusConflict,            // 409
+	resultapp.NOT_FOUND_CODE:           http.StatusNotFound,            // 404
+	resultapp.SERVER_ERROR_CODE:        http.StatusInternalServerError, // 500
+	resultapp.CONSTRAINT_VIOLATED_CODE: http.StatusBadRequest,          // 400
+	resultapp.BAD_REQUEST_CODE:         http.StatusBadRequest,          // 400
+	resultapp.UNAVAILABLE_CODE:         http.StatusServiceUnavailable,  // 503
+	resultapp.UNMODIFIED_CODE:          http.StatusNotModified,         // 304
 }
 
 type handleFunc func(http.ResponseWriter, *http.Request) (interface{}, int, error)

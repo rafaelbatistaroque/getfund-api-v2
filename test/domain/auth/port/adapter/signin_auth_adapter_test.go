@@ -17,7 +17,7 @@ func Test_GivenSignin_WhenDecodeError_ThenEnsureReturnBadRequestWithError(t *tes
 	_, code, err := sut.Signin(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(resultapp.BAD_REQUEST)
+	verify.Should(t, code).Be(resultapp.BAD_REQUEST_CODE)
 	verify.Should(t, err).NotNil()
 }
 
@@ -71,7 +71,7 @@ func Test_GivenSignin_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t
 
 	// Assert
 	success := signed.(*signin.Output)
-	verify.Should(t, code).Be(resultapp.CODE_SUCCESS)
+	verify.Should(t, code).Be(resultapp.SUCCESS_CODE)
 	verify.Should(t, success.Token).Be(signinSpy.SuccessResult["Execute"].Token)
 	verify.Should(t, success.Session.ID).Be(signinSpy.SuccessResult["Execute"].Session.ID)
 	verify.Should(t, success.Session.FirstName).Be(signinSpy.SuccessResult["Execute"].Session.FirstName)
