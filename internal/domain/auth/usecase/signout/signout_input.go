@@ -1,6 +1,6 @@
 package signout
 
-import "getfund-api-v2/internal/pkg/inputvalidation"
+import "getfund-api-v2/pkg/inputvalidation"
 
 type Input = signoutInput
 

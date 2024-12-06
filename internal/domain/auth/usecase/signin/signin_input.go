@@ -1,7 +1,7 @@
 package signin
 
 import (
-	validation "getfund-api-v2/internal/pkg/inputvalidation"
+	validation "getfund-api-v2/pkg/inputvalidation"
 )
 
 type Input = signinInput

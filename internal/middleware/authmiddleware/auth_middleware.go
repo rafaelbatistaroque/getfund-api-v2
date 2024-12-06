@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"getfund-api-v2/internal/shared/proxy"
+	"getfund-api-v2/internal/proxy"
 	"getfund-api-v2/internal/shared/resultapp"
 	"getfund-api-v2/internal/shared/service/sessionservice"
 	"net/http"

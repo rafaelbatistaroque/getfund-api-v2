@@ -4,14 +4,15 @@ import (
 	"context"
 	authComposer "getfund-api-v2/internal/domain/auth/main/composer"
 	notificationComposer "getfund-api-v2/internal/domain/notification/main/notificationcomposer"
-	applog "getfund-api-v2/internal/log"
 	authMiddleware "getfund-api-v2/internal/middleware/authmiddleware"
-	"getfund-api-v2/internal/pkg/cache"
-	"getfund-api-v2/internal/pkg/db"
-	"getfund-api-v2/internal/pkg/eventbus"
-	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/security"
+	"getfund-api-v2/internal/shared/service/cacheservice"
 	"getfund-api-v2/internal/shared/service/sessionservice"
+	"getfund-api-v2/pkg/eventbus"
+	applog "getfund-api-v2/pkg/log"
+	redisconfig "getfund-api-v2/pkg/redis"
+	sqlitedb "getfund-api-v2/pkg/sqlite"
+	"getfund-api-v2/settings"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -20,13 +21,17 @@ import (
 func main() {
 	//general dependences
 	applog.Load()
-	db := db.New()
-	appSettings := settings.Load()
+	db := sqlitedb.New()
 	eventBus := eventbus.New()
-	cache := cache.New(context.Background(), appSettings)
-	sessionService := sessionservice.New(cache, security.New(), appSettings)
+	ctx := context.Background()
+	appSettings := settings.Load()
+	redis := redisconfig.New(ctx, appSettings)
 
-	defer cache.Close()
+	//Services
+	cacheService := cacheservice.New(redis, ctx)
+	sessionService := sessionservice.New(cacheService, security.New(), appSettings)
+
+	defer cacheService.Close()
 
 	//Subscriber
 	notificationComposer.SubscribeEventHandlers(appSettings, eventBus)
@@ -38,7 +43,7 @@ func main() {
 
 		//Auth
 		authMiddleware := authMiddleware.New(sessionService)
-		authHandlers := authComposer.GetHandlers(appSettings, cache, sessionService, db, eventBus)
+		authHandlers := authComposer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus)
 		api.Post("/sign-in", authHandlers.Signin)
 		api.With(authMiddleware.Authenticate).Get("/sign-out", authHandlers.Signout)
 	})

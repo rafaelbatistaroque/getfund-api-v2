@@ -3,7 +3,7 @@ package newslettereventhandler
 import (
 	"encoding/json"
 	"fmt"
-	"getfund-api-v2/internal/pkg/eventbus"
+	"getfund-api-v2/pkg/eventbus"
 )
 
 type newsletterPayload struct {

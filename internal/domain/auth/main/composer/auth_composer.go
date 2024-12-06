@@ -7,12 +7,12 @@ import (
 	userRepository "getfund-api-v2/internal/domain/auth/port/repository"
 	signinApplication "getfund-api-v2/internal/domain/auth/usecase/signin/application"
 	signoutapplication "getfund-api-v2/internal/domain/auth/usecase/signout/application"
-	"getfund-api-v2/internal/pkg/cache"
-	"getfund-api-v2/internal/pkg/eventbus"
+	"getfund-api-v2/internal/proxy"
 	"getfund-api-v2/internal/shared/contract/settings"
-	"getfund-api-v2/internal/shared/proxy"
 	"getfund-api-v2/internal/shared/security"
+	"getfund-api-v2/internal/shared/service/cacheservice"
 	sessionService "getfund-api-v2/internal/shared/service/sessionservice"
+	"getfund-api-v2/pkg/eventbus"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -25,7 +25,7 @@ type AuthComposer struct {
 
 func GetHandlers(
 	settings settings.ApplicationSettings,
-	cache cache.Cache,
+	cache cacheservice.Cache,
 	sessionServive sessionService.SessionService,
 	db *gorm.DB,
 	eventBus eventbus.EventBus) AuthComposer {
