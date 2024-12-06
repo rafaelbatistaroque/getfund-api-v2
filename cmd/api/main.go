@@ -5,14 +5,13 @@ import (
 	authComposer "getfund-api-v2/internal/domain/auth/main/composer"
 	notificationComposer "getfund-api-v2/internal/domain/notification/main/notificationcomposer"
 	authMiddleware "getfund-api-v2/internal/middleware/authmiddleware"
+	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cacheservice"
 	"getfund-api-v2/internal/shared/service/sessionservice"
 	"getfund-api-v2/pkg/eventbus"
-	applog "getfund-api-v2/pkg/log"
 	redisconfig "getfund-api-v2/pkg/redis"
 	sqlitedb "getfund-api-v2/pkg/sqlite"
-	"getfund-api-v2/settings"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -20,7 +19,6 @@ import (
 
 func main() {
 	//general dependences
-	applog.Load()
 	db := sqlitedb.New()
 	eventBus := eventbus.New()
 	ctx := context.Background()

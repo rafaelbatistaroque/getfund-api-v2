@@ -1,19 +1,20 @@
 package sqlitedb
 
 import (
-	applog "getfund-api-v2/pkg/log"
+	logger "getfund-api-v2/pkg/log"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
 func New() *gorm.DB {
+	logger := logger.New("Sqlite config")
 	db, err := gorm.Open(sqlite.Open("../../getfund.db"), &gorm.Config{})
 	if err != nil {
-		applog.Error.Fatal("Erro ao conectar ao banco de dados:", err)
+		logger.Errorf("Erro ao conectar ao banco de dados:", err)
 	}
 
-	applog.Info.Print("Database connected")
+	logger.Info("Database connected")
 
 	return db
 }

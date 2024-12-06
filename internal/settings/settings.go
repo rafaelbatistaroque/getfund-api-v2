@@ -2,8 +2,8 @@ package settings
 
 import (
 	"encoding/hex"
-	"fmt"
 	"getfund-api-v2/internal/shared/contract/settings"
+	logger "getfund-api-v2/pkg/log"
 	"os"
 	"strconv"
 
@@ -37,13 +37,14 @@ func (s *applicationSettings) GetSecretKey() []byte  { return s.secretKey }
 func (s *applicationSettings) GetAddrRedis() string  { return s.addrRedis }
 
 func Load() settings.ApplicationSettings {
+	logger := logger.New("Settings")
 	env := os.Getenv("GET_FUND_API_ENV")
 	if env != "production" {
 		if err := godotenv.Load("../../.env.development"); err != nil {
 			panic(err.Error())
 		}
 
-		fmt.Println(".env file loaded")
+		logger.Info(".env file loaded")
 	}
 
 	secretKey, err := hex.DecodeString(os.Getenv("SECRET_KEY"))

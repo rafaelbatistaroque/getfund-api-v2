@@ -2,7 +2,7 @@ package eventbus
 
 import (
 	"encoding/json"
-	applog "getfund-api-v2/pkg/log"
+	logger "getfund-api-v2/pkg/log"
 	"sync"
 )
 
@@ -24,6 +24,7 @@ type EventBus interface {
 }
 
 type eventBus struct {
+	logger   *logger.Logger
 	handlers map[string][]Handler // Armazena handlers
 	lock     sync.RWMutex
 }
@@ -31,6 +32,7 @@ type eventBus struct {
 func New() EventBus {
 	return &eventBus{
 		handlers: make(map[string][]Handler),
+		logger:   logger.New("EventBus"),
 	}
 }
 
@@ -40,7 +42,7 @@ func (eb *eventBus) Subscribe(eventName string, handler Handler) {
 	defer eb.lock.Unlock()
 
 	eb.handlers[eventName] = append(eb.handlers[eventName], handler)
-	applog.Info.Printf("Event subscribed %v", eventName)
+	eb.logger.Infof("Event %s subscribed", eventName)
 }
 
 // Publish dispara um evento para todos os handlers associados
@@ -49,7 +51,7 @@ func (eb *eventBus) Publish(event Event) {
 	defer eb.lock.RUnlock()
 
 	if handlers, ok := eb.handlers[event.GetName()]; ok {
-		applog.Info.Printf("Event published %v", event.GetName())
+		eb.logger.Infof("Event %v published", event.GetName())
 		for _, handle := range handlers {
 			go handle.Handle(event)
 		}
@@ -60,7 +62,7 @@ func (eb *eventBus) Publish(event Event) {
 func (eb *eventBus) CreateAndPublish(event Event, payload any) {
 	data, err := json.Marshal(payload)
 	if err != nil {
-		applog.Info.Printf("error on serialize the payload: %v", err)
+		eb.logger.Errorf("Error on serialize the payload: %v", err)
 	}
 
 	event.SetPayload(data)
