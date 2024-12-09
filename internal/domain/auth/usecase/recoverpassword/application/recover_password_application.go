@@ -47,7 +47,10 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 	}
 
 	//TODO: invoke a new service to get random code
-	uc.codeService.GetRandomCode(8)
+	_, errCode := uc.codeService.GetRandomCode(8)
+	if errCode != nil {
+		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, errCode)
+	}
 	//TODO: save user_email (username), user_firstname, recovery_link and recovery_code with specific key in cache by a hour
 	//TODO: publish event RecoverPasswordStarted with key cache
 	//TODO: return success with message
