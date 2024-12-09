@@ -105,3 +105,14 @@ func Test_GivenRecoverPasswordExecute_WhenGetByUserNameSuccess_ThenEnsureCallGet
 	// Assert
 	verify.Should(t, codeSpy.Params["GetRandomCode:length"]).Be(8)
 }
+
+func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, _, _, _, codeSpy := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, codeSpy.CallsCount["GetRandomCode"]).Be(1)
+}
