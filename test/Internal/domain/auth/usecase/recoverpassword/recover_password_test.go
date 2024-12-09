@@ -33,3 +33,14 @@ func Test_GivenRecoverPasswordExecute_WhenValidInput_ThenEnsureCallHashWithSaltW
 	verify.Should(t, hasherSpy.Params["HashWithSalt:inputText"]).Be(expectedInput.Username)
 	verify.Should(t, bytes.Equal(hasherSpy.Params["HashWithSalt:serverSalt"].([]byte), settingsSpy.GetServerSalt())).BeTrue()
 }
+
+func Test_GivenRecoverPasswordExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, hasherSpy, _ := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, hasherSpy.CallsCount["HashWithSalt"]).Be(1)
+}
