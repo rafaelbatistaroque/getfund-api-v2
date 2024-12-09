@@ -17,39 +17,39 @@ type recoverPasswordApplication struct {
 	eventBus eventbus.EventBus
 }
 
-func New(hasher security.Hasher, settings settings.ApplicationSettings) recoverpassword.UseCase {
+func New(hasher security.Hasher, settings settings.ApplicationSettings, userRepository auth_contract.UserRepository) recoverpassword.UseCase {
 
 	return &recoverPasswordApplication{
 		hasher:         hasher,
 		settings:       settings,
-		userRepository: nil,
+		userRepository: userRepository,
 		eventBus:       nil,
 	}
 }
 
 func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*recoverpassword.Output, *resultapp.ApplicationError) {
-	//fail fast validation
 	input.Validate()
 	if input.IsInvalid() {
 		return nil, resultapp.New(resultapp.BAD_REQUEST_CODE, input.GetErrors())
 	}
 
-	_, err := uc.hasher.HashWithSalt(input.Username, uc.settings.GetServerSalt())
+	usernameHashed, err := uc.hasher.HashWithSalt(input.Username, uc.settings.GetServerSalt())
 	if err != nil {
 		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, err)
 	}
 
-	//decrypt username with hasher
-	//get user in repository with repository
-	//invoke a new service to get random code
-	//save user_email, user_firstname, recovery_link and recovery_code with specific key in cache by a hour
-	//publish event RecoverPasswordStarted with key cache
-	//return success with message
+	//TODO: get user in repository with repository
+	uc.userRepository.GetByUserName(usernameHashed)
+
+	//TODO: invoke a new service to get random code
+	//TODO: save user_email, user_firstname, recovery_link and recovery_code with specific key in cache by a hour
+	//TODO: publish event RecoverPasswordStarted with key cache
+	//TODO: return success with message
 
 	//Handler
-	//recover data cached by key received
-	//build a email template with params to replace
-	//replace specific
-	//send email
+	//TODO: recover data cached by key received
+	//TODO: build a email template with params to replace
+	//TODO: replace specific
+	//TODO: send email
 	return nil, nil
 }
