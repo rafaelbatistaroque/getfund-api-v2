@@ -1,4 +1,4 @@
-package signinapplicationfixtures
+package signinapplicationfixture_test
 
 import (
 	"fmt"
