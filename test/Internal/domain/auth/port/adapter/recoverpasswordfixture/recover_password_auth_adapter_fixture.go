@@ -46,7 +46,7 @@ func GetRecoverPasswordInputSerialized() string {
 }
 
 func GetRecoverPasswordInput() *recoverpassword.Input {
-	return &recoverpassword.Input{UserName: "fake-username"}
+	return &recoverpassword.Input{Username: "fake-username"}
 }
 
 func (s *recoverPasswordUsecaseSpy) DefineError() {

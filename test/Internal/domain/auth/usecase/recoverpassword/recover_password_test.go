@@ -1,0 +1,21 @@
+package recoverpassword_test
+
+import (
+	"getfund-api-v2/pkg/verify"
+	fixture "getfund-api-v2/test/internal/domain/auth/usecase/recoverpassword/recoverpasswordfixture"
+	"testing"
+)
+
+func Test_GivenRecoverPasswordExecute_WhenInputTokenInvalid_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	invalidInput, expectedError := fixture.GetInvalidInputWithError()
+	sut, _, _ := fixture.NewSut()
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err).NotNil()
+	verify.Should(t, err.Code).Be(expectedError.Code)
+	verify.Should(t, err.Message).Be(expectedError.Message)
+}
