@@ -11,7 +11,7 @@ import (
 func Test_GivenRecoverPasswordExecute_WhenInputTokenInvalid_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	invalidInput, expectedError := fixture.GetInvalidInputWithError()
-	sut, _, _ := fixture.NewSut()
+	sut, _, _, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -25,7 +25,7 @@ func Test_GivenRecoverPasswordExecute_WhenInputTokenInvalid_ThenEnsureReturnErro
 func Test_GivenRecoverPasswordExecute_WhenValidInput_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedInput := fixture.GetValidInput()
-	sut, hasherSpy, settingsSpy := fixture.NewSut()
+	sut, hasherSpy, settingsSpy, _ := fixture.NewSut()
 
 	// Act
 	sut.Execute(expectedInput)
@@ -37,7 +37,7 @@ func Test_GivenRecoverPasswordExecute_WhenValidInput_ThenEnsureCallHashWithSaltW
 
 func Test_GivenRecoverPasswordExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
-	sut, hasherSpy, _ := fixture.NewSut()
+	sut, hasherSpy, _, _ := fixture.NewSut()
 
 	// Act
 	sut.Execute(fixture.GetValidInput())
@@ -48,7 +48,7 @@ func Test_GivenRecoverPasswordExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnc
 
 func Test_GivenRecoverPasswordExecute_WhenHashWithSaltError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut, hasherSpy, _ := fixture.NewSut()
+	sut, hasherSpy, _, _ := fixture.NewSut()
 	hasherSpy.DefineHashWithSaltError()
 
 	// Act
@@ -57,4 +57,16 @@ func Test_GivenRecoverPasswordExecute_WhenHashWithSaltError_ThenEnsureReturnErro
 	// Assert
 	verify.Should(t, err.Code).Be(resultapp.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(hasherSpy.ErrorResult["HashWithSalt"])
+}
+
+func Test_GivenRecoverPasswordExecute_WhenHashWithSaltSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, hasherSpy, _, userRepoSpy := fixture.NewSut()
+	hasherSpy.DefineHashWithSaltSuccess("fake-success-result")
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, userRepoSpy.Params["GetByUserName:username"]).Be(hasherSpy.SuccessResult["HashWithSalt"])
 }
