@@ -14,7 +14,7 @@ func NewSut() (recoverpassword.UseCase, *securityspy.HasherSpy, *settingsspy.App
 	hasherSpy := securityspy.New()
 	settingsSpy := settingsspy.New()
 
-	return sut.New(hasherSpy), hasherSpy, settingsSpy
+	return sut.New(hasherSpy, settingsSpy), hasherSpy, settingsSpy
 }
 
 func GetInvalidInputWithError() (*recoverpassword.Input, *resultapp.ApplicationError) {
