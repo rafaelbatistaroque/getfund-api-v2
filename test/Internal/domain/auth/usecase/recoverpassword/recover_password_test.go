@@ -71,6 +71,17 @@ func Test_GivenRecoverPasswordExecute_WhenHashWithSaltSuccess_ThenEnsureCallGetB
 	verify.Should(t, userRepoSpy.Params["GetByUserName:username"]).Be(hasherSpy.SuccessResult["HashWithSalt"])
 }
 
+func Test_GivenRecoverPasswordExecute_WhenGetByUserNameInvoked_ThenEnsureCalssOnce(t *testing.T) {
+	// Arrange
+	sut, _, _, userRepoSpy := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, userRepoSpy.CallsCount["GetByUserName"]).Be(1)
+}
+
 func Test_GivenRecoverPasswordExecute_WhenGetByUserNameError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, _, _, userRepoSpy := fixture.NewSut()
