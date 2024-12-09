@@ -116,3 +116,16 @@ func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOn
 	// Assert
 	verify.Should(t, codeSpy.CallsCount["GetRandomCode"]).Be(1)
 }
+
+func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeError_ThenEnsureReturnErrorFromWithServerErrorCode(t *testing.T) {
+	// Arrange
+	sut, _, _, _, codeSpy := fixture.NewSut()
+	codeSpy.DefineGetRandomCodeError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(resultapp.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(codeSpy.ErrorResult["GetRandomCode"])
+}
