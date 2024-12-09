@@ -27,10 +27,10 @@ func New(context string) *Logger {
 	logger := log.New(writer, context, log.Ldate|log.Ltime|log.Lshortfile)
 
 	return &Logger{
-		debug:   log.New(writer, "DEBUG: ", logger.Flags()),
-		info:    log.New(writer, "INFO: ", logger.Flags()),
-		warning: log.New(writer, "WARNING: ", logger.Flags()),
-		err:     log.New(writer, "ERRO: ", logger.Flags()),
+		debug:   log.New(writer, "[DEBUG]: ", logger.Flags()),
+		info:    log.New(writer, "[INFO]: ", logger.Flags()),
+		warning: log.New(writer, "[WARNING]: ", logger.Flags()),
+		err:     log.New(writer, "[ERRO]: ", logger.Flags()),
 		context: context,
 	}
 }
