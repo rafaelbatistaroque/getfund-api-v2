@@ -34,7 +34,10 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, resultapp.New(resultapp.BAD_REQUEST_CODE, input.GetErrors())
 	}
 
-	uc.hasher.HashWithSalt(input.Username, uc.settings.GetServerSalt())
+	_, err := uc.hasher.HashWithSalt(input.Username, uc.settings.GetServerSalt())
+	if err != nil {
+		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, err)
+	}
 
 	//decrypt username with hasher
 	//get user in repository with repository
