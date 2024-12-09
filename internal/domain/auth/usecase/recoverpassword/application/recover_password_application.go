@@ -39,7 +39,10 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 	}
 
 	//TODO: get user in repository with repository
-	uc.userRepository.GetByUserName(usernameHashed)
+	_, errRepo := uc.userRepository.GetByUserName(usernameHashed)
+	if errRepo != nil {
+		return nil, resultapp.New(resultapp.NOT_FOUND_CODE, errRepo)
+	}
 
 	//TODO: invoke a new service to get random code
 	//TODO: save user_email, user_firstname, recovery_link and recovery_code with specific key in cache by a hour
