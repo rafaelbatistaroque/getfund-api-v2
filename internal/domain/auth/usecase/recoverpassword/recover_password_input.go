@@ -8,5 +8,11 @@ type Input = recoverPasswordInput
 
 type recoverPasswordInput struct {
 	validation.InputValidation
-	UserName string `json:"email"`
+	Username string `json:"email"`
+}
+
+func (i *recoverPasswordInput) Validate() {
+	if validation.IsNilOrEmpty(i.Username) {
+		i.AppendError("Username", validation.Err_Msg_PARAMETER_NOT_EMPTY.Error())
+	}
 }

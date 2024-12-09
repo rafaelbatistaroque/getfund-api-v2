@@ -15,8 +15,22 @@ type recoverPasswordApplication struct {
 	eventBus eventbus.EventBus
 }
 
+func New(hasher security.Hasher) recoverpassword.UseCase {
+
+	return &recoverPasswordApplication{
+		hasher:         hasher,
+		userRepository: nil,
+		eventBus:       nil,
+	}
+}
+
 func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*recoverpassword.Output, *resultapp.ApplicationError) {
 	//fail fast validation
+	input.Validate()
+	if input.IsInvalid() {
+		return nil, resultapp.New(resultapp.BAD_REQUEST_CODE, input.GetErrors())
+	}
+
 	//decrypt username with hasher
 	//get user in repository with repository
 	//invoke a new service to get random code
@@ -25,7 +39,7 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 	//return success with message
 
 	//Handler
-	//recover data cached received by key
+	//recover data cached by key received
 	//build a email template with params to replace
 	//replace specific
 	//send email
