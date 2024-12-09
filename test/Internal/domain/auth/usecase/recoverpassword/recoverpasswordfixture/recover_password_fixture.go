@@ -6,17 +6,19 @@ import (
 	sut "getfund-api-v2/internal/domain/auth/usecase/recoverpassword/application"
 	"getfund-api-v2/internal/shared/resultapp"
 	"getfund-api-v2/pkg/inputvalidation"
+	"getfund-api-v2/test/helper/codespy"
 	"getfund-api-v2/test/helper/securityspy"
 	"getfund-api-v2/test/helper/settingsspy"
 	"getfund-api-v2/test/helper/userrepositoryspy"
 )
 
-func NewSut() (recoverpassword.UseCase, *securityspy.HasherSpy, *settingsspy.ApplicationSettingsSpy, *userrepositoryspy.UserRepositorySpy) {
+func NewSut() (recoverpassword.UseCase, *securityspy.HasherSpy, *settingsspy.ApplicationSettingsSpy, *userrepositoryspy.UserRepositorySpy, *codespy.CodeSpy) {
 	hasherSpy := securityspy.New()
 	settingsSpy := settingsspy.New()
 	userRepoSpy := userrepositoryspy.New()
+	codeSpy := codespy.New()
 
-	return sut.New(hasherSpy, settingsSpy, userRepoSpy), hasherSpy, settingsSpy, userRepoSpy
+	return sut.New(hasherSpy, settingsSpy, userRepoSpy, codeSpy), hasherSpy, settingsSpy, userRepoSpy, codeSpy
 }
 
 func GetInvalidInputWithError() (*recoverpassword.Input, *resultapp.ApplicationError) {
