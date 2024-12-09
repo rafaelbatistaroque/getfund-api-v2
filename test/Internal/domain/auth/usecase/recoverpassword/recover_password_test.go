@@ -2,6 +2,7 @@ package recoverpassword_test
 
 import (
 	"bytes"
+	"getfund-api-v2/internal/shared/resultapp"
 	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/auth/usecase/recoverpassword/recoverpasswordfixture"
 	"testing"
@@ -43,4 +44,17 @@ func Test_GivenRecoverPasswordExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnc
 
 	// Assert
 	verify.Should(t, hasherSpy.CallsCount["HashWithSalt"]).Be(1)
+}
+
+func Test_GivenRecoverPasswordExecute_WhenHashWithSaltError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, hasherSpy, _ := fixture.NewSut()
+	hasherSpy.DefineHashWithSaltError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(resultapp.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(hasherSpy.ErrorResult["HashWithSalt"])
 }
