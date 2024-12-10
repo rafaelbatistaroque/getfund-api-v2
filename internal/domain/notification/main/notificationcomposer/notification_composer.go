@@ -1,14 +1,14 @@
 package notificationcomposer
 
 import (
-	handler "getfund-api-v2/internal/domain/notification/port/eventhandler/newsletter"
+	recoverpasswordeventhandler "getfund-api-v2/internal/domain/notification/port/eventhandler/recoverpassword"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/pkg/eventbus"
 )
 
 func SubscribeEventHandlers(settings settings.ApplicationSettings, eventBus eventbus.EventBus) {
 	handlers := map[string]eventbus.Handler{
-		"UserSignedEvent": handler.New(),
+		"RecoverPasswordStartedEvent": recoverpasswordeventhandler.New(),
 	}
 
 	for eventName, handler := range handlers {

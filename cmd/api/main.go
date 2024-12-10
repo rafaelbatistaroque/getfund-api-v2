@@ -8,6 +8,7 @@ import (
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cacheservice"
+	"getfund-api-v2/internal/shared/service/codeservice"
 	"getfund-api-v2/internal/shared/service/sessionservice"
 	"getfund-api-v2/pkg/eventbus"
 	redisconfig "getfund-api-v2/pkg/redis"
@@ -28,6 +29,7 @@ func main() {
 	//Services
 	cacheService := cacheservice.New(redis, ctx)
 	sessionService := sessionservice.New(cacheService, security.New(), appSettings)
+	codeService := codeservice.New(security.New(), appSettings)
 
 	defer cacheService.Close()
 
@@ -41,9 +43,10 @@ func main() {
 
 		//Auth
 		authMiddleware := authMiddleware.New(sessionService)
-		authHandlers := authComposer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus)
+		authHandlers := authComposer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus, codeService)
 		api.Post("/sign-in", authHandlers.Signin)
 		api.With(authMiddleware.Authenticate).Get("/sign-out", authHandlers.Signout)
+		api.Post("/recover-password", authHandlers.RecoverPassword)
 	})
 
 	http.ListenAndServe(appSettings.GetPort(), r)

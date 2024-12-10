@@ -2,6 +2,7 @@ package cacheservice
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -27,7 +28,20 @@ func New(redis *redis.Client, context context.Context) Cache {
 }
 
 func (c *cacheService) Set(key string, value interface{}, time time.Duration) error {
-	return c.redis.SetEx(c.context, key, value, time).Err()
+	var data []byte
+	var err error
+
+	switch typeData := value.(type) {
+	case string:
+		data = []byte(typeData)
+	default:
+		data, err = json.Marshal(value)
+		if err != nil {
+			return err
+		}
+	}
+
+	return c.redis.SetEx(c.context, key, data, time).Err()
 }
 
 func (c *cacheService) Get(key string) (string, error) {

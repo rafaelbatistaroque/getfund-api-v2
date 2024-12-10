@@ -19,6 +19,8 @@ const (
 	HASH_LENGTH          = 64
 	MERGE_HASHING_LENGTH = HASH_LENGTH + (SIZE_SALT * 2)
 	BYTES_LENGTH         = 32
+	ENTRANCE_CODE        = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	CODE_LENGTH          = 8
 )
 
 type Hasher interface {
@@ -60,8 +62,8 @@ func (s *hasher) HashWithSalt(inputText string, serverSalt []byte) (string, erro
 	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
-// Gera um hash com salt
-func hash(inputText string, serverSalt []byte) (*hashing, error) {
+// Gera um Hash com salt
+func Hash(inputText string, serverSalt []byte) (*hashing, error) {
 	entrySalt := make([]byte, SIZE_SALT)
 	if _, err := io.ReadFull(rand.Reader, entrySalt); err != nil {
 		return nil, err
@@ -96,7 +98,7 @@ func (s *hasher) Encrypt(input string, secretKey []byte) string {
 
 // Mescla o salt e os dados do hash
 func (s *hasher) HashAndMerge(input string, serverSalt []byte) string {
-	hashing, err := hash(input, serverSalt)
+	hashing, err := Hash(input, serverSalt)
 	if err != nil {
 		panic(err)
 	}

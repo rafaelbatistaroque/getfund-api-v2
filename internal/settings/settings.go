@@ -32,6 +32,7 @@ type smtpData struct {
 
 func (s *applicationSettings) GetPort() string       { return s.port }
 func (s *applicationSettings) GetApiUrl() string     { return s.apiUrl }
+func (s *applicationSettings) GetBaseUrl() string    { return s.baseUrl }
 func (s *applicationSettings) GetServerSalt() []byte { return s.serverSalt }
 func (s *applicationSettings) GetSecretKey() []byte  { return s.secretKey }
 func (s *applicationSettings) GetAddrRedis() string  { return s.addrRedis }
