@@ -9,6 +9,19 @@ import (
 	"github.com/google/uuid"
 )
 
+func Test_GivenCacheSet_WhenMarshalError_ThenEnsureSetCorrectValues(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidValue := map[interface{}]interface{}{123: "invalid-value"}
+	defer sut.Close()
+
+	// Act
+	err := sut.Set(uuid.NewString(), invalidValue, 1*time.Second)
+
+	// Assert
+	verify.Should(t, err).NotNil()
+}
+
 func Test_GivenCacheSet_WhenSuccess_ThenEnsureSetCorrectValues(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()

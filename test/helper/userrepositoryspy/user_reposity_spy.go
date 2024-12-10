@@ -26,7 +26,8 @@ func (r *UserRepositorySpy) GetByUserName(username string) (*model.UserModel, er
 	if sucess != nil {
 		return sucess.(*model.UserModel), r.ErrorResult["GetByUserName"]
 	}
-	return nil, r.ErrorResult["GetByUserName"]
+	r.DefineSuccess()
+	return r.SuccessResult["GetByUserName"].(*model.UserModel), r.ErrorResult["GetByUserName"]
 }
 
 func (r *UserRepositorySpy) DefineError() {
@@ -34,5 +35,5 @@ func (r *UserRepositorySpy) DefineError() {
 }
 
 func (r *UserRepositorySpy) DefineSuccess() {
-	r.SuccessResult["GetByUserName"] = &model.UserModel{Password: "fake-password-hashed"}
+	r.SuccessResult["GetByUserName"] = &model.UserModel{Password: "fake-password-hashed", FirstName: "fake-username", Id: "fake-id", IsAdmin: 0}
 }
