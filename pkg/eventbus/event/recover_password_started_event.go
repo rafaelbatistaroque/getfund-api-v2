@@ -1,17 +1,17 @@
 package event
 
-type RecoverPasswordStartedEvent struct {
+type RecoverPasswordStarted struct {
 	payload []byte
 }
 
-func (e *RecoverPasswordStartedEvent) GetName() string {
+func (e *RecoverPasswordStarted) GetName() string {
 	return "RecoverPasswordStartedEvent"
 }
 
-func (e *RecoverPasswordStartedEvent) GetPayload() []byte {
+func (e *RecoverPasswordStarted) GetPayload() []byte {
 	return e.payload
 }
 
-func (e *RecoverPasswordStartedEvent) SetPayload(payload []byte) {
+func (e *RecoverPasswordStarted) SetPayload(payload []byte) {
 	e.payload = payload
 }

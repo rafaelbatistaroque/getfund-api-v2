@@ -8,7 +8,7 @@ import (
 
 func SubscribeEventHandlers(settings settings.ApplicationSettings, eventBus eventbus.EventBus) {
 	handlers := map[string]eventbus.Handler{
-		"RecoverPasswordStartedEvent": recoverpasswordeventhandler.New(),
+		"RecoverPasswordStarted": recoverpasswordeventhandler.New(),
 	}
 
 	for eventName, handler := range handlers {

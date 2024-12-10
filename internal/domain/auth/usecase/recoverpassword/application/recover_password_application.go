@@ -77,7 +77,7 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, resultapp.New(resultapp.SERVER_ERROR_CODE, cacheErr)
 	}
 
-	uc.eventBus.CreateAndPublish(&event.RecoverPasswordStartedEvent{}, keyCache)
+	uc.eventBus.CreateAndPublish(&event.RecoverPasswordStarted{}, keyCache)
 
 	return &recoverpassword.RecoverPasswordOutput{Message: "recover password started"}, nil
 }
