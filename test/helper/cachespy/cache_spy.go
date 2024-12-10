@@ -18,7 +18,7 @@ func New() *RedisCacheSpy {
 	return &RedisCacheSpy{Params: make(map[string]interface{}), CallsCount: make(map[string]int), SuccessResult: make(map[string]interface{}), ErrorResult: make(map[string]error)}
 }
 
-func (r *RedisCacheSpy) Set(key string, value string, time time.Duration) error {
+func (r *RedisCacheSpy) Set(key string, value interface{}, time time.Duration) error {
 	r.Params["Set:key"] = key
 	r.Params["Set:value"] = value
 	r.Params["Set:time"] = time

@@ -8,7 +8,7 @@ import (
 )
 
 type Cache interface {
-	Set(key string, value string, time time.Duration) error
+	Set(key string, value interface{}, time time.Duration) error
 	Get(key string) (string, error)
 	Delete(key string) error
 	Close() error
@@ -26,7 +26,7 @@ func New(redis *redis.Client, context context.Context) Cache {
 	}
 }
 
-func (c *cacheService) Set(key string, value string, time time.Duration) error {
+func (c *cacheService) Set(key string, value interface{}, time time.Duration) error {
 	return c.redis.SetEx(c.context, key, value, time).Err()
 }
 
