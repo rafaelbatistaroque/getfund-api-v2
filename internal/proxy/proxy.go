@@ -2,20 +2,20 @@ package proxy
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/shared/resultapp"
+	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
 )
 
 var httpCodeMap = map[int]int{
-	resultapp.SUCCESS_CODE:             http.StatusOK,                  // 200
-	resultapp.UNAUTHORIZED_CODE:        http.StatusUnauthorized,        // 401
-	resultapp.DUPLICATED_ENTRY_CODE:    http.StatusConflict,            // 409
-	resultapp.NOT_FOUND_CODE:           http.StatusNotFound,            // 404
-	resultapp.SERVER_ERROR_CODE:        http.StatusInternalServerError, // 500
-	resultapp.CONSTRAINT_VIOLATED_CODE: http.StatusBadRequest,          // 400
-	resultapp.BAD_REQUEST_CODE:         http.StatusBadRequest,          // 400
-	resultapp.UNAVAILABLE_CODE:         http.StatusServiceUnavailable,  // 503
-	resultapp.UNMODIFIED_CODE:          http.StatusNotModified,         // 304
+	result_app.SUCCESS_CODE:             http.StatusOK,                  // 200
+	result_app.UNAUTHORIZED_CODE:        http.StatusUnauthorized,        // 401
+	result_app.DUPLICATED_ENTRY_CODE:    http.StatusConflict,            // 409
+	result_app.NOT_FOUND_CODE:           http.StatusNotFound,            // 404
+	result_app.SERVER_ERROR_CODE:        http.StatusInternalServerError, // 500
+	result_app.CONSTRAINT_VIOLATED_CODE: http.StatusBadRequest,          // 400
+	result_app.BAD_REQUEST_CODE:         http.StatusBadRequest,          // 400
+	result_app.UNAVAILABLE_CODE:         http.StatusServiceUnavailable,  // 503
+	result_app.UNMODIFIED_CODE:          http.StatusNotModified,         // 304
 }
 
 type handleFunc func(http.ResponseWriter, *http.Request) (interface{}, int, error)

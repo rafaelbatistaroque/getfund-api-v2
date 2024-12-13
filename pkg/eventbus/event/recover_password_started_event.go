@@ -5,7 +5,7 @@ type RecoverPasswordStarted struct {
 }
 
 func (e *RecoverPasswordStarted) GetName() string {
-	return "RecoverPasswordStartedEvent"
+	return "RecoverPasswordStarted"
 }
 
 func (e *RecoverPasswordStarted) GetPayload() []byte {

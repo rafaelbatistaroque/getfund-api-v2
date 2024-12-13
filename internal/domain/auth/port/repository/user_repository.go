@@ -2,8 +2,8 @@ package authuserrepository
 
 import (
 	"errors"
-	auth_contract "getfund-api-v2/internal/domain/auth/contract"
-	model "getfund-api-v2/internal/domain/auth/model"
+	auth_contract "getfund-api-v2/internal/domain/auth/adapter/contract"
+	model "getfund-api-v2/internal/domain/auth/adapter/model"
 
 	"gorm.io/gorm"
 )

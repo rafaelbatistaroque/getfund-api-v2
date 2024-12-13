@@ -2,14 +2,14 @@ package main
 
 import (
 	"context"
-	authComposer "getfund-api-v2/internal/domain/auth/main/composer"
-	notificationComposer "getfund-api-v2/internal/domain/notification/main/notificationcomposer"
-	authMiddleware "getfund-api-v2/internal/middleware/authmiddleware"
+	auth_composer "getfund-api-v2/internal/domain/auth/main/composer"
+	"getfund-api-v2/internal/domain/notification/main/notification_composer"
+	"getfund-api-v2/internal/middleware/auth_middleware"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/security"
-	"getfund-api-v2/internal/shared/service/cacheservice"
-	"getfund-api-v2/internal/shared/service/codeservice"
-	"getfund-api-v2/internal/shared/service/sessionservice"
+	"getfund-api-v2/internal/shared/service/cache_service"
+	"getfund-api-v2/internal/shared/service/code_service"
+	"getfund-api-v2/internal/shared/service/session_service"
 	"getfund-api-v2/pkg/eventbus"
 	redisconfig "getfund-api-v2/pkg/redis"
 	sqlitedb "getfund-api-v2/pkg/sqlite"
@@ -27,14 +27,17 @@ func main() {
 	redis := redisconfig.New(ctx, appSettings)
 
 	//Services
-	cacheService := cacheservice.New(redis, ctx)
-	sessionService := sessionservice.New(cacheService, security.New(), appSettings)
-	codeService := codeservice.New(security.New(), appSettings)
+	cacheService := cache_service.New(redis, ctx)
+	sessionService := session_service.New(cacheService, security.New(), appSettings)
+	codeService := code_service.New(security.New(), appSettings)
 
 	defer cacheService.Close()
 
 	//Subscriber
-	notificationComposer.SubscribeEventHandlers(appSettings, eventBus)
+	notification_composer.SubscribeEventHandlers(appSettings, eventBus, cacheService)
+
+	//Composer
+	authHandlers := auth_composer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus, codeService)
 
 	//Routes
 	r := chi.NewRouter()
@@ -42,8 +45,7 @@ func main() {
 		api.Get("/", HelloWorld)
 
 		//Auth
-		authMiddleware := authMiddleware.New(sessionService)
-		authHandlers := authComposer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus, codeService)
+		authMiddleware := auth_middleware.New(sessionService)
 		api.Post("/sign-in", authHandlers.Signin)
 		api.With(authMiddleware.Authenticate).Get("/sign-out", authHandlers.Signout)
 		api.Post("/recover-password", authHandlers.RecoverPassword)
