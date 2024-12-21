@@ -1,7 +1,6 @@
 package recover_password_started_event_handler
 
 import (
-	"encoding/json"
 	"getfund-api-v2/internal/domain/notification/adapter/usecase/send_recover_password_mail"
 	"getfund-api-v2/pkg/eventbus"
 	logger "getfund-api-v2/pkg/log"
@@ -20,12 +19,13 @@ func New(sendRecoverPasswordMail send_recover_password_mail.UseCase) eventbus.Ha
 }
 
 func (h *recoverPasswordStartedEventHandler) Handle(event eventbus.Event) {
-	var input send_recover_password_mail.Input
-
-	err := json.Unmarshal(event.GetPayload(), &input.KeyCache)
-	if err != nil || input.KeyCache == "" {
+	payload := string(event.GetPayload())
+	if payload == "" {
 		panic("Unmarshal failed")
 	}
+
+	input := &send_recover_password_mail.Input{KeyCache: payload}
+	h.sendRecoverPasswordMail.Execute(input)
 
 	//WIP: Handler
 	//TODO: recover data cached by key received
