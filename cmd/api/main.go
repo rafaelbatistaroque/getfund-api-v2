@@ -34,7 +34,7 @@ func main() {
 	defer cacheService.Close()
 
 	//Subscriber
-	notification_composer.SubscribeEventHandlers(appSettings, eventBus, cacheService)
+	notification_composer.SubscribeEventHandlers(appSettings, eventBus)
 
 	//Composer
 	authHandlers := auth_composer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus, codeService)

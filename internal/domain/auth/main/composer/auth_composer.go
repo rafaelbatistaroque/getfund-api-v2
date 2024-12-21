@@ -2,7 +2,7 @@ package auth_composer
 
 import (
 	"getfund-api-v2/internal/domain/auth/adapter/domain_service/auth_service"
-	"getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password/recover_password_application"
+	recover_password_application "getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password/application"
 	signin_application "getfund-api-v2/internal/domain/auth/adapter/usecase/signin/application"
 	signout_application "getfund-api-v2/internal/domain/auth/adapter/usecase/signout/application"
 	mapper "getfund-api-v2/internal/domain/auth/main/mapper/signin_mapper"
