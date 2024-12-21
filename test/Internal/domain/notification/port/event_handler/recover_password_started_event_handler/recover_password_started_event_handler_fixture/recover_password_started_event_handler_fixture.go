@@ -5,6 +5,7 @@ import (
 	sut "getfund-api-v2/internal/domain/notification/port/event_handler/recover_password_started_event_handler"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/eventbus"
+	"getfund-api-v2/pkg/eventbus/event"
 )
 
 type SendRecoverPasswordMailUsecaseSpy struct {
@@ -25,5 +26,24 @@ func NewSut() (eventbus.Handler, *SendRecoverPasswordMailUsecaseSpy) {
 }
 
 func (uc *SendRecoverPasswordMailUsecaseSpy) Execute(input *send_recover_password_mail.Input) (*send_recover_password_mail.Output, *result_app.ApplicationError) {
-	return nil, nil
+	uc.Params["Execute:input"] = input
+
+	uc.CallsCount["Execute"]++
+
+	return uc.SuccessResult["Execute"], uc.ErrorResult["Execute"]
+}
+
+func GetInvalidRecoverPasswordStartedEvent() *event.RecoverPasswordStarted {
+	return &event.RecoverPasswordStarted{}
+}
+
+func GetValidRecoverPasswordStartedEvent(withValue string) *event.RecoverPasswordStarted {
+	event := &event.RecoverPasswordStarted{}
+	event.SetPayload([]byte(withValue))
+
+	return event
+}
+
+func GetSendRecoverPasswordMailInput(withValue string) *send_recover_password_mail.Input {
+	return &send_recover_password_mail.Input{KeyCache: withValue}
 }

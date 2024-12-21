@@ -21,7 +21,7 @@ func New(sendRecoverPasswordMail send_recover_password_mail.UseCase) eventbus.Ha
 func (h *recoverPasswordStartedEventHandler) Handle(event eventbus.Event) {
 	payload := string(event.GetPayload())
 	if payload == "" {
-		panic("Unmarshal failed")
+		panic("get payload failed")
 	}
 
 	input := &send_recover_password_mail.Input{KeyCache: payload}
