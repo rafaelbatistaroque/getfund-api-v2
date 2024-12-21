@@ -3,7 +3,7 @@ package recover_password_fixture
 import (
 	"fmt"
 	"getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password"
-	sut "getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password/recover_password_application"
+	sut "getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password/application"
 	"getfund-api-v2/internal/shared/result_app"
 	inputvalidation "getfund-api-v2/pkg/input_validation"
 	"getfund-api-v2/test/helper/cache_spy"

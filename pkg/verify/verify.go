@@ -236,14 +236,14 @@ func (v *Verifier) LowerThan(threshold interface{}) *Verifier {
 }
 
 // ExpectPanic verifica se uma função causa um pânico
-func (v *Verifier) Panic(t *testing.T, fn func(), msg ...string) *Verifier {
+func (v *Verifier) Panic(fn func(), msg ...string) *Verifier {
 	defer func() {
 		if r := recover(); r == nil {
 			message := "Expected function to panic"
 			if len(msg) > 0 {
 				message = msg[0]
 			}
-			t.Errorf("%s: expected panic, but function did not panic", message)
+			v.t.Errorf("%s: expected panic, but function did not panic", message)
 		}
 	}()
 	fn()
@@ -252,14 +252,14 @@ func (v *Verifier) Panic(t *testing.T, fn func(), msg ...string) *Verifier {
 }
 
 // ExpectNotPanic verifica se uma função não causa um pânico
-func (v *Verifier) NotPanic(t *testing.T, fn func(), msg ...string) *Verifier {
+func (v *Verifier) NotPanic(fn func(), msg ...string) *Verifier {
 	defer func() {
 		if r := recover(); r != nil {
 			message := "Expected function to not panic"
 			if len(msg) > 0 {
 				message = msg[0]
 			}
-			t.Errorf("%s: expected no panic, but function panicked with %v", message, r)
+			v.t.Errorf("%s: expected no panic, but function panicked with %v", message, r)
 		}
 	}()
 	fn()
