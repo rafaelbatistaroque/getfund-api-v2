@@ -27,15 +27,9 @@ func (h *recoverPasswordStartedEventHandler) Handle(event eventbus.Event) {
 	input := &send_recover_password_mail.Input{KeyCache: payload}
 	success, err := h.sendRecoverPasswordMail.Execute(input)
 	if err != nil {
-		h.logger.Errorf("IsOk: False | Code: %d | Message: %s", err.Code, err.Message)
+		h.logger.Errorf("IsOk: False | %v", err)
 		return
 	}
 
-	h.logger.Infof("IsOk: True | Message: %s", success.Messagem)
-
-	//WIP: Handler
-	//TODO: recover data cached by key received
-	//TODO: build a email template with params to replace
-	//TODO: replace specific
-	//TODO: send email
+	h.logger.Infof("IsOk: True | %v", success)
 }
