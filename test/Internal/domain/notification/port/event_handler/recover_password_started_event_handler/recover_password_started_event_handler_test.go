@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func Test_GivenHandler_WhenUnmarshalError_ThenEnsurePanic(t *testing.T) {
+func Test_GivenHandler_WhenPayloadParseError_ThenEnsurePanic(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
 
@@ -16,7 +16,7 @@ func Test_GivenHandler_WhenUnmarshalError_ThenEnsurePanic(t *testing.T) {
 	verify.Should(t, nil).Panic(func() { sut.Handle(fixture.GetInvalidRecoverPasswordStartedEvent()) })
 }
 
-func Test_GivenHandler_WhenUnmarshalSuccess_ThenEnsureCAllUSecaseWithCorrectParameter(t *testing.T) {
+func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallUSecaseWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedPayload := uuid.NewString()
 	usecaseInput := fixture.GetSendRecoverPasswordMailInput(expectedPayload)
