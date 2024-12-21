@@ -1,8 +1,8 @@
-package recover_password_event_handler_fixture
+package recover_password_started_event_handler_fixture
 
 import (
 	"getfund-api-v2/internal/domain/notification/adapter/usecase/send_recover_password_mail"
-	sut "getfund-api-v2/internal/domain/notification/port/event_handler/recover_password_event_handler"
+	sut "getfund-api-v2/internal/domain/notification/port/event_handler/recover_password_started_event_handler"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/eventbus"
 )

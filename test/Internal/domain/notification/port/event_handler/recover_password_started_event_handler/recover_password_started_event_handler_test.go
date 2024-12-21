@@ -3,7 +3,7 @@ package recover_password_eventhandler_test
 import (
 	"getfund-api-v2/pkg/eventbus/event"
 	"getfund-api-v2/pkg/verify"
-	fixture "getfund-api-v2/test/internal/domain/notification/port/event_handler/recover_password_event_handler/recover_password_event_handler_fixture"
+	fixture "getfund-api-v2/test/internal/domain/notification/port/event_handler/recover_password_started_event_handler/recover_password_started_event_handler_fixture"
 	"testing"
 )
 
