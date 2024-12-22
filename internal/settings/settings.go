@@ -20,6 +20,7 @@ type applicationSettings struct {
 	stripeSecretKey string
 	masterToken     string
 	smtp            *smtpData
+	templateDir     string
 }
 
 type smtpData struct {
@@ -30,13 +31,14 @@ type smtpData struct {
 	passsword string
 }
 
-func (s *applicationSettings) GetPort() string       { return s.port }
-func (s *applicationSettings) GetApiUrl() string     { return s.apiUrl }
-func (s *applicationSettings) GetBaseUrl() string    { return s.baseUrl }
-func (s *applicationSettings) GetServerSalt() []byte { return s.serverSalt }
-func (s *applicationSettings) GetSecretKey() []byte  { return s.secretKey }
-func (s *applicationSettings) GetAddrRedis() string  { return s.addrRedis }
-func (s *applicationSettings) GetSMTPFrom() string   { return s.smtp.from }
+func (s *applicationSettings) GetPort() string        { return s.port }
+func (s *applicationSettings) GetApiUrl() string      { return s.apiUrl }
+func (s *applicationSettings) GetBaseUrl() string     { return s.baseUrl }
+func (s *applicationSettings) GetServerSalt() []byte  { return s.serverSalt }
+func (s *applicationSettings) GetSecretKey() []byte   { return s.secretKey }
+func (s *applicationSettings) GetAddrRedis() string   { return s.addrRedis }
+func (s *applicationSettings) GetSMTPFrom() string    { return s.smtp.from }
+func (s *applicationSettings) GetTemplateDir() string { return s.templateDir }
 
 func Load() settings.ApplicationSettings {
 	logger := logger.New("Settings")
@@ -75,6 +77,7 @@ func Load() settings.ApplicationSettings {
 			passsword: getEnv("SMTP_PASSWORD", ""),
 			userName:  getEnv("SMTP_USERNAME", ""),
 		},
+		templateDir: "internal/domain/notification/port/template_file",
 	}
 }
 

@@ -8,4 +8,5 @@ type ApplicationSettings interface {
 	GetServerSalt() []byte
 	GetSecretKey() []byte
 	GetSMTPFrom() string
+	GetTemplateDir() string
 }
