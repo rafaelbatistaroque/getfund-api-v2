@@ -34,6 +34,10 @@ func (t *TemplateFileSpy) DefineGetRecoveryPasswordTemplateSuccess() {
 	t.SuccessResult["GetRecoveryPasswordTemplate"] = "<div>{{first_name}}</div><div>{{recovery_link}}</div>"
 }
 
+func (t *TemplateFileSpy) GetRecoveryPasswordTemplateReplaced(firstName, recoveryLink string) string {
+	return "<div>" + firstName + "</div><div>" + recoveryLink + "</div>"
+}
+
 func (t *TemplateFileSpy) DefineGetRecoveryPasswordTemplateError() {
 	t.ErrorResult["GetRecoveryPasswordTemplate"] = errors.New("fake-error")
 }

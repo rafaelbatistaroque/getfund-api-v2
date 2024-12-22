@@ -72,3 +72,21 @@ func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnAppl
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.TemplateFileSpy.ErrorResult["GetRecoveryPasswordTemplate"])
 }
+
+func Test_GivenExecute_WhenGotTemplateAndRecoveryPasswordModel_ThenEnsureSendMailWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+	data, expectedValue := fixture.GetValidRecoverPasswordModeToSendMail()
+	spies.CacheSpy.DefineCacheGetSuccessWithValue(expectedValue)
+	spies.TemplateFileSpy.DefineGetRecoveryPasswordTemplateSuccess()
+	templateReplaced := spies.TemplateFileSpy.GetRecoveryPasswordTemplateReplaced(data.FirstName, data.RecoveryLink)
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, spies.MailSpy.Params["SendMail:to"]).Be(data.Username)
+	verify.Should(t, spies.MailSpy.Params["SendMail:from"]).Be(spies.SettingsSpy.GetSMTPFrom())
+	verify.Should(t, spies.MailSpy.Params["SendMail:subject"]).Be("Password Recovery")
+	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
+}

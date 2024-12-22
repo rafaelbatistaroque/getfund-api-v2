@@ -18,13 +18,13 @@ func New() *MailServiceSpy {
 }
 
 func (s *MailServiceSpy) SendMail(from, to, subject, content string, replyTo []string) error {
-	s.Params["Send:from"] = to
-	s.Params["Send:to"] = to
-	s.Params["Send:subject"] = subject
-	s.Params["Send:content"] = content
-	s.Params["Send:replyTo"] = replyTo
+	s.Params["SendMail:from"] = from
+	s.Params["SendMail:to"] = to
+	s.Params["SendMail:subject"] = subject
+	s.Params["SendMail:content"] = content
+	s.Params["SendMail:replyTo"] = replyTo
 
-	s.CallsCount["Send"]++
+	s.CallsCount["SendMail"]++
 
-	return s.ErrorResult["Send"]
+	return s.ErrorResult["SendMail"]
 }
