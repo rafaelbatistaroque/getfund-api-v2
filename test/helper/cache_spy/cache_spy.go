@@ -33,6 +33,7 @@ func (r *RedisCacheSpy) DefineCacheGetError()    { r.ErrorResult["Get"] = errors
 func (r *RedisCacheSpy) DefineCacheGetSuccess() {
 	r.SuccessResult["Get"] = `{"fakeField": "fake-value"}`
 }
+func (r *RedisCacheSpy) DefineCacheGetSuccessWithValue(value string) { r.SuccessResult["Get"] = value }
 
 func (r *RedisCacheSpy) Get(key string) (string, error) {
 	r.Params["Get:key"] = key

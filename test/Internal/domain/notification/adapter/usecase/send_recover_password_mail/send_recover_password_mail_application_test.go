@@ -35,14 +35,26 @@ func Test_GivenExecute_WhenValidInput_ThenEnsureCallCacheWithCorrectParameter(t 
 
 func Test_GivenExecute_WhenCacheError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
-	validInput := fixture.GetValidInput()
 	sut, spies := fixture.NewSUT()
 	spies.CacheSpy.DefineCacheGetError()
 
 	// Act
-	_, err := sut.Execute(validInput)
+	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.CacheSpy.ErrorResult["Get"])
+}
+
+func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+	spies.CacheSpy.DefineCacheGetSuccessWithValue("invalid-serialized-json")
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
 }
