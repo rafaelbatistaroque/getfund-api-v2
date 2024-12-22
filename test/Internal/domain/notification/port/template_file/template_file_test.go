@@ -1,16 +1,14 @@
 package template_file_test
 
 import (
-	"getfund-api-v2/internal/domain/notification/port/template_file"
 	"getfund-api-v2/pkg/verify"
-	"getfund-api-v2/test/helper/settings_spy"
+	fixture "getfund-api-v2/test/internal/domain/notification/port/template_file/template_file_fixture"
 	"testing"
 )
 
 func Test_GivenGetRecoveryPasswordTemplate_WhenTemplateNotFound_ThenEnsureReturnCorrectError(t *testing.T) {
 	// Arrange
-	settingsSpy := settings_spy.New()
-	sut := template_file.New(settingsSpy)
+	sut, _ := fixture.NewSUT()
 
 	// Act
 	_, err := sut.GetRecoveryPasswordTemplate()
