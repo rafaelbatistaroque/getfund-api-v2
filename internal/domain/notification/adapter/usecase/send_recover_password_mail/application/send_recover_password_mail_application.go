@@ -3,21 +3,30 @@ package send_recover_password_mail_application
 import (
 	"encoding/json"
 	"errors"
+	template_file "getfund-api-v2/internal/domain/notification/adapter/contract"
+	"getfund-api-v2/internal/domain/notification/adapter/domain_service/mail_service"
 	notification_model "getfund-api-v2/internal/domain/notification/adapter/model"
 	"getfund-api-v2/internal/domain/notification/adapter/usecase/send_recover_password_mail"
+
+	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
 )
 
 type sendRecoverPasswordMailApplication struct {
 	cacheService cache_service.Cache
-	//email service
-	//settings
+	mailService  mail_service.MailService
+	settings     settings.ApplicationSettings
+	template     template_file.TemplateFile
+	//template service
 }
 
-func New(cacheService cache_service.Cache) send_recover_password_mail.UseCase {
+func New(cacheService cache_service.Cache, mailService mail_service.MailService, settings settings.ApplicationSettings, template template_file.TemplateFile) send_recover_password_mail.UseCase {
 	return &sendRecoverPasswordMailApplication{
 		cacheService: cacheService,
+		mailService:  mailService,
+		settings:     settings,
+		template:     template,
 	}
 }
 
@@ -36,6 +45,12 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 	errUnmarshal := json.Unmarshal([]byte(userCached), userToRecoverPasswordMailModel)
 	if errUnmarshal != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
+	}
+
+	_, errTemplate := uc.template.GetRecoveryPasswordTemplate()
+	if errTemplate != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errTemplate)
+
 	}
 
 	return nil, nil
