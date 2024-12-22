@@ -67,5 +67,5 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}
 
-	return nil, nil
+	return &send_recover_password_mail.Output{Messagem: "Email sent successfully"}, nil
 }
