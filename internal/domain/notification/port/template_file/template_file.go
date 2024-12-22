@@ -17,10 +17,10 @@ func New(settings settings.ApplicationSettings) *templateFile {
 }
 
 func (t *templateFile) GetRecoveryPasswordTemplate() (string, error) {
-	_, err := os.ReadFile(t.settings.GetTemplateDir() + "/recovery_password.html")
+	template, err := os.ReadFile(t.settings.GetTemplateDir() + "/recovery_password_template.html")
 	if err != nil {
 		return "", errors.New("template does not exist")
 	}
 
-	return "", nil
+	return string(template), nil
 }

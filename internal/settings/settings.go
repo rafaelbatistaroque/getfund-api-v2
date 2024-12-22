@@ -77,7 +77,7 @@ func Load() settings.ApplicationSettings {
 			passsword: getEnv("SMTP_PASSWORD", ""),
 			userName:  getEnv("SMTP_USERNAME", ""),
 		},
-		templateDir: "internal/domain/notification/port/template_file",
+		templateDir: "../../internal/domain/notification/port/template",
 	}
 }
 
