@@ -1,6 +1,9 @@
 package send_recover_password_mail_application
 
 import (
+	"encoding/json"
+	"errors"
+	notification_model "getfund-api-v2/internal/domain/notification/adapter/model"
 	"getfund-api-v2/internal/domain/notification/adapter/usecase/send_recover_password_mail"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
@@ -24,9 +27,15 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 		return nil, result_app.New(result_app.BAD_REQUEST_CODE, input.GetErrors())
 	}
 
-	_, errCache := uc.cacheService.Get(input.KeyCache)
+	userCached, errCache := uc.cacheService.Get(input.KeyCache)
 	if errCache != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCache)
+	}
+
+	userToRecoverPasswordMailModel := &notification_model.RecoverPasswordMailModel{}
+	errUnmarshal := json.Unmarshal([]byte(userCached), userToRecoverPasswordMailModel)
+	if errUnmarshal != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
 	}
 
 	return nil, nil
