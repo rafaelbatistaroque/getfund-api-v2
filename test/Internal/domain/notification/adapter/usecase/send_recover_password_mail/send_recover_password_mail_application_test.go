@@ -32,3 +32,17 @@ func Test_GivenExecute_WhenValidInput_ThenEnsureCallCacheWithCorrectParameter(t 
 	// Assert
 	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(validInput.KeyCache)
 }
+
+func Test_GivenExecute_WhenCacheError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
+	// Arrange
+	validInput := fixture.GetValidInput()
+	sut, spies := fixture.NewSUT()
+	spies.CacheSpy.DefineCacheGetError()
+
+	// Act
+	_, err := sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.CacheSpy.ErrorResult["Get"])
+}
