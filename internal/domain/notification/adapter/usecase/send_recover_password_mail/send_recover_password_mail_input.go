@@ -1,14 +1,14 @@
 package send_recover_password_mail
 
-import inputvalidation "getfund-api-v2/pkg/input_validation"
+import validation "getfund-api-v2/pkg/input_validation"
 
 type Input = sendRecoverPasswordMailInput
 
 type sendRecoverPasswordMailInput struct {
-	inputvalidation.InputValidation
+	validation.InputValidation
 	KeyCache string
 }
 
 func (i *sendRecoverPasswordMailInput) Validate() {
-
+	i.Required(i.KeyCache, "KeyCache")
 }
