@@ -65,9 +65,3 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 
 	return nil, nil
 }
-
-//WIP: Handler
-//TODO: recover data cached by key received
-//TODO: build a email template with params to replace
-//TODO: replace specific
-//TODO: send email
