@@ -3,6 +3,7 @@ package template_file_test
 import (
 	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/notification/port/template_file/template_file_fixture"
+	"os"
 	"testing"
 )
 
@@ -15,4 +16,25 @@ func Test_GivenGetRecoveryPasswordTemplate_WhenTemplateNotFound_ThenEnsureReturn
 
 	// Assert
 	verify.Should(t, err.Error()).Be("template does not exist")
+}
+
+func Test_GivenGetRecoveryPasswordTemplate_WhenTemplateFound_ThenEnsureReturnCorrectTemplate(t *testing.T) {
+	// Arrange
+	templateDir, _ := os.Getwd()
+	filePath := templateDir + "/recovery_password_template.html"
+	templateContent := "fake-template-content"
+	file, _ := os.Create(filePath)
+	file.WriteString(templateContent)
+
+	defer os.Remove(filePath)
+	defer file.Close()
+
+	sut, spies := fixture.NewSUT()
+	spies.SettingsSpy.SetTemplateDir(templateDir)
+
+	// Act
+	result, _ := sut.GetRecoveryPasswordTemplate()
+
+	// Assert
+	verify.Should(t, result).Be(templateContent)
 }
