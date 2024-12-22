@@ -24,7 +24,9 @@ func (i *InputValidation) GetErrors() error {
 	return errors.New(strings.Join(i.erros, "\n"))
 }
 
-// Adiciona o erro na lista de erros existentes
-func (i *InputValidation) AppendError(propertyName, erroMessagem string) {
-	i.erros = append(i.erros, fmt.Sprintf(erroMessagem, propertyName))
+// Adiciona o erro na lista de erros existentes se valor é nulo ou vazio
+func (i *InputValidation) Required(propetyValue, propertyName string) {
+	if isNilOrEmpty(propetyValue) {
+		i.erros = append(i.erros, fmt.Sprintf(Err_Msg_PARAMETER_NOT_EMPTY.Error(), propertyName))
+	}
 }

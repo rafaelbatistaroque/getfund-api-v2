@@ -6,7 +6,7 @@ import (
 )
 
 // IsNilOrEmpty verifica se um valor é nulo ou vazio
-func IsNilOrEmpty[T string | []string](value T) bool {
+func isNilOrEmpty[T string | []string](value T) bool {
 	switch v := any(value).(type) {
 	case string:
 		// Trim e verificar se a string está vazia

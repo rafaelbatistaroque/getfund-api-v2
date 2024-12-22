@@ -12,7 +12,5 @@ type recoverPasswordInput struct {
 }
 
 func (i *recoverPasswordInput) Validate() {
-	if validation.IsNilOrEmpty(i.Username) {
-		i.AppendError("Username", validation.Err_Msg_PARAMETER_NOT_EMPTY.Error())
-	}
+	i.Required(i.Username, "Username")
 }

@@ -10,7 +10,5 @@ type signoutInput struct {
 }
 
 func (i *signoutInput) Validate() {
-	if inputvalidation.IsNilOrEmpty(i.Token) {
-		i.AppendError("Token", inputvalidation.Err_Msg_PARAMETER_NOT_EMPTY.Error())
-	}
+	i.Required(i.Token, "Token")
 }

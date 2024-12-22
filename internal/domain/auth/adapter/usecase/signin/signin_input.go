@@ -13,11 +13,6 @@ type signinInput struct {
 }
 
 func (i *signinInput) Validate() {
-	if validation.IsNilOrEmpty(i.UserName) {
-		i.AppendError("UserName", validation.Err_Msg_PARAMETER_NOT_EMPTY.Error())
-	}
-
-	if validation.IsNilOrEmpty(i.Password) {
-		i.AppendError("Password", validation.Err_Msg_PARAMETER_NOT_EMPTY.Error())
-	}
+	i.Required(i.UserName, "UserName")
+	i.Required(i.Password, "Password")
 }
