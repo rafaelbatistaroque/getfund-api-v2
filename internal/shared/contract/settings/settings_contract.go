@@ -7,4 +7,5 @@ type ApplicationSettings interface {
 	GetAddrRedis() string
 	GetServerSalt() []byte
 	GetSecretKey() []byte
+	GetSMTPFrom() string
 }

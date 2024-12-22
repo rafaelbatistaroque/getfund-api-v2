@@ -58,3 +58,17 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnApplicationErrorWithSe
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
 }
+
+func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+	spies.CacheSpy.DefineCacheGetSuccessWithValue("{}")
+	spies.TemplateFileSpy.DefineGetRecoveryPasswordTemplateError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.TemplateFileSpy.ErrorResult["GetRecoveryPasswordTemplate"])
+}
