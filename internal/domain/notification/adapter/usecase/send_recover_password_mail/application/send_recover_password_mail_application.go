@@ -57,11 +57,15 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 	recoveryPasswordTemplate = strings.ReplaceAll(recoveryPasswordTemplate, "{{first_name}}", userToRecoverPasswordMailModel.FirstName)
 	recoveryPasswordTemplate = strings.ReplaceAll(recoveryPasswordTemplate, "{{recovery_link}}", userToRecoverPasswordMailModel.RecoveryLink)
 
-	uc.mailService.SendMail(
+	err := uc.mailService.SendMail(
 		uc.settings.GetSMTPFrom(),
 		userToRecoverPasswordMailModel.Username,
 		"Password Recovery",
 		recoveryPasswordTemplate, nil)
+
+	if err != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
+	}
 
 	return nil, nil
 }
