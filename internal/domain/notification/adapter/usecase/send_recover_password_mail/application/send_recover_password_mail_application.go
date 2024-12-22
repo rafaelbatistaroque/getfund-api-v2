@@ -24,7 +24,10 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 		return nil, result_app.New(result_app.BAD_REQUEST_CODE, input.GetErrors())
 	}
 
-	uc.cacheService.Get(input.KeyCache)
+	_, errCache := uc.cacheService.Get(input.KeyCache)
+	if errCache != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCache)
+	}
 
 	return nil, nil
 }
