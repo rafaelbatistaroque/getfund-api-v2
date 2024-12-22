@@ -62,7 +62,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnApplicationErrorWithSe
 func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccessWithValue("{}")
+	spies.CacheSpy.DefineCacheGetSuccess()
 	spies.TemplateFileSpy.DefineGetRecoveryPasswordTemplateError()
 
 	// Act
@@ -89,4 +89,18 @@ func Test_GivenExecute_WhenGotTemplateAndRecoveryPasswordModel_ThenEnsureSendMai
 	verify.Should(t, spies.MailSpy.Params["SendMail:from"]).Be(spies.SettingsSpy.GetSMTPFrom())
 	verify.Should(t, spies.MailSpy.Params["SendMail:subject"]).Be("Password Recovery")
 	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
+}
+
+func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+	spies.CacheSpy.DefineCacheGetSuccess()
+	spies.MailSpy.DefineSendMailError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.MailSpy.ErrorResult["SendMail"])
 }

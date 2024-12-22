@@ -1,5 +1,7 @@
 package mail_spy
 
+import "errors"
+
 type MailServiceSpy struct {
 	Params     map[string]interface{}
 	CallsCount map[string]int
@@ -27,4 +29,8 @@ func (s *MailServiceSpy) SendMail(from, to, subject, content string, replyTo []s
 	s.CallsCount["SendMail"]++
 
 	return s.ErrorResult["SendMail"]
+}
+
+func (s *MailServiceSpy) DefineSendMailError() {
+	s.ErrorResult["SendMail"] = errors.New("fake-error")
 }
