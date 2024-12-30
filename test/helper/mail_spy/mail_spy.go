@@ -19,8 +19,7 @@ func New() *MailServiceSpy {
 	}
 }
 
-func (s *MailServiceSpy) SendMail(from, to, subject, content string, replyTo []string) error {
-	s.Params["SendMail:from"] = from
+func (s *MailServiceSpy) SendMail(to, subject, content string, replyTo []string) error {
 	s.Params["SendMail:to"] = to
 	s.Params["SendMail:subject"] = subject
 	s.Params["SendMail:content"] = content

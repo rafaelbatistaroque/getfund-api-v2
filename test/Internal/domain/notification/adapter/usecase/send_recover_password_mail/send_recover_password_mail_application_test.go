@@ -86,7 +86,6 @@ func Test_GivenExecute_WhenGotTemplateAndRecoveryPasswordModel_ThenEnsureSendMai
 
 	// Assert
 	verify.Should(t, spies.MailSpy.Params["SendMail:to"]).Be(data.Username)
-	verify.Should(t, spies.MailSpy.Params["SendMail:from"]).Be(spies.SettingsSpy.GetSMTPFrom())
 	verify.Should(t, spies.MailSpy.Params["SendMail:subject"]).Be("Password Recovery")
 	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
 }
