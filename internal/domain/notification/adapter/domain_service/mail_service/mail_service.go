@@ -9,7 +9,7 @@ type MailService interface {
 }
 
 type mailService struct {
-	inputvalidation.InputValidation
+	params inputvalidation.InputValidation
 }
 
 func New() MailService {
@@ -17,10 +17,11 @@ func New() MailService {
 }
 
 func (ms *mailService) SendMail(to, subject, content string, replyTo []string) error {
-	ms.Required(to, "To")
-	ms.Required(subject, "Subject")
-	if ms.IsInvalid() {
-		return ms.GetErrors()
+	ms.params.Required(to, "To")
+	ms.params.Required(subject, "Subject")
+	ms.params.Required(content, "Content")
+	if ms.params.IsInvalid() {
+		return ms.params.GetErrors()
 	}
 
 	return nil
