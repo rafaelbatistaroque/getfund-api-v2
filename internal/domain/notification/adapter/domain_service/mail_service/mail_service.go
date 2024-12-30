@@ -32,5 +32,9 @@ func (ms *mailService) SendMail(to, subject, content string, replyTo []string) e
 	ms.message.SetHeader("To", to)
 	ms.message.SetHeader("Subject", subject)
 
+	if len(replyTo) > 0 {
+		ms.message.SetHeader("Reply-To", replyTo...)
+	}
+
 	return nil
 }
