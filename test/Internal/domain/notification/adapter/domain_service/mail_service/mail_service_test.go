@@ -8,10 +8,11 @@ import (
 
 func Test_GivenSendMail_WhenInvalidToParam_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut := fixture.NewSUT()
+	params := fixture.GetFakeEmailParams(fixture.WithoutTo())
+	sut, _ := fixture.NewSUT()
 
 	// Act
-	err := sut.SendMail(fixture.GetFakeEmailParams(fixture.WithoutTo()))
+	err := sut.SendMail(params.GetParams())
 
 	// Assert
 	verify.Should(t, err.Error()).Be("parameter To cannot be null or empty")
@@ -19,10 +20,11 @@ func Test_GivenSendMail_WhenInvalidToParam_ThenEnsureReturnError(t *testing.T) {
 
 func Test_GivenSendMail_WhenInvalidSubjectParam_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut := fixture.NewSUT()
+	params := fixture.GetFakeEmailParams(fixture.WithoutSubject())
+	sut, _ := fixture.NewSUT()
 
 	// Act
-	err := sut.SendMail(fixture.GetFakeEmailParams(fixture.WithoutSubject()))
+	err := sut.SendMail(params.GetParams())
 
 	// Assert
 	verify.Should(t, err.Error()).Be("parameter Subject cannot be null or empty")
@@ -30,11 +32,24 @@ func Test_GivenSendMail_WhenInvalidSubjectParam_ThenEnsureReturnError(t *testing
 
 func Test_GivenSendMail_WhenInvalidContentParam_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut := fixture.NewSUT()
+	params := fixture.GetFakeEmailParams(fixture.WithoutContent())
+	sut, _ := fixture.NewSUT()
 
 	// Act
-	err := sut.SendMail(fixture.GetFakeEmailParams(fixture.WithoutContent()))
+	err := sut.SendMail(params.GetParams())
 
 	// Assert
 	verify.Should(t, err.Error()).Be("parameter Content cannot be null or empty")
+}
+
+func Test_GivenSendMail_WhenValidParams_ThenEnsureSetCorrectParamsToSend(t *testing.T) {
+	// Arrange
+	params := fixture.GetFakeEmailParams()
+	sut, dependences := fixture.NewSUT()
+
+	// Act
+	sut.SendMail(params.GetParams())
+
+	// Assert
+	verify.Should(t, dependences.Mail.GetHeader("To")[0]).Be(params.To)
 }

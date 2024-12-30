@@ -1,9 +1,18 @@
 package mail_service_fixture
 
-import "getfund-api-v2/internal/domain/notification/adapter/domain_service/mail_service"
+import (
+	"getfund-api-v2/internal/domain/notification/adapter/domain_service/mail_service"
 
-func NewSUT() mail_service.MailService {
-	return mail_service.New()
+	"gopkg.in/gomail.v2"
+)
+
+type MailServiceFixture struct {
+	Mail *gomail.Message
+}
+
+func NewSUT() (mail_service.MailService, *MailServiceFixture) {
+	mail := gomail.NewMessage()
+	return mail_service.New(mail), &MailServiceFixture{Mail: mail}
 }
 
 type emailParams struct {
@@ -42,10 +51,14 @@ func WithoutContent() Option {
 	}
 }
 
-func GetFakeEmailParams(options ...Option) (string, string, string, []string) {
+func GetFakeEmailParams(options ...Option) *emailParams {
 	params := defaultEmailParams()
 	for _, opt := range options {
 		opt(params)
 	}
-	return params.To, params.Subject, params.Content, params.Attachments
+	return params
+}
+
+func (e *emailParams) GetParams() (string, string, string, []string) {
+	return e.To, e.Subject, e.Content, e.Attachments
 }
