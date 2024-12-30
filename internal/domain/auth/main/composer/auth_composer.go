@@ -12,7 +12,6 @@ import (
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/internal/shared/service/code_service"
 	sessionService "getfund-api-v2/internal/shared/service/session_service"
 	"getfund-api-v2/pkg/eventbus"
 	"net/http"
@@ -31,8 +30,7 @@ func GetHandlers(
 	cache cache_service.Cache,
 	sessionServive sessionService.SessionService,
 	db *gorm.DB,
-	eventBus eventbus.EventBus,
-	codeService code_service.CodeService) AuthComposer {
+	eventBus eventbus.EventBus) AuthComposer {
 
 	//dependencies
 	hasher := security.New()
@@ -43,7 +41,7 @@ func GetHandlers(
 	//applications
 	signin := signin_application.New(authService, sessionServive, mapper)
 	signout := signout_application.New(sessionServive)
-	recoverPassword := recover_password_application.New(hasher, settings, userRepository, codeService, cache, eventBus)
+	recoverPassword := recover_password_application.New(hasher, settings, userRepository, cache, eventBus)
 
 	//parser
 	parser := parser.New(signin, signout, recoverPassword)

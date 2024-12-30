@@ -105,7 +105,7 @@ func Test_GivenRecoverPasswordExecute_WhenGetByUserNameSuccess_ThenEnsureCallGet
 	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.CodeSpy.Params["GetRandomCode:length"]).Be(8)
+	verify.Should(t, spies.HasherSpy.Params["GetRandomCode:length"]).Be(8)
 }
 
 func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
@@ -116,20 +116,20 @@ func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOn
 	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.CodeSpy.CallsCount["GetRandomCode"]).Be(1)
+	verify.Should(t, spies.HasherSpy.CallsCount["GetRandomCode"]).Be(1)
 }
 
 func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeError_ThenEnsureReturnErrorFromWithServerErrorCode(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CodeSpy.DefineGetRandomCodeError()
+	spies.HasherSpy.DefineGetRandomCodeError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.CodeSpy.ErrorResult["GetRandomCode"])
+	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["GetRandomCode"])
 }
 
 func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallCacheSetWithCorrectParameter(t *testing.T) {
@@ -138,12 +138,12 @@ func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallCac
 	validInput := fixture.GetValidInput()
 	spies.UserRepoSpy.DefineSuccess()
 	spies.HasherSpy.DefineDecryptMergedSuccess("fake-first-name")
-	spies.CodeSpy.DefineGetRandomCodeSuccess()
-	expectedKey := "recovery_password_" + spies.CodeSpy.SuccessResult["GetRandomCode"].(string)
+	spies.HasherSpy.DefineGetRandomCodeSuccess()
+	expectedKey := "recovery_password_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
 	expectedValue := map[string]interface{}{
 		"username":      validInput.Username,
 		"first_name":    spies.HasherSpy.SuccessResult["DecryptMerged"].(string),
-		"recovery_link": spies.SettingsSpy.GetBaseUrl() + "/new-password/" + spies.CodeSpy.SuccessResult["GetRandomCode"].(string),
+		"recovery_link": spies.SettingsSpy.GetBaseUrl() + "/new-password/" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
 	}
 
 	// Act
@@ -171,8 +171,8 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetError_ThenEnsureReturnErrorFro
 func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallCreateAndPublishWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CodeSpy.DefineGetRandomCodeSuccess()
-	expectedPaylod := "recovery_password_" + spies.CodeSpy.SuccessResult["GetRandomCode"].(string)
+	spies.HasherSpy.DefineGetRandomCodeSuccess()
+	expectedPaylod := "recovery_password_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
 
 	// Act
 	sut.Execute(fixture.GetValidInput())

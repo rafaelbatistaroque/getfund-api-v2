@@ -82,6 +82,19 @@ func (h *HasherSpy) Encrypt(input string, secretKey []byte) string {
 	return ""
 }
 
+func (h *HasherSpy) GetRandomCode(length int) (string, error) {
+	h.Params["GetRandomCode:length"] = length
+
+	h.CallsCount["GetRandomCode"]++
+
+	success := h.SuccessResult["GetRandomCode"]
+	if success != nil {
+		return success.(string), nil
+	}
+
+	return "", h.ErrorResult["GetRandomCode"]
+}
+
 func (h *HasherSpy) DefineHashWithSaltError() {
 	h.ErrorResult["HashWithSalt"] = errors.New("fake-error")
 }
@@ -108,4 +121,12 @@ func (h *HasherSpy) DefineHashAndMergeSuccess(result string) {
 
 func (h *HasherSpy) DefineDecryptMergedSuccess(result string) {
 	h.SuccessResult["DecryptMerged"] = result
+}
+
+func (h *HasherSpy) DefineGetRandomCodeSuccess() {
+	h.SuccessResult["GetRandomCode"] = "FAKE_RANDOM_CODE"
+}
+
+func (h *HasherSpy) DefineGetRandomCodeError() {
+	h.ErrorResult["GetRandomCode"] = errors.New("fake-error")
 }

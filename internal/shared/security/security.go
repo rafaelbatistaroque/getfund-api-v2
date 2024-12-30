@@ -9,6 +9,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io"
+	mathrand "math/rand"
+	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -29,6 +32,7 @@ type Hasher interface {
 	Encrypt(input string, secretKey []byte) string
 	DecryptMerged(mergedEncryptedData string, secretKey []byte) string
 	HashAndMerge(input string, serverSalt []byte) string
+	GetRandomCode(length int) (string, error)
 }
 
 type hasher struct {
@@ -253,4 +257,16 @@ func unpad(src []byte, blockSize int) ([]byte, error) {
 		return nil, fmt.Errorf("invalid padding")
 	}
 	return src[:length-padding], nil
+}
+
+func (h *hasher) GetRandomCode(length int) (string, error) {
+	var code strings.Builder
+	mathrand.NewSource(time.Now().UnixNano())
+
+	for i := 0; i < length; i++ {
+		randomIndex := mathrand.Intn(len(ENTRANCE_CODE))
+		code.WriteByte(ENTRANCE_CODE[randomIndex])
+	}
+
+	return code.String(), nil
 }

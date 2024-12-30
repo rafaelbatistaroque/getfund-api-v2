@@ -7,7 +7,6 @@ import (
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/internal/shared/service/code_service"
 	"getfund-api-v2/pkg/eventbus"
 	"getfund-api-v2/pkg/eventbus/event"
 	"time"
@@ -21,7 +20,6 @@ type recoverPasswordApplication struct {
 	hasher         security.Hasher
 	settings       settings.ApplicationSettings
 	userRepository auth_contract.UserRepository
-	codeService    code_service.CodeService
 	cacheService   cache_service.Cache
 	eventBus       eventbus.EventBus
 }
@@ -30,7 +28,6 @@ func New(
 	hasher security.Hasher,
 	settings settings.ApplicationSettings,
 	userRepository auth_contract.UserRepository,
-	codeService code_service.CodeService,
 	cacheService cache_service.Cache,
 	eventBus eventbus.EventBus) recoverpassword.UseCase {
 
@@ -38,7 +35,6 @@ func New(
 		hasher:         hasher,
 		settings:       settings,
 		userRepository: userRepository,
-		codeService:    codeService,
 		cacheService:   cacheService,
 		eventBus:       eventBus,
 	}
@@ -60,7 +56,7 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errRepo)
 	}
 
-	randomCode, errCode := uc.codeService.GetRandomCode(8)
+	randomCode, errCode := uc.hasher.GetRandomCode(8)
 	if errCode != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
 	}

@@ -8,7 +8,6 @@ import (
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/internal/shared/service/code_service"
 	"getfund-api-v2/internal/shared/service/session_service"
 	"getfund-api-v2/pkg/eventbus"
 	redisconfig "getfund-api-v2/pkg/redis"
@@ -29,15 +28,14 @@ func main() {
 	//Services
 	cacheService := cache_service.New(redis, ctx)
 	sessionService := session_service.New(cacheService, security.New(), appSettings)
-	codeService := code_service.New(security.New(), appSettings)
 
 	defer cacheService.Close()
 
 	//Subscriber
-	notification_composer.SubscribeEventHandlers(appSettings, eventBus)
+	notification_composer.SubscribeEventHandlers(appSettings, eventBus, cacheService)
 
 	//Composer
-	authHandlers := auth_composer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus, codeService)
+	authHandlers := auth_composer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus)
 
 	//Routes
 	r := chi.NewRouter()
