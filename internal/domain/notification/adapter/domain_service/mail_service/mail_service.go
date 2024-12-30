@@ -2,6 +2,8 @@ package mail_service
 
 import (
 	inputvalidation "getfund-api-v2/pkg/input_validation"
+
+	"gopkg.in/gomail.v2"
 )
 
 type MailService interface {
@@ -9,11 +11,14 @@ type MailService interface {
 }
 
 type mailService struct {
-	params inputvalidation.InputValidation
+	params  inputvalidation.InputValidation
+	message *gomail.Message
 }
 
-func New() MailService {
-	return &mailService{}
+func New(message *gomail.Message) MailService {
+	return &mailService{
+		message: message,
+	}
 }
 
 func (ms *mailService) SendMail(to, subject, content string, replyTo []string) error {
@@ -23,6 +28,8 @@ func (ms *mailService) SendMail(to, subject, content string, replyTo []string) e
 	if ms.params.IsInvalid() {
 		return ms.params.GetErrors()
 	}
+
+	ms.message.SetHeader("To", to)
 
 	return nil
 }
