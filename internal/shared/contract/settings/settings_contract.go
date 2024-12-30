@@ -7,6 +7,10 @@ type ApplicationSettings interface {
 	GetAddrRedis() string
 	GetServerSalt() []byte
 	GetSecretKey() []byte
+	GetSMTPHost() string
+	GetSMTPPort() int
+	GetSMTPPassword() string
+	GetSMTPUsername() string
 	GetSMTPFrom() string
 	GetTemplateDir() string
 }

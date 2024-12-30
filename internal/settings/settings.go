@@ -31,14 +31,18 @@ type smtpData struct {
 	passsword string
 }
 
-func (s *applicationSettings) GetPort() string        { return s.port }
-func (s *applicationSettings) GetApiUrl() string      { return s.apiUrl }
-func (s *applicationSettings) GetBaseUrl() string     { return s.baseUrl }
-func (s *applicationSettings) GetServerSalt() []byte  { return s.serverSalt }
-func (s *applicationSettings) GetSecretKey() []byte   { return s.secretKey }
-func (s *applicationSettings) GetAddrRedis() string   { return s.addrRedis }
-func (s *applicationSettings) GetSMTPFrom() string    { return s.smtp.from }
-func (s *applicationSettings) GetTemplateDir() string { return s.templateDir }
+func (s *applicationSettings) GetPort() string         { return s.port }
+func (s *applicationSettings) GetApiUrl() string       { return s.apiUrl }
+func (s *applicationSettings) GetBaseUrl() string      { return s.baseUrl }
+func (s *applicationSettings) GetServerSalt() []byte   { return s.serverSalt }
+func (s *applicationSettings) GetSecretKey() []byte    { return s.secretKey }
+func (s *applicationSettings) GetAddrRedis() string    { return s.addrRedis }
+func (s *applicationSettings) GetSMTPHost() string     { return s.smtp.host }
+func (s *applicationSettings) GetSMTPPort() int        { return s.smtp.port }
+func (s *applicationSettings) GetSMTPPassword() string { return s.smtp.passsword }
+func (s *applicationSettings) GetSMTPUsername() string { return s.smtp.userName }
+func (s *applicationSettings) GetSMTPFrom() string     { return s.smtp.from }
+func (s *applicationSettings) GetTemplateDir() string  { return s.templateDir }
 
 func Load() settings.ApplicationSettings {
 	logger := logger.New("Settings")
@@ -71,11 +75,11 @@ func Load() settings.ApplicationSettings {
 		stripeSecretKey: getEnv("STRIPE_SECRET_KEY", "Stripe key not found"),
 		masterToken:     getEnv("MASTER_TOKEN", ""),
 		smtp: &smtpData{
-			port:      getIntEnv("SMTP_PORT", ""),
 			host:      getEnv("SMTP_HOST", ""),
-			from:      getEnv("SMTP_FROM", ""),
+			port:      getIntEnv("SMTP_PORT", ""),
 			passsword: getEnv("SMTP_PASSWORD", ""),
 			userName:  getEnv("SMTP_USERNAME", ""),
+			from:      getEnv("SMTP_FROM", ""),
 		},
 		templateDir: "../../internal/domain/notification/port/template",
 	}
