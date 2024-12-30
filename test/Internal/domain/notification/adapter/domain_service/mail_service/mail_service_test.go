@@ -42,7 +42,7 @@ func Test_GivenSendMail_WhenInvalidContentParam_ThenEnsureReturnError(t *testing
 	verify.Should(t, err.Error()).Be("parameter Content cannot be null or empty")
 }
 
-func Test_GivenSendMail_WhenValidParams_ThenEnsureSetCorrectParamsToSend(t *testing.T) {
+func Test_GivenSendMail_WhenValidParams_ThenEnsureSetToKeyAsCorrectParamsToSend(t *testing.T) {
 	// Arrange
 	params := fixture.GetFakeEmailParams()
 	sut, dependences := fixture.NewSUT()
@@ -52,4 +52,16 @@ func Test_GivenSendMail_WhenValidParams_ThenEnsureSetCorrectParamsToSend(t *test
 
 	// Assert
 	verify.Should(t, dependences.Mail.GetHeader("To")[0]).Be(params.To)
+}
+
+func Test_GivenSendMail_WhenValidParams_ThenEnsureSetSubjectKeyAsCorrectParamsToSend(t *testing.T) {
+	// Arrange
+	params := fixture.GetFakeEmailParams()
+	sut, dependences := fixture.NewSUT()
+
+	// Act
+	sut.SendMail(params.GetParams())
+
+	// Assert
+	verify.Should(t, dependences.Mail.GetHeader("Subject")[0]).Be(params.Subject)
 }
