@@ -18,6 +18,7 @@ func New() MailService {
 
 func (ms *mailService) SendMail(to, subject, content string, replyTo []string) error {
 	ms.Required(to, "To")
+	ms.Required(subject, "Subject")
 	if ms.IsInvalid() {
 		return ms.GetErrors()
 	}
