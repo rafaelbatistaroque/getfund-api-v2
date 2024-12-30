@@ -65,3 +65,15 @@ func Test_GivenSendMail_WhenValidParams_ThenEnsureSetSubjectKeyAsCorrectParamsTo
 	// Assert
 	verify.Should(t, dependences.Mail.GetHeader("Subject")[0]).Be(params.Subject)
 }
+
+func Test_GivenSendMail_WhenValidParams_ThenEnsureSetReplyToKeyAsCorrectParamsToSend(t *testing.T) {
+	// Arrange
+	params := fixture.GetFakeEmailParams()
+	sut, dependences := fixture.NewSUT()
+
+	// Act
+	sut.SendMail(params.GetParams())
+
+	// Assert
+	verify.Should(t, dependences.Mail.GetHeader("Reply-To")[0]).Be(params.Attachments[0])
+}

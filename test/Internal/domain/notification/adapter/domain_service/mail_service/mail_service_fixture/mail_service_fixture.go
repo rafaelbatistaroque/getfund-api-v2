@@ -27,7 +27,7 @@ func defaultEmailParams() *emailParams {
 		To:          "fake-To",
 		Subject:     "fake-Subject",
 		Content:     "fake-content",
-		Attachments: nil,
+		Attachments: []string{"fake-attachment"},
 	}
 }
 
