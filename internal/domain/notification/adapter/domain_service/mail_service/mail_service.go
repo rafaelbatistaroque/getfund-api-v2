@@ -30,6 +30,7 @@ func (ms *mailService) SendMail(to, subject, content string, replyTo []string) e
 	}
 
 	ms.message.SetHeader("To", to)
+	ms.message.SetHeader("Subject", subject)
 
 	return nil
 }
