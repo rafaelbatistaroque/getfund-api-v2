@@ -28,3 +28,14 @@ func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectHostParameter(t *testing
 	// Assert
 	verify.Should(t, sutDialer.Host).Be(settings_spy.GetSMTPHost())
 }
+
+func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectPortParameter(t *testing.T) {
+	// Arrange
+	settings_spy := settings_spy.New()
+
+	// Act
+	_, sutDialer := mail.New(settings_spy)
+
+	// Assert
+	verify.Should(t, sutDialer.Port).Be(settings_spy.GetSMTPPort())
+}

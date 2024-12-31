@@ -11,7 +11,7 @@ func (s *ApplicationSettingsSpy) GetAddrRedis() string    { return "localhost:63
 func (s *ApplicationSettingsSpy) GetServerSalt() []byte   { return []byte("fake-server-salt") }
 func (s *ApplicationSettingsSpy) GetSecretKey() []byte    { return []byte("fake-secret-key") }
 func (s *ApplicationSettingsSpy) GetSMTPHost() string     { return "fake-host" }
-func (s *ApplicationSettingsSpy) GetSMTPPort() int        { return 000 }
+func (s *ApplicationSettingsSpy) GetSMTPPort() int        { return 123 }
 func (s *ApplicationSettingsSpy) GetSMTPPassword() string { return "fake-password" }
 func (s *ApplicationSettingsSpy) GetSMTPUsername() string { return "fake-username" }
 func (s *ApplicationSettingsSpy) GetSMTPFrom() string     { return "fake-smtp-from" }
