@@ -50,3 +50,14 @@ func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectUsernameParameter(t *tes
 	// Assert
 	verify.Should(t, sutDialer.Username).Be(settings_spy.GetSMTPUsername())
 }
+
+func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectPasswordParameter(t *testing.T) {
+	// Arrange
+	settings_spy := settings_spy.New()
+
+	// Act
+	_, sutDialer := mail.New(settings_spy)
+
+	// Assert
+	verify.Should(t, sutDialer.Password).Be(settings_spy.GetSMTPPassword())
+}
