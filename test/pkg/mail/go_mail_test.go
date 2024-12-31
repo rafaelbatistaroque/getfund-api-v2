@@ -17,3 +17,14 @@ func Test_GivenNew_WhenReturnMessage_ThenEnsureSetFromKeyCorrectParameter(t *tes
 	// Assert
 	verify.Should(t, sutMessage.GetHeader("From")[0]).Be(settings_spy.GetSMTPFrom())
 }
+
+func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectHostParameter(t *testing.T) {
+	// Arrange
+	settings_spy := settings_spy.New()
+
+	// Act
+	_, sutDialer := mail.New(settings_spy)
+
+	// Assert
+	verify.Should(t, sutDialer.Host).Be(settings_spy.GetSMTPHost())
+}
