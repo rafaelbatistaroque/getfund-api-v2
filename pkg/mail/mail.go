@@ -12,5 +12,11 @@ func New(settings settings.ApplicationSettings) (*gomail.Message, *gomail.Dialer
 	logger.New("SMTP mail config")
 	mail.SetHeader("From", settings.GetSMTPFrom())
 
-	return mail, nil
+	dialer := gomail.NewDialer(
+		settings.GetSMTPHost(),
+		0,
+		"",
+		"")
+
+	return mail, dialer
 }
