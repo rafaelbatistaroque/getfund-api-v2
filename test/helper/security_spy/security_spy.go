@@ -109,7 +109,7 @@ func (h *HasherSpy) Hash(inputText string, serverSalt []byte) (*security.Hashing
 		return success.(*security.Hashing), nil
 	}
 
-	return nil, h.ErrorResult["Hash"]
+	return &security.Hashing{}, h.ErrorResult["Hash"]
 }
 
 func (h *HasherSpy) DefineHashWithSaltError() {

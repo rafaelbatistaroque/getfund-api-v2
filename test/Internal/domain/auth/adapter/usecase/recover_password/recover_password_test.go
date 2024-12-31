@@ -3,6 +3,7 @@ package recover_password_test
 import (
 	"bytes"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/pkg/eventbus/event"
 	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/usecase/recover_password/recover_password_fixture"
@@ -158,18 +159,19 @@ func Test_GivenRecoverPasswordExecute_WhenHashError_ThenEnsureReturnErrorFromWit
 	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["Hash"])
 }
 
-func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallCacheSetWithCorrectParameter(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenHashSuccess_ThenEnsureCallCacheSetWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetValidInput()
 	spies.UserRepoSpy.DefineSuccess()
 	spies.HasherSpy.DefineDecryptMergedSuccess("fake-first-name")
-	spies.HasherSpy.DefineGetRandomCodeSuccess()
-	expectedKey := "recovery_password_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
+	spies.HasherSpy.DefineHashSuccess()
+	hashCode := spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data
+	expectedKey := "recovery_password_" + hashCode
 	expectedValue := map[string]interface{}{
 		"username":      validInput.Username,
 		"first_name":    spies.HasherSpy.SuccessResult["DecryptMerged"].(string),
-		"recovery_link": spies.SettingsSpy.GetBaseUrl() + "/new-password/" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
+		"recovery_link": spies.SettingsSpy.GetBaseUrl() + "/new-password/" + hashCode,
 	}
 
 	// Act
@@ -197,8 +199,8 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetError_ThenEnsureReturnErrorFro
 func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallCreateAndPublishWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.HasherSpy.DefineGetRandomCodeSuccess()
-	expectedPaylod := "recovery_password_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
+	spies.HasherSpy.DefineHashSuccess()
+	expectedPaylod := "recovery_password_" + spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data
 
 	// Act
 	sut.Execute(fixture.GetValidInput())
