@@ -3,8 +3,7 @@ package send_recover_password_mail_application
 import (
 	"encoding/json"
 	"errors"
-	template_file "getfund-api-v2/internal/domain/notification/adapter/contract"
-	"getfund-api-v2/internal/domain/notification/adapter/domain_service/mail_service"
+	contract "getfund-api-v2/internal/domain/notification/adapter/contract"
 	notification_model "getfund-api-v2/internal/domain/notification/adapter/model"
 	"getfund-api-v2/internal/domain/notification/adapter/usecase/send_recover_password_mail"
 	"strings"
@@ -16,12 +15,12 @@ import (
 
 type sendRecoverPasswordMailApplication struct {
 	cacheService cache_service.Cache
-	mailService  mail_service.MailService
+	mailService  contract.MailService
 	settings     settings.ApplicationSettings
-	template     template_file.TemplateFile
+	template     contract.TemplateFileService
 }
 
-func New(cacheService cache_service.Cache, mailService mail_service.MailService, settings settings.ApplicationSettings, template template_file.TemplateFile) send_recover_password_mail.UseCase {
+func New(cacheService cache_service.Cache, mailService contract.MailService, settings settings.ApplicationSettings, template contract.TemplateFileService) send_recover_password_mail.UseCase {
 	return &sendRecoverPasswordMailApplication{
 		cacheService: cacheService,
 		mailService:  mailService,

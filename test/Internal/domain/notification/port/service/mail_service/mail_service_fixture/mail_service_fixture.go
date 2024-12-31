@@ -1,7 +1,8 @@
 package mail_service_fixture
 
 import (
-	"getfund-api-v2/internal/domain/notification/adapter/domain_service/mail_service"
+	contract "getfund-api-v2/internal/domain/notification/adapter/contract"
+	"getfund-api-v2/internal/domain/notification/port/service/mail_service"
 
 	"gopkg.in/gomail.v2"
 )
@@ -10,7 +11,7 @@ type mailServiceFixture struct {
 	Mail *gomail.Message
 }
 
-func NewSUT() (mail_service.MailService, *mailServiceFixture) {
+func NewSUT() (contract.MailService, *mailServiceFixture) {
 	mail := gomail.NewMessage()
 	dialer := gomail.NewDialer("fake-host", 123, "fake-username", "fake-password")
 	dialer.DialAndSend()

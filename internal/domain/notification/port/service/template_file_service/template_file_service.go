@@ -1,4 +1,4 @@
-package template_file
+package template_file_service
 
 import (
 	"errors"
@@ -6,17 +6,17 @@ import (
 	"os"
 )
 
-type templateFile struct {
+type templateFileService struct {
 	settings settings.ApplicationSettings
 }
 
-func New(settings settings.ApplicationSettings) *templateFile {
-	return &templateFile{
+func New(settings settings.ApplicationSettings) *templateFileService {
+	return &templateFileService{
 		settings: settings,
 	}
 }
 
-func (t *templateFile) GetRecoveryPasswordTemplate() (string, error) {
+func (t *templateFileService) GetRecoveryPasswordTemplate() (string, error) {
 	template, err := os.ReadFile(t.settings.GetTemplateDir() + "/recovery_password_template.html")
 	if err != nil {
 		return "", errors.New("template does not exist")

@@ -1,6 +1,7 @@
 package mail_service
 
 import (
+	contract "getfund-api-v2/internal/domain/notification/adapter/contract"
 	inputvalidation "getfund-api-v2/pkg/input_validation"
 
 	"gopkg.in/gomail.v2"
@@ -14,17 +15,13 @@ var (
 	_CONTENT_TYPE = "text/html"
 )
 
-type MailService interface {
-	SendMail(to, subject, content string, replyTo []string) error
-}
-
 type mailService struct {
 	params  inputvalidation.InputValidation
 	message *gomail.Message
 	dialer  *gomail.Dialer
 }
 
-func New(message *gomail.Message, dialer *gomail.Dialer) MailService {
+func New(message *gomail.Message, dialer *gomail.Dialer) contract.MailService {
 	return &mailService{
 		message: message,
 		dialer:  dialer,

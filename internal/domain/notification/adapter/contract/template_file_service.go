@@ -1,5 +1,5 @@
 package notification_contract
 
-type TemplateFile interface {
+type TemplateFileService interface {
 	GetRecoveryPasswordTemplate() (string, error)
 }

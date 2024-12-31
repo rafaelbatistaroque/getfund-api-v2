@@ -1,8 +1,8 @@
-package template_file_test
+package template_file_service_test
 
 import (
 	"getfund-api-v2/pkg/verify"
-	fixture "getfund-api-v2/test/internal/domain/notification/port/template_file/template_file_fixture"
+	fixture "getfund-api-v2/test/internal/domain/notification/port/service/template_file_service/template_file_service_fixture"
 	"os"
 	"testing"
 )
