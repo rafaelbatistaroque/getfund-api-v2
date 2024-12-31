@@ -1,5 +1,1 @@
 //WIP: Handler
-//TODO: Ensure return application error with server error when SendMail return error
-//TODO: Ensure return output with success when SendMail return success
-//TODO: Ensure implementation and test coverage of the Domain Service
-//TODO: Ensure implementation and test coverage of the Template File contract

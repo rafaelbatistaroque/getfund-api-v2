@@ -19,7 +19,6 @@ type sendRecoverPasswordMailApplication struct {
 	mailService  mail_service.MailService
 	settings     settings.ApplicationSettings
 	template     template_file.TemplateFile
-	//template service
 }
 
 func New(cacheService cache_service.Cache, mailService mail_service.MailService, settings settings.ApplicationSettings, template template_file.TemplateFile) send_recover_password_mail.UseCase {
@@ -51,11 +50,9 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 	recoveryPasswordTemplate, errTemplate := uc.template.GetRecoveryPasswordTemplate()
 	if errTemplate != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errTemplate)
-
 	}
 
-	recoveryPasswordTemplate = strings.ReplaceAll(recoveryPasswordTemplate, "{{first_name}}", userToRecoverPasswordMailModel.FirstName)
-	recoveryPasswordTemplate = strings.ReplaceAll(recoveryPasswordTemplate, "{{recovery_link}}", userToRecoverPasswordMailModel.RecoveryLink)
+	recoveryPasswordTemplate = replaceTags(recoveryPasswordTemplate, userToRecoverPasswordMailModel)
 
 	err := uc.mailService.SendMail(
 		userToRecoverPasswordMailModel.Username,
@@ -67,4 +64,11 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 	}
 
 	return &send_recover_password_mail.Output{Messagem: "Email sent successfully"}, nil
+}
+
+func replaceTags(template string, model *notification_model.RecoverPasswordMailModel) string {
+	template = strings.ReplaceAll(template, "{{first_name}}", model.FirstName)
+	template = strings.ReplaceAll(template, "{{recovery_link}}", model.RecoveryLink)
+
+	return template
 }
