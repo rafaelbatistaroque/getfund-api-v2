@@ -61,7 +61,7 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
 	}
 
-	_, errHash := uc.hasher.Hash(randomCode, uc.settings.GetServerSalt())
+	recoveryCode, errHash := uc.hasher.Hash(randomCode, uc.settings.GetServerSalt())
 	if errHash != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errHash)
 	}
@@ -69,10 +69,10 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 	data := map[string]interface{}{
 		"username":      input.Username,
 		"first_name":    uc.hasher.DecryptMerged(userModel.FirstName, uc.settings.GetSecretKey()),
-		"recovery_link": buildRecoverLink(uc.settings, randomCode),
+		"recovery_link": buildRecoverLink(uc.settings, recoveryCode.Data),
 	}
 
-	keyCache := buildKeyCache(randomCode)
+	keyCache := buildKeyCache(recoveryCode.Data)
 	cacheErr := uc.cacheService.Set(keyCache, data, time.Hour)
 	if cacheErr != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, cacheErr)
@@ -83,10 +83,10 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 	return &recoverpassword.RecoverPasswordOutput{Message: "recover password started"}, nil
 }
 
-func buildRecoverLink(applicationSettings settings.ApplicationSettings, randomCode string) string {
-	return applicationSettings.GetBaseUrl() + "/new-password/" + randomCode
+func buildRecoverLink(applicationSettings settings.ApplicationSettings, recoveryCode string) string {
+	return applicationSettings.GetBaseUrl() + "/new-password/" + recoveryCode
 }
 
-func buildKeyCache(randomCode string) string {
-	return key_cache_prefix + randomCode
+func buildKeyCache(recoveryCode string) string {
+	return key_cache_prefix + recoveryCode
 }
