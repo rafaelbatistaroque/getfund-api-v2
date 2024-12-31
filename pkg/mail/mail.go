@@ -18,5 +18,7 @@ func New(settings settings.ApplicationSettings) (*gomail.Message, *gomail.Dialer
 		settings.GetSMTPUsername(),
 		settings.GetSMTPPassword())
 
+	dialer.SSL = true
+
 	return mail, dialer
 }
