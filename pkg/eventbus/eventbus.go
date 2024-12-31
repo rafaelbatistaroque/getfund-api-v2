@@ -60,9 +60,17 @@ func (eb *eventBus) Publish(event Event) {
 
 // CreateAndPublish após incluir o payload ao evento dispara para todos os handlers
 func (eb *eventBus) CreateAndPublish(event Event, payload any) {
-	data, err := json.Marshal(payload)
-	if err != nil {
-		eb.logger.Errorf("Error on serialize the payload: %v", err)
+	var data []byte
+	var err error
+
+	switch typeData := payload.(type) {
+	case string:
+		data = []byte(typeData)
+	default:
+		data, err = json.Marshal(payload)
+		if err != nil {
+			eb.logger.Errorf("Error on serialize the payload: %v", err)
+		}
 	}
 
 	event.SetPayload(data)
