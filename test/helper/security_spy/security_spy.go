@@ -147,3 +147,11 @@ func (h *HasherSpy) DefineGetRandomCodeSuccess() {
 func (h *HasherSpy) DefineGetRandomCodeError() {
 	h.ErrorResult["GetRandomCode"] = errors.New("fake-error")
 }
+
+func (h *HasherSpy) DefineHashSuccess() {
+	h.SuccessResult["Hash"] = &security.Hashing{Data: "FAKE_HASHED", Salt: "FAKE_SALT"}
+}
+
+func (h *HasherSpy) DefineHashError() {
+	h.ErrorResult["Hash"] = errors.New("fake-error")
+}

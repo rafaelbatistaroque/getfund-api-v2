@@ -145,6 +145,19 @@ func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallsHa
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["Hash:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
 
+func Test_GivenRecoverPasswordExecute_WhenHashError_ThenEnsureReturnErrorFromWithServerErrorCode(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["Hash"])
+}
+
 func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallCacheSetWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
