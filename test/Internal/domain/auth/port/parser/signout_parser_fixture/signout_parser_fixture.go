@@ -1,4 +1,4 @@
-package signout_fixture
+package signout_parser_fixture
 
 import (
 	"context"
@@ -20,7 +20,8 @@ type signoutUsecaseSpy struct {
 
 func NewSut() (parser.AuthParser, *signoutUsecaseSpy) {
 	signoutSpy := &signoutUsecaseSpy{Params: make(map[string]*signout.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*result_app.ApplicationError), SuccessResult: make(map[string]*signout.Output)}
-	return parser.New(nil, signoutSpy, nil), signoutSpy
+
+	return parser.New(nil, signoutSpy, nil, nil), signoutSpy
 }
 
 func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *result_app.ApplicationError) {

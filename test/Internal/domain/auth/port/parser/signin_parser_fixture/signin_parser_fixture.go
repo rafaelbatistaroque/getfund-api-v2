@@ -1,4 +1,4 @@
-package signin_fixture
+package signin_parser_fixture
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ func NewSut() (parser.AuthParser, *signinUsecaseSpy) {
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*signin.Output)}
 
-	return parser.New(signinSpy, nil, nil), signinSpy
+	return parser.New(signinSpy, nil, nil, nil), signinSpy
 }
 
 func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *result_app.ApplicationError) {

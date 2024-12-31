@@ -4,7 +4,7 @@ import (
 	"getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/verify"
-	fixture "getfund-api-v2/test/internal/domain/auth/port/parser/recover_password_fixture"
+	fixture "getfund-api-v2/test/internal/domain/auth/port/parser/recover_password_parser_fixture"
 	"testing"
 )
 

@@ -1,4 +1,4 @@
-package recover_password_fixture
+package recover_password_parser_fixture
 
 import (
 	"bytes"
@@ -24,7 +24,7 @@ func NewSut() (parser.AuthParser, *recoverPasswordUsecaseSpy) {
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*recover_password.Output)}
 
-	return parser.New(nil, nil, recoverPasswordSpy), recoverPasswordSpy
+	return parser.New(nil, nil, recoverPasswordSpy, nil), recoverPasswordSpy
 }
 
 func (s *recoverPasswordUsecaseSpy) Execute(input *recover_password.Input) (*recover_password.Output, *result_app.ApplicationError) {
