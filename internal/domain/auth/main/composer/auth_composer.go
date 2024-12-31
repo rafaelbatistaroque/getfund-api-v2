@@ -44,7 +44,7 @@ func GetHandlers(
 	recoverPassword := recover_password_application.New(hasher, settings, userRepository, cache, eventBus)
 
 	//parser
-	parser := parser.New(signin, signout, recoverPassword)
+	parser := parser.New(signin, signout, recoverPassword, nil)
 
 	return AuthComposer{
 		Signin:          proxy.New(parser.Signin),
