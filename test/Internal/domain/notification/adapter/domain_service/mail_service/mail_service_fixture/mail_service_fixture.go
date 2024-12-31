@@ -6,13 +6,18 @@ import (
 	"gopkg.in/gomail.v2"
 )
 
-type MailServiceFixture struct {
+type mailServiceFixture struct {
 	Mail *gomail.Message
 }
 
-func NewSUT() (mail_service.MailService, *MailServiceFixture) {
+func NewSUT() (mail_service.MailService, *mailServiceFixture) {
 	mail := gomail.NewMessage()
-	return mail_service.New(mail), &MailServiceFixture{Mail: mail}
+	dialer := gomail.NewDialer("fake-host", 123, "fake-username", "fake-password")
+	dialer.DialAndSend()
+	return mail_service.New(mail, dialer),
+		&mailServiceFixture{
+			Mail: mail,
+		}
 }
 
 type emailParams struct {
