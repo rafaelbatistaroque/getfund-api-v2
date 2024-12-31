@@ -33,6 +33,7 @@ type Hasher interface {
 	DecryptMerged(mergedEncryptedData string, secretKey []byte) string
 	HashAndMerge(input string, serverSalt []byte) string
 	GetRandomCode(length int) (string, error)
+	Hash(inputText string, serverSalt []byte) (*Hashing, error)
 }
 
 type hasher struct {
@@ -47,7 +48,7 @@ type encryption struct {
 	Data string
 }
 
-type hashing struct {
+type Hashing struct {
 	Salt string
 	Data string
 }
@@ -67,7 +68,7 @@ func (s *hasher) HashWithSalt(inputText string, serverSalt []byte) (string, erro
 }
 
 // Gera um Hash com salt
-func Hash(inputText string, serverSalt []byte) (*hashing, error) {
+func (s *hasher) Hash(inputText string, serverSalt []byte) (*Hashing, error) {
 	entrySalt := make([]byte, SIZE_SALT)
 	if _, err := io.ReadFull(rand.Reader, entrySalt); err != nil {
 		return nil, err
@@ -78,7 +79,7 @@ func Hash(inputText string, serverSalt []byte) (*hashing, error) {
 	hash.Write(append(append(serverSalt, inputData...), entrySalt...))
 	hashedData := hash.Sum(nil)
 
-	return &hashing{
+	return &Hashing{
 		Salt: hex.EncodeToString(entrySalt),
 		Data: hex.EncodeToString(hashedData),
 	}, nil
@@ -102,7 +103,7 @@ func (s *hasher) Encrypt(input string, secretKey []byte) string {
 
 // Mescla o salt e os dados do hash
 func (s *hasher) HashAndMerge(input string, serverSalt []byte) string {
-	hashing, err := Hash(input, serverSalt)
+	hashing, err := s.Hash(input, serverSalt)
 	if err != nil {
 		panic(err)
 	}
@@ -111,7 +112,7 @@ func (s *hasher) HashAndMerge(input string, serverSalt []byte) string {
 }
 
 // Mescla o salt e os dados do hash
-func mergeHashing(hashing *hashing) string {
+func mergeHashing(hashing *Hashing) string {
 	return hashing.Salt + hashing.Data
 }
 

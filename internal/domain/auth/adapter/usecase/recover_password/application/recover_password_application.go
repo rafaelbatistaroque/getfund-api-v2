@@ -61,6 +61,8 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
 	}
 
+	uc.hasher.Hash(randomCode, uc.settings.GetServerSalt())
+
 	data := map[string]interface{}{
 		"username":      input.Username,
 		"first_name":    uc.hasher.DecryptMerged(userModel.FirstName, uc.settings.GetSecretKey()),
