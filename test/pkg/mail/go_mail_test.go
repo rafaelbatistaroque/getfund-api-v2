@@ -39,3 +39,14 @@ func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectPortParameter(t *testing
 	// Assert
 	verify.Should(t, sutDialer.Port).Be(settings_spy.GetSMTPPort())
 }
+
+func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectUsernameParameter(t *testing.T) {
+	// Arrange
+	settings_spy := settings_spy.New()
+
+	// Act
+	_, sutDialer := mail.New(settings_spy)
+
+	// Assert
+	verify.Should(t, sutDialer.Username).Be(settings_spy.GetSMTPUsername())
+}
