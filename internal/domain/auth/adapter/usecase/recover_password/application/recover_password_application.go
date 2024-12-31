@@ -61,7 +61,10 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
 	}
 
-	uc.hasher.Hash(randomCode, uc.settings.GetServerSalt())
+	_, errHash := uc.hasher.Hash(randomCode, uc.settings.GetServerSalt())
+	if errHash != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errHash)
+	}
 
 	data := map[string]interface{}{
 		"username":      input.Username,
