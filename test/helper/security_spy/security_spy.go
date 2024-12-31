@@ -1,6 +1,9 @@
 package security_spy
 
-import "errors"
+import (
+	"errors"
+	"getfund-api-v2/internal/shared/security"
+)
 
 type HasherSpy struct {
 	Params        map[string]interface{}
@@ -93,6 +96,20 @@ func (h *HasherSpy) GetRandomCode(length int) (string, error) {
 	}
 
 	return "", h.ErrorResult["GetRandomCode"]
+}
+
+func (h *HasherSpy) Hash(inputText string, serverSalt []byte) (*security.Hashing, error) {
+	h.Params["Hash:inputText"] = inputText
+	h.Params["Hash:serverSalt"] = serverSalt
+
+	h.CallsCount["Hash"]++
+
+	success := h.SuccessResult["Hash"]
+	if success != nil {
+		return success.(*security.Hashing), nil
+	}
+
+	return nil, h.ErrorResult["Hash"]
 }
 
 func (h *HasherSpy) DefineHashWithSaltError() {

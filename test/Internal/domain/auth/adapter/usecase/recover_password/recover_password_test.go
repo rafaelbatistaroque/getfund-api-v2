@@ -73,7 +73,7 @@ func Test_GivenRecoverPasswordExecute_WhenHashWithSaltSuccess_ThenEnsureCallGetB
 	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
 }
 
-func Test_GivenRecoverPasswordExecute_WhenGetByUserNameInvoked_ThenEnsureCalssOnce(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenGetByUserNameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
@@ -130,6 +130,19 @@ func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeError_ThenEnsureReturnErr
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["GetRandomCode"])
+}
+
+func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallsHashWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineGetRandomCodeSuccess()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.Params["Hash:inputText"]).Be(spies.HasherSpy.SuccessResult["GetRandomCode"].(string))
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["Hash:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
 
 func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallCacheSetWithCorrectParameter(t *testing.T) {
