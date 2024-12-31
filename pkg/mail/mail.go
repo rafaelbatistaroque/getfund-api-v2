@@ -14,7 +14,7 @@ func New(settings settings.ApplicationSettings) (*gomail.Message, *gomail.Dialer
 
 	dialer := gomail.NewDialer(
 		settings.GetSMTPHost(),
-		0,
+		settings.GetSMTPPort(),
 		"",
 		"")
 
