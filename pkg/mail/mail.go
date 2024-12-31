@@ -9,7 +9,7 @@ import (
 
 func New(settings settings.ApplicationSettings) (*gomail.Message, *gomail.Dialer) {
 	mail := gomail.NewMessage()
-	logger.New("SMTP mail config")
+	logger := logger.New("SMTP mail config")
 	mail.SetHeader("From", settings.GetSMTPFrom())
 
 	dialer := gomail.NewDialer(
@@ -19,6 +19,8 @@ func New(settings settings.ApplicationSettings) (*gomail.Message, *gomail.Dialer
 		settings.GetSMTPPassword())
 
 	dialer.SSL = true
+
+	logger.Info("SMTP connection successfully")
 
 	return mail, dialer
 }
