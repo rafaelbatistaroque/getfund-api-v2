@@ -61,3 +61,14 @@ func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectPasswordParameter(t *tes
 	// Assert
 	verify.Should(t, sutDialer.Password).Be(settings_spy.GetSMTPPassword())
 }
+
+func Test_GivenNew_WhenReturnDialer_ThenEnsureSetCorrectSSLParameter(t *testing.T) {
+	// Arrange
+	settings_spy := settings_spy.New()
+
+	// Act
+	_, sutDialer := mail.New(settings_spy)
+
+	// Assert
+	verify.Should(t, sutDialer.SSL).BeTrue()
+}
