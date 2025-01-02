@@ -3,7 +3,6 @@ package reset_password_parser_fixture
 import (
 	"bytes"
 	"errors"
-	"getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password"
 	"getfund-api-v2/internal/domain/auth/adapter/usecase/reset_password"
 	parser "getfund-api-v2/internal/domain/auth/port/parser"
 	"getfund-api-v2/internal/shared/result_app"
@@ -37,7 +36,7 @@ func (s *resetPasswordUsecaseSpy) Execute(input *reset_password.Input) (*reset_p
 }
 
 func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.Request) {
-	body := bytes.NewBufferString(GetRecoverPasswordInputSerialized())
+	body := bytes.NewBufferString(GetResetPasswordInputSerialized())
 	if bodyString != "" {
 		body = bytes.NewBufferString(bodyString)
 	}
@@ -47,12 +46,12 @@ func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.R
 	return res, req
 }
 
-func GetRecoverPasswordInputSerialized() string {
-	return `{"code": "fake-code", "password": "fake-password"}`
+func GetResetPasswordInputSerialized() string {
+	return `{"code": "fake-recovery-code", "password": "fake-password"}`
 }
 
-func GetRecoverPasswordInput() *recover_password.Input {
-	return &recover_password.Input{Username: "fake-username"}
+func GetResetPasswordInput() *reset_password.Input {
+	return &reset_password.Input{RecoveryCode: "fake-recovery-code", Password: "fake-password"}
 }
 
 func (s *resetPasswordUsecaseSpy) DefineError() {

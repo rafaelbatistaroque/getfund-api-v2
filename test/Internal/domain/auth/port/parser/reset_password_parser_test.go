@@ -19,3 +19,16 @@ func Test_GivenResetPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestWit
 	verify.Should(t, code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err).NotNil()
 }
+
+func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, resetPasswordUsecaseSpy := fixture.NewSut()
+	expectedInput := fixture.GetResetPasswordInput()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	sut.ResetPassword(res, req)
+
+	// Assert
+	verify.Should(t, resetPasswordUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
+}
