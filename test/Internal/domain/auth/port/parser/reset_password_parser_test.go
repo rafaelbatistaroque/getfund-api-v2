@@ -32,3 +32,15 @@ func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectP
 	// Assert
 	verify.Should(t, resetPasswordUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
+
+func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallUsecaseOnce(t *testing.T) {
+	// Arrange
+	sut, resetPasswordUsecaseSpy := fixture.NewSut()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	sut.ResetPassword(res, req)
+
+	// Assert
+	verify.Should(t, resetPasswordUsecaseSpy.CallsCount["Execute"]).Be(1)
+}
