@@ -14,5 +14,7 @@ func (h *authParser) ResetPassword(w http.ResponseWriter, r *http.Request) (inte
 		return nil, result_app.BAD_REQUEST_CODE, err
 	}
 
+	h.resetPassword.Execute(&input)
+
 	return nil, 0, nil
 }

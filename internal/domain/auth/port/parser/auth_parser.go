@@ -32,5 +32,6 @@ func New(
 		signin:          signin,
 		signout:         signout,
 		recoverPassword: recoverPassword,
+		resetPassword:   resetPassword,
 	}
 }
