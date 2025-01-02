@@ -14,10 +14,10 @@ func (h *authParser) ResetPassword(w http.ResponseWriter, r *http.Request) (inte
 		return nil, result_app.BAD_REQUEST_CODE, err
 	}
 
-	_, err := h.resetPassword.Execute(&input)
+	result, err := h.resetPassword.Execute(&input)
 	if err != nil {
 		return nil, err.Code, err.Message
 	}
 
-	return nil, 0, nil
+	return result, result_app.SUCCESS_CODE, nil
 }
