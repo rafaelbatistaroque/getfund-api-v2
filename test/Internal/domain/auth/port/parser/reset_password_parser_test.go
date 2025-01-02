@@ -44,3 +44,17 @@ func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallUsecaseOnce(t *test
 	// Assert
 	verify.Should(t, resetPasswordUsecaseSpy.CallsCount["Execute"]).Be(1)
 }
+
+func Test_GivenResetPassword_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *testing.T) {
+	// Arrange
+	sut, resetPasswordUsecaseSpy := fixture.NewSut()
+	resetPasswordUsecaseSpy.DefineError()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	_, code, err := sut.ResetPassword(res, req)
+
+	// Assert
+	verify.Should(t, code).Be(resetPasswordUsecaseSpy.ErrorResult["Execute"].Code)
+	verify.Should(t, err).Be(resetPasswordUsecaseSpy.ErrorResult["Execute"].Message)
+}
