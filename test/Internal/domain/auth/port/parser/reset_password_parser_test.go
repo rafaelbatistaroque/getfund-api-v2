@@ -1,6 +1,7 @@
 package auth_parser_test
 
 import (
+	"getfund-api-v2/internal/domain/auth/adapter/usecase/reset_password"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/auth/port/parser/reset_password_parser_fixture"
@@ -57,4 +58,19 @@ func Test_GivenResetPassword_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom
 	// Assert
 	verify.Should(t, code).Be(resetPasswordUsecaseSpy.ErrorResult["Execute"].Code)
 	verify.Should(t, err).Be(resetPasswordUsecaseSpy.ErrorResult["Execute"].Message)
+}
+
+func Test_GivenResetPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t *testing.T) {
+	// Arrange
+	sut, resetPasswordUsecaseSpy := fixture.NewSut()
+	resetPasswordUsecaseSpy.DefineSuccess()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	result, code, _ := sut.ResetPassword(res, req)
+
+	// Assert
+	success := result.(*reset_password.Output)
+	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
+	verify.Should(t, success.Message).Be(resetPasswordUsecaseSpy.SuccessResult["Execute"].Message)
 }
