@@ -33,7 +33,7 @@ func WithRecoveryCodeEmpty() Option {
 	}
 }
 
-func WithRecoveryCodeInvalid() Option {
+func WithRecoveryCodeInvalidLength() Option {
 	return func(params *reset_password.Input) {
 		params.RecoveryCode = "invalid_recovery_code"
 	}

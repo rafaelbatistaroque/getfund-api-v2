@@ -23,3 +23,17 @@ func Test_GivenExecute_WhenInputRecoveryCodeEmpty_ThenEnsureReturnErrorFromValid
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "RecoveryCode"))
 }
+
+func Test_GivenExecute_WhenInputRecoveryCodeLengthNotExactly64_ThenEnsureReturnErrorFromValidate(t *testing.T) {
+	// Arrange
+	invalidOptions := []fixture.Option{fixture.WithRecoveryCodeEmpty(), fixture.WithRecoveryCodeInvalidLength()}
+	invalidInput := fixture.GetInput(invalidOptions...)
+	sut := reset_password_application.New()
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "RecoveryCode", 64))
+}
