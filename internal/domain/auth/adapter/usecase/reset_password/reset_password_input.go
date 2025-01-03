@@ -14,7 +14,8 @@ type resetPasswordInput struct {
 func (i *resetPasswordInput) Validate() validation.Validatable {
 	i.rules.
 		ApplyRules(i.RecoveryCode, "RecoveryCode",
-			&validation.RequiredRule{})
+			&validation.RequiredRule{},
+			&validation.LengthRule{Length: 64})
 
 	return i.rules.GetResult()
 }
