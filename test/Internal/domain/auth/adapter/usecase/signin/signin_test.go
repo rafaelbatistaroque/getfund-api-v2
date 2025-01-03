@@ -4,9 +4,10 @@ import (
 	"errors"
 	authmodel "getfund-api-v2/internal/domain/auth/adapter/model"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/pkg/verify"
 	fixtures "getfund-api-v2/test/internal/domain/auth/adapter/usecase/signin/signin_fixture"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenSigninExecute_WhenSigninInputUserNameInvalid_ThenEnsureReturnError(t *testing.T) {

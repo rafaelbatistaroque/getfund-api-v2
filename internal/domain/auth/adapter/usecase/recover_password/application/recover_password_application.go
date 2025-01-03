@@ -7,8 +7,8 @@ import (
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/pkg/eventbus"
-	"getfund-api-v2/pkg/eventbus/event"
+	"getfund-api-v2/pkg/bus"
+	"getfund-api-v2/pkg/bus/event"
 	"time"
 )
 
@@ -21,7 +21,7 @@ type recoverPasswordApplication struct {
 	settings       settings.ApplicationSettings
 	userRepository auth_contract.UserRepository
 	cacheService   cache_service.Cache
-	eventBus       eventbus.EventBus
+	eventBus       bus.EventBus
 }
 
 func New(
@@ -29,7 +29,7 @@ func New(
 	settings settings.ApplicationSettings,
 	userRepository auth_contract.UserRepository,
 	cacheService cache_service.Cache,
-	eventBus eventbus.EventBus) recoverpassword.UseCase {
+	eventBus bus.EventBus) recoverpassword.UseCase {
 
 	return &recoverPasswordApplication{
 		hasher:         hasher,
@@ -41,9 +41,9 @@ func New(
 }
 
 func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*recoverpassword.Output, *result_app.ApplicationError) {
-	input.Validate()
-	if input.IsInvalid() {
-		return nil, result_app.New(result_app.BAD_REQUEST_CODE, input.GetErrors())
+	validated := input.Validate()
+	if validated.IsInvalid() {
+		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
 	usernameHashed, err := uc.hasher.HashWithSalt(input.Username, uc.settings.GetServerSalt())

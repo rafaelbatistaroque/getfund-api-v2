@@ -3,10 +3,12 @@ package send_recover_password_mail_application_test
 import (
 	"fmt"
 	"getfund-api-v2/internal/shared/result_app"
-	inputvalidation "getfund-api-v2/pkg/input_validation"
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/notification/adapter/usecase/send_recover_password_mail/send_recover_password_mail_fixture"
 	"testing"
+
+	inputvalidation "github.com/rafaelbatistaroque/validation"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenExecute_WhenInvalidInput_ThenEnsureReturnApplicationErrorWithBadRequestError(t *testing.T) {
@@ -18,7 +20,7 @@ func Test_GivenExecute_WhenInvalidInput_ThenEnsureReturnApplicationErrorWithBadR
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
-	verify.Should(t, err.Message.Error()).Be(fmt.Sprintf(inputvalidation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "KeyCache"))
+	verify.Should(t, err.Message.Error()).Be(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "KeyCache"))
 }
 
 func Test_GivenExecute_WhenValidInput_ThenEnsureCallCacheWithCorrectParameter(t *testing.T) {

@@ -1,14 +1,18 @@
 package send_recover_password_mail
 
-import validation "getfund-api-v2/pkg/input_validation"
+import validation "github.com/rafaelbatistaroque/validation"
 
 type Input = sendRecoverPasswordMailInput
 
 type sendRecoverPasswordMailInput struct {
-	validation.InputValidation
 	KeyCache string
+
+	rules validation.Rule
 }
 
-func (i *sendRecoverPasswordMailInput) Validate() {
-	i.Required(i.KeyCache, "KeyCache")
+func (i *sendRecoverPasswordMailInput) Validate() validation.Validatable {
+	i.rules.
+		ApplyRules(i.KeyCache, "KeyCache", &validation.RequiredRule{})
+
+	return i.rules.GetResult()
 }

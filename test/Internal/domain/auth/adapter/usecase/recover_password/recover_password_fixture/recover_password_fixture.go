@@ -5,12 +5,13 @@ import (
 	"getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password"
 	sut "getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password/application"
 	"getfund-api-v2/internal/shared/result_app"
-	inputvalidation "getfund-api-v2/pkg/input_validation"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
 	"getfund-api-v2/test/helper/user_repository_spy"
+
+	"github.com/rafaelbatistaroque/validation"
 )
 
 type RecoverPasswordFixture struct {
@@ -40,7 +41,7 @@ func NewSut() (recover_password.UseCase, *RecoverPasswordFixture) {
 
 func GetInvalidInputWithError() (*recover_password.Input, *result_app.ApplicationError) {
 	return &recover_password.Input{Username: ""},
-		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(inputvalidation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "Username"))
+		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Username"))
 }
 
 func GetValidInput() *recover_password.Input {

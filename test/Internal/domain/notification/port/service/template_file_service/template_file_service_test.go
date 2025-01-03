@@ -1,10 +1,11 @@
 package template_file_service_test
 
 import (
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/notification/port/service/template_file_service/template_file_service_fixture"
 	"os"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenGetRecoveryPasswordTemplate_WhenTemplateNotFound_ThenEnsureReturnCorrectError(t *testing.T) {

@@ -1,9 +1,10 @@
 package mail_service_test
 
 import (
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/notification/port/service/mail_service/mail_service_fixture"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenSendMail_WhenInvalidToParam_ThenEnsureReturnError(t *testing.T) {

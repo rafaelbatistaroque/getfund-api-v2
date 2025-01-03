@@ -9,7 +9,7 @@ import (
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/internal/shared/service/session_service"
-	"getfund-api-v2/pkg/eventbus"
+	"getfund-api-v2/pkg/bus"
 	redisconfig "getfund-api-v2/pkg/redis"
 	sqlitedb "getfund-api-v2/pkg/sqlite"
 	"net/http"
@@ -20,7 +20,7 @@ import (
 func main() {
 	//general dependences
 	db := sqlitedb.New()
-	eventBus := eventbus.New()
+	eventBus := bus.New()
 	ctx := context.Background()
 	appSettings := settings.Load()
 	redis := redisconfig.New(ctx, appSettings)

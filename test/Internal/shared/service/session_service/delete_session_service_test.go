@@ -1,9 +1,10 @@
 package session_service_test
 
 import (
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/shared/service/session_service/session_service_fixture"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenDeleteSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T) {

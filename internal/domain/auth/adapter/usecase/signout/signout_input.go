@@ -1,14 +1,18 @@
 package signout
 
-import inputvalidation "getfund-api-v2/pkg/input_validation"
+import "github.com/rafaelbatistaroque/validation"
 
 type Input = signoutInput
 
 type signoutInput struct {
-	inputvalidation.InputValidation
 	Token string
+
+	rules validation.Rule
 }
 
-func (i *signoutInput) Validate() {
-	i.Required(i.Token, "Token")
+func (i *signoutInput) Validate() validation.Validatable {
+	i.rules.
+		ApplyRules(i.Token, "Token", &validation.RequiredRule{})
+
+	return i.rules.GetResult()
 }

@@ -2,9 +2,10 @@ package go_mail_test
 
 import (
 	"getfund-api-v2/pkg/mail"
-	"getfund-api-v2/pkg/verify"
 	"getfund-api-v2/test/helper/settings_spy"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenNew_WhenReturnMessage_ThenEnsureSetFromKeyCorrectParameter(t *testing.T) {

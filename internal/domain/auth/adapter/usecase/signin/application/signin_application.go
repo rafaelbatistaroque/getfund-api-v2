@@ -23,9 +23,9 @@ func New(authService auth_service.AuthService, sessionService session_service.Se
 }
 
 func (uc *signinApplication) Execute(input *signin.Input) (*signin.Output, *result_app.ApplicationError) {
-	input.Validate()
-	if input.IsInvalid() {
-		return nil, result_app.New(result_app.BAD_REQUEST_CODE, input.GetErrors())
+	validated := input.Validate()
+	if validated.IsInvalid() {
+		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
 	session, authErr := uc.authService.Authenticate(input.UserName, input.Password)

@@ -2,10 +2,11 @@ package session_service_test
 
 import (
 	"bytes"
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/shared/service/session_service/session_service_fixture"
 	"testing"
 	"time"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenSaveSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T) {

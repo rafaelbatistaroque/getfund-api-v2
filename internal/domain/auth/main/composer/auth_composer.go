@@ -13,7 +13,7 @@ import (
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	sessionService "getfund-api-v2/internal/shared/service/session_service"
-	"getfund-api-v2/pkg/eventbus"
+	"getfund-api-v2/pkg/bus"
 	"net/http"
 
 	"gorm.io/gorm"
@@ -30,7 +30,7 @@ func GetHandlers(
 	cache cache_service.Cache,
 	sessionServive sessionService.SessionService,
 	db *gorm.DB,
-	eventBus eventbus.EventBus) AuthComposer {
+	eventBus bus.EventBus) AuthComposer {
 
 	//dependencies
 	hasher := security.New()

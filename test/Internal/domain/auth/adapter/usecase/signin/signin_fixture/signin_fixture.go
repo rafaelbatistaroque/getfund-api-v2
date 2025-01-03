@@ -6,9 +6,10 @@ import (
 	"getfund-api-v2/internal/domain/auth/adapter/usecase/signin"
 	sut "getfund-api-v2/internal/domain/auth/adapter/usecase/signin/application"
 	"getfund-api-v2/internal/shared/result_app"
-	validation "getfund-api-v2/pkg/input_validation"
 	"getfund-api-v2/test/helper/mapper_spy/signin_mapper_spy"
 	"getfund-api-v2/test/helper/session_spy"
+
+	validation "github.com/rafaelbatistaroque/validation"
 )
 
 func NewSut() (signin.UseCase, *authServiceSpy, *session_spy.SessionServiceSpy, *signin_mapper_spy.SigninMapperSpy) {
@@ -25,12 +26,12 @@ func GetValidInput() *signin.Input {
 
 func GetInputWithUserNameInvalid() (*signin.Input, *result_app.ApplicationError) {
 	return &signin.Input{UserName: "", Password: "fake-password"},
-		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "UserName"))
+		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "UserName"))
 }
 
 func GetInputWithPasswordInvalid() (*signin.Input, *result_app.ApplicationError) {
 	return &signin.Input{Password: "", UserName: "fake-username"},
-		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_Msg_PARAMETER_NOT_EMPTY.Error(), "Password"))
+		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
 }
 
 type authServiceSpy struct {

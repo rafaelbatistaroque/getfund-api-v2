@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
-	"getfund-api-v2/pkg/eventbus/event"
-	"getfund-api-v2/pkg/verify"
+	"getfund-api-v2/pkg/bus/event"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/usecase/recover_password/recover_password_fixture"
 	"testing"
 	"time"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenRecoverPasswordExecute_WhenInputTokenInvalid_ThenEnsureReturnError(t *testing.T) {

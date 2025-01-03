@@ -1,9 +1,10 @@
 package auth_user_repository_test
 
 import (
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/auth/port/repository/user_repository_fixture"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 
 	"github.com/google/uuid"
 )

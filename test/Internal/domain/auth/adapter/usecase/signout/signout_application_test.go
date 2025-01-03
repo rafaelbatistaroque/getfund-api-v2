@@ -2,14 +2,15 @@ package signout_test
 
 import (
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/usecase/signout/signout_fixture"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenSignoutExecute_WhenInputInvalid_ThenEnsureReturnErro(t *testing.T) {
 	// Arrange
-	invalidInput := fixture.GetInvalidInput()
+	invalidInput, errorInput := fixture.GetInvalidInputWithError()
 	sut, _ := fixture.NewSut()
 
 	// Act
@@ -17,8 +18,8 @@ func Test_GivenSignoutExecute_WhenInputInvalid_ThenEnsureReturnErro(t *testing.T
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
-	verify.Should(t, err.Message).Be(invalidInput.GetErrors())
+	verify.Should(t, err.Code).Be(errorInput.Code)
+	verify.Should(t, err.Message).Be(errorInput.Message)
 }
 
 func Test_GivenSignoutExecute_WhenValidInput_ThenEnsureCallDeleteSessionWithCorrectParameter(t *testing.T) {

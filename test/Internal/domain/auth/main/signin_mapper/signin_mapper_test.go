@@ -3,9 +3,10 @@ package signin_mapper_test
 import (
 	"bytes"
 	"encoding/json"
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/auth/main/signin_mapper/signin_mapper_fixture"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 
 	"github.com/google/uuid"
 )

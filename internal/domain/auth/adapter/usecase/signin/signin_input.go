@@ -1,18 +1,22 @@
 package signin
 
 import (
-	validation "getfund-api-v2/pkg/input_validation"
+	validation "github.com/rafaelbatistaroque/validation"
 )
 
 type Input = signinInput
 
 type signinInput struct {
-	validation.InputValidation
 	Password string
 	UserName string
+
+	rules validation.Rule
 }
 
-func (i *signinInput) Validate() {
-	i.Required(i.UserName, "UserName")
-	i.Required(i.Password, "Password")
+func (i *signinInput) Validate() validation.Validatable {
+	i.rules.
+		ApplyRules(i.UserName, "UserName", &validation.RequiredRule{}).
+		ApplyRules(i.Password, "Password", &validation.RequiredRule{})
+
+	return i.rules.GetResult()
 }

@@ -1,10 +1,11 @@
 package cache_service_test
 
 import (
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/shared/service/cache_service/redis_cache_service_fixture"
 	"testing"
 	"time"
+
+	"github.com/rafaelbatistaroque/verify"
 
 	"github.com/google/uuid"
 )

@@ -4,8 +4,8 @@ import (
 	"getfund-api-v2/internal/domain/notification/adapter/usecase/send_recover_password_mail"
 	sut "getfund-api-v2/internal/domain/notification/port/event_handler/recover_password_started_event_handler"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/pkg/eventbus"
-	"getfund-api-v2/pkg/eventbus/event"
+	"getfund-api-v2/pkg/bus"
+	"getfund-api-v2/pkg/bus/event"
 )
 
 type SendRecoverPasswordMailUsecaseSpy struct {
@@ -15,7 +15,7 @@ type SendRecoverPasswordMailUsecaseSpy struct {
 	SuccessResult map[string]*send_recover_password_mail.Output
 }
 
-func NewSut() (eventbus.Handler, *SendRecoverPasswordMailUsecaseSpy) {
+func NewSut() (bus.Handler, *SendRecoverPasswordMailUsecaseSpy) {
 	sendRecoverPasswordMailUsecaseSpy := &SendRecoverPasswordMailUsecaseSpy{
 		Params:        make(map[string]*send_recover_password_mail.Input),
 		CallsCount:    make(map[string]int),

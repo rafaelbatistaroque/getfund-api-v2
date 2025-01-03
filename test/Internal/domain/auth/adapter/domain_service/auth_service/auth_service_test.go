@@ -5,9 +5,10 @@ import (
 	"errors"
 	authmodel "getfund-api-v2/internal/domain/auth/adapter/model"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/pkg/verify"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/domain_service/auth_service/auth_service_fixture"
 	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
 )
 
 func Test_GivenAuthenticate_WhenInit_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {

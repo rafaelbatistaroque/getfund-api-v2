@@ -1,16 +1,20 @@
 package recover_password
 
 import (
-	validation "getfund-api-v2/pkg/input_validation"
+	validation "github.com/rafaelbatistaroque/validation"
 )
 
 type Input = recoverPasswordInput
 
 type recoverPasswordInput struct {
-	validation.InputValidation
 	Username string `json:"email"`
+
+	rules validation.Rule
 }
 
-func (i *recoverPasswordInput) Validate() {
-	i.Required(i.Username, "Username")
+func (i *recoverPasswordInput) Validate() validation.Validatable {
+	i.rules.
+		ApplyRules(i.Username, "Username", &validation.RequiredRule{})
+
+	return i.rules.GetResult()
 }

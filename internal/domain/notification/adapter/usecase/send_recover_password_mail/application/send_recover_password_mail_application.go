@@ -30,9 +30,9 @@ func New(cacheService cache_service.Cache, mailService contract.MailService, set
 }
 
 func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_password_mail.Input) (*send_recover_password_mail.Output, *result_app.ApplicationError) {
-	input.Validate()
-	if input.IsInvalid() {
-		return nil, result_app.New(result_app.BAD_REQUEST_CODE, input.GetErrors())
+	validated := input.Validate()
+	if validated.IsInvalid() {
+		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
 	userCached, errCache := uc.cacheService.Get(input.KeyCache)
