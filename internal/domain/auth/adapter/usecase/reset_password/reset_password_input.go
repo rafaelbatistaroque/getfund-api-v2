@@ -19,7 +19,7 @@ func (i *resetPasswordInput) Validate() validation.Validatable {
 		).
 		ApplyRules(i.Password, "Password",
 			&validation.RequiredRule{},
-			&validation.PasswordRule{MinLength: 8, RequireUpper: true, RequireLower: true})
+			&validation.PasswordRule{MinLength: 8, RequireUpper: true, RequireLower: true, RequireDigit: true})
 
 	return i.rules.GetResult()
 }
