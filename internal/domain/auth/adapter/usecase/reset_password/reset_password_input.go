@@ -18,7 +18,8 @@ func (i *resetPasswordInput) Validate() validation.Validatable {
 			&validation.LengthRule{Length: 64},
 		).
 		ApplyRules(i.Password, "Password",
-			&validation.RequiredRule{})
+			&validation.RequiredRule{},
+			&validation.PasswordRule{MinLength: 8})
 
 	return i.rules.GetResult()
 }
