@@ -89,3 +89,16 @@ func Test_GivenExecute_WhenInputPasswordMissingLowerCaseCharacter_ThenEnsureRetu
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_SHOULD_HAVE_LOWER_CHARACTER.Error(), "Password"))
 }
+
+func Test_GivenExecute_WhenInputPasswordMissingDigitCharacter_ThenEnsureReturnErrorFromValidate(t *testing.T) {
+	// Arrange
+	invalidInput := fixture.GetInput(fixture.WithInvalidDigitPassword())
+	sut := reset_password_application.New()
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_SHOULD_HAVE_DIGIT_CHARACTER.Error(), "Password"))
+}
