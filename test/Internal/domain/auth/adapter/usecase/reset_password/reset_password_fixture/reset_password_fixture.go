@@ -3,8 +3,6 @@ package reset_password_fixture
 import (
 	"getfund-api-v2/internal/domain/auth/adapter/usecase/reset_password"
 	sut "getfund-api-v2/internal/domain/auth/adapter/usecase/reset_password/application"
-
-	"github.com/google/uuid"
 )
 
 type ResetPasswordFixture struct {
@@ -18,7 +16,7 @@ func NewSut() (reset_password.UseCase, *ResetPasswordFixture) {
 type Option func(*reset_password.Input)
 
 func GetInput(options ...Option) *reset_password.Input {
-	input := &reset_password.Input{RecoveryCode: uuid.NewString() + uuid.NewString(), Password: "strongPassword123"}
+	input := &reset_password.Input{RecoveryCode: "fake-al44iyayjdL7fpW93wEXnkfXotDrx2krPjoREOhIgO7QD4j5MIEtWe5bSxO", Password: "strongPassword123"}
 
 	for _, opt := range options {
 		opt(input)
