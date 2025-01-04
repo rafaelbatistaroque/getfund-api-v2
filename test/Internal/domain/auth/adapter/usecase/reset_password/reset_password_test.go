@@ -48,5 +48,18 @@ func Test_GivenExecute_WhenInputPasswordEmpty_ThenEnsureReturnErrorFromValidate(
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
-	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
+}
+
+func Test_GivenExecute_WhenInputPasswordLowerThan8Character_ThenEnsureReturnErrorFromValidate(t *testing.T) {
+	// Arrange
+	invalidInput := fixture.GetInput(fixture.WithInvalidLengthPassword())
+	sut := reset_password_application.New()
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_LENGHT_INVALID.Error(), "Password", 8))
 }
