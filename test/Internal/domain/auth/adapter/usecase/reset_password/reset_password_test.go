@@ -138,3 +138,18 @@ func Test_GivenExecute_WhenGetCacheError_ThenEnsureReturnNotFoundWithErrorFrom(t
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
 	verify.Should(t, err.Message).Be(spies.CacheSpy.ErrorResult["Get"])
 }
+
+func Test_GivenExecute_WhenExecuteFinished_ThenEnsureDeleteCacheInOrderWithCorrectParameter(t *testing.T) {
+	// Arrange
+	validInput := fixture.GetInput()
+	expectedCacheParameter := "recovery_password_" + validInput.RecoveryCode
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.Params["Delete:key"]).Be(expectedCacheParameter)
+	verify.Should(t, spies.CacheSpy.InvokeOrder[0]).Be("Get")
+	verify.Should(t, spies.CacheSpy.InvokeOrder[1]).Be("Delete")
+}
