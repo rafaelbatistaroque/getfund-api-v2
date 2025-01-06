@@ -2,7 +2,6 @@ package reset_password_test
 
 import (
 	"fmt"
-	reset_password_application "getfund-api-v2/internal/domain/auth/adapter/usecase/reset_password/application"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/usecase/reset_password/reset_password_fixture"
 	"testing"
@@ -14,7 +13,7 @@ import (
 func Test_GivenExecute_WhenInputRecoveryCodeEmpty_ThenEnsureReturnErrorFromValidate(t *testing.T) {
 	// Arrange
 	invalidInput := fixture.GetInput(fixture.WithRecoveryCodeEmpty())
-	sut := reset_password_application.New()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -28,7 +27,7 @@ func Test_GivenExecute_WhenInputRecoveryCodeLengthNotExactly64_ThenEnsureReturnE
 	// Arrange
 	invalidOptions := []fixture.Option{fixture.WithRecoveryCodeEmpty(), fixture.WithRecoveryCodeInvalidLength()}
 	invalidInput := fixture.GetInput(invalidOptions...)
-	sut := reset_password_application.New()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -41,7 +40,7 @@ func Test_GivenExecute_WhenInputRecoveryCodeLengthNotExactly64_ThenEnsureReturnE
 func Test_GivenExecute_WhenInputPasswordEmpty_ThenEnsureReturnErrorFromValidate(t *testing.T) {
 	// Arrange
 	invalidInput := fixture.GetInput(fixture.WithPasswordEmpty())
-	sut := reset_password_application.New()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -54,7 +53,7 @@ func Test_GivenExecute_WhenInputPasswordEmpty_ThenEnsureReturnErrorFromValidate(
 func Test_GivenExecute_WhenInputPasswordLowerThan8Character_ThenEnsureReturnErrorFromValidate(t *testing.T) {
 	// Arrange
 	invalidInput := fixture.GetInput(fixture.WithInvalidLengthPassword())
-	sut := reset_password_application.New()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -67,7 +66,7 @@ func Test_GivenExecute_WhenInputPasswordLowerThan8Character_ThenEnsureReturnErro
 func Test_GivenExecute_WhenInputPasswordMissingUpperCaseCharacter_ThenEnsureReturnErrorFromValidate(t *testing.T) {
 	// Arrange
 	invalidInput := fixture.GetInput(fixture.WithInvalidUpperPassword())
-	sut := reset_password_application.New()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -80,7 +79,7 @@ func Test_GivenExecute_WhenInputPasswordMissingUpperCaseCharacter_ThenEnsureRetu
 func Test_GivenExecute_WhenInputPasswordMissingLowerCaseCharacter_ThenEnsureReturnErrorFromValidate(t *testing.T) {
 	// Arrange
 	invalidInput := fixture.GetInput(fixture.WithInvalidLowerPassword())
-	sut := reset_password_application.New()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -93,7 +92,7 @@ func Test_GivenExecute_WhenInputPasswordMissingLowerCaseCharacter_ThenEnsureRetu
 func Test_GivenExecute_WhenInputPasswordMissingDigitCharacter_ThenEnsureReturnErrorFromValidate(t *testing.T) {
 	// Arrange
 	invalidInput := fixture.GetInput(fixture.WithInvalidDigitPassword())
-	sut := reset_password_application.New()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
