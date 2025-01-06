@@ -12,6 +12,7 @@ var (
 	BAD_REQUEST_CODE         = 6
 	UNAVAILABLE_CODE         = 7
 	UNMODIFIED_CODE          = 8
+	SUCCESS_CREATED_CODE     = 9
 )
 
 type ApplicationError struct {
