@@ -26,7 +26,10 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validatable.GetErrors())
 	}
 
-	r.cacheService.Get(_KEY_CACHE_PREFIX + input.RecoveryCode)
+	_, errCache := r.cacheService.Get(_KEY_CACHE_PREFIX + input.RecoveryCode)
+	if errCache != nil {
+		return nil, result_app.New(result_app.NOT_FOUND_CODE, errCache)
+	}
 
 	return nil, nil
 }
