@@ -153,3 +153,14 @@ func Test_GivenExecute_WhenExecuteFinished_ThenEnsureDeleteCacheInOrderWithCorre
 	verify.Should(t, spies.CacheSpy.InvokeOrder[0]).Be("Get")
 	verify.Should(t, spies.CacheSpy.InvokeOrder[1]).Be("Delete")
 }
+
+func Test_GivenExecute_WhenExecuteFinished_ThenEnsureCallDeleteCacheOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
+}
