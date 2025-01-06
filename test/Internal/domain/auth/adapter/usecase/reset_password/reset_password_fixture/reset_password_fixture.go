@@ -3,14 +3,19 @@ package reset_password_fixture
 import (
 	"getfund-api-v2/internal/domain/auth/adapter/usecase/reset_password"
 	sut "getfund-api-v2/internal/domain/auth/adapter/usecase/reset_password/application"
+	"getfund-api-v2/test/helper/cache_spy"
 )
 
 type ResetPasswordFixture struct {
+	CacheSpy *cache_spy.RedisCacheSpy
 }
 
 func NewSut() (reset_password.UseCase, *ResetPasswordFixture) {
+	cacheSpy := cache_spy.New()
 
-	return sut.New(), nil
+	return sut.New(cacheSpy), &ResetPasswordFixture{
+		CacheSpy: cacheSpy,
+	}
 }
 
 type Option func(*reset_password.Input)

@@ -101,3 +101,16 @@ func Test_GivenExecute_WhenInputPasswordMissingDigitCharacter_ThenEnsureReturnEr
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_SHOULD_HAVE_DIGIT_CHARACTER.Error(), "Password"))
 }
+
+func Test_GivenExecute_WhenValidInput_ThenEnsureCallGetCacheWithCorrectParameter(t *testing.T) {
+	// Arrange
+	validInput := fixture.GetInput()
+	expectedCacheParameter := "recovery_password_" + validInput.RecoveryCode
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(expectedCacheParameter)
+}
