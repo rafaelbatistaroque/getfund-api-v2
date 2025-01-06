@@ -125,3 +125,16 @@ func Test_GivenExecute_WhenGetCacheInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Assert
 	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(1)
 }
+
+func Test_GivenExecute_WhenGetCacheError_ThenEnsureReturnNotFoundWithErrorFrom(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Message).Be(spies.CacheSpy.ErrorResult["Get"])
+}
