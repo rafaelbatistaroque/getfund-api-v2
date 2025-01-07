@@ -1,13 +1,13 @@
 package auth_composer
 
 import (
-	"getfund-api-v2/internal/domain/auth/adapter/domain_service/auth_service"
-	recover_password_application "getfund-api-v2/internal/domain/auth/adapter/usecase/recover_password/application"
-	signin_application "getfund-api-v2/internal/domain/auth/adapter/usecase/signin/application"
-	signout_application "getfund-api-v2/internal/domain/auth/adapter/usecase/signout/application"
+	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	userRepository "getfund-api-v2/internal/domain/auth/adapter/repository"
+	"getfund-api-v2/internal/domain/auth/core/domain_service/auth_service"
+	recover_password_application "getfund-api-v2/internal/domain/auth/core/usecase/recover_password/application"
+	signin_application "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
+	signout_application "getfund-api-v2/internal/domain/auth/core/usecase/signout/application"
 	mapper "getfund-api-v2/internal/domain/auth/main/mapper/signin_mapper"
-	parser "getfund-api-v2/internal/domain/auth/port/parser"
-	userRepository "getfund-api-v2/internal/domain/auth/port/repository"
 	"getfund-api-v2/internal/proxy"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
@@ -43,12 +43,12 @@ func GetHandlers(
 	signout := signout_application.New(sessionServive)
 	recoverPassword := recover_password_application.New(hasher, settings, userRepository, cache, eventBus)
 
-	//parser
-	parser := parser.New(signin, signout, recoverPassword, nil)
+	//gateway
+	auth_gateway := auth_gateway.New(signin, signout, recoverPassword, nil)
 
 	return AuthComposer{
-		Signin:          proxy.New(parser.Signin),
-		Signout:         proxy.New(parser.Signout),
-		RecoverPassword: proxy.New(parser.RecoverPassword),
+		Signin:          proxy.New(auth_gateway.Signin),
+		Signout:         proxy.New(auth_gateway.Signout),
+		RecoverPassword: proxy.New(auth_gateway.RecoverPassword),
 	}
 }

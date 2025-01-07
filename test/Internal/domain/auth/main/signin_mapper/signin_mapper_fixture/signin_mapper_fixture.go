@@ -1,7 +1,7 @@
 package signin_mapper_fixture
 
 import (
-	model "getfund-api-v2/internal/domain/auth/adapter/model"
+	model "getfund-api-v2/internal/domain/auth/core/model"
 	"getfund-api-v2/internal/domain/auth/main/mapper/signin_mapper"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"

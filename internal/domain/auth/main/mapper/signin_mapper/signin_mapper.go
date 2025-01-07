@@ -2,8 +2,8 @@ package signin_mapper
 
 import (
 	"encoding/json"
-	model "getfund-api-v2/internal/domain/auth/adapter/model"
-	"getfund-api-v2/internal/domain/auth/adapter/usecase/signin"
+	model "getfund-api-v2/internal/domain/auth/core/model"
+	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
 )

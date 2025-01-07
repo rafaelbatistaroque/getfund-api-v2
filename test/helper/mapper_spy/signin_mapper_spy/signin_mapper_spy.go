@@ -2,8 +2,8 @@ package signin_mapper_spy
 
 import (
 	"errors"
-	model "getfund-api-v2/internal/domain/auth/adapter/model"
-	"getfund-api-v2/internal/domain/auth/adapter/usecase/signin"
+	model "getfund-api-v2/internal/domain/auth/core/model"
+	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
 
 type Spy struct {

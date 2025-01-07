@@ -2,7 +2,7 @@ package user_repository_spy
 
 import (
 	"errors"
-	model "getfund-api-v2/internal/domain/auth/adapter/model"
+	model "getfund-api-v2/internal/domain/auth/core/model"
 )
 
 type UserRepositorySpy struct {

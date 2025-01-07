@@ -1,10 +1,10 @@
 package notification_composer
 
 import (
-	send_recover_password_mail_application "getfund-api-v2/internal/domain/notification/adapter/usecase/send_recover_password_mail/application"
-	"getfund-api-v2/internal/domain/notification/port/event_handler/recover_password_started_event_handler"
-	"getfund-api-v2/internal/domain/notification/port/service/mail_service"
-	"getfund-api-v2/internal/domain/notification/port/service/template_file_service"
+	"getfund-api-v2/internal/domain/notification/adapter/event_handler/recover_password_started_event_handler"
+	"getfund-api-v2/internal/domain/notification/adapter/service/mail_service"
+	"getfund-api-v2/internal/domain/notification/adapter/service/template_file_service"
+	send_recover_password_mail_application "getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail/application"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
