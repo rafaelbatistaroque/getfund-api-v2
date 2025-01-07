@@ -177,3 +177,16 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
 }
+
+func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(`{"username":"fake-username","first_name":"fake-first-name","recovery_link":"fake-recovery-link"}`)
+	expectedParam := fixture.GetForgetPasswordFromGetSuccessCache(spies.CacheSpy)
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.RepositorySpy.Params["GetByUserName:username"]).Be(expectedParam.Username)
+}

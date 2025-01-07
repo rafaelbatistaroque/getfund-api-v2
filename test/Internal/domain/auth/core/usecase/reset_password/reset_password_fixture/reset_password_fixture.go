@@ -1,21 +1,34 @@
 package reset_password_fixture
 
 import (
+	"encoding/json"
+	auth_model "getfund-api-v2/internal/domain/auth/core/model"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/reset_password/application"
 	"getfund-api-v2/test/helper/cache_spy"
+	"getfund-api-v2/test/helper/user_repository_spy"
 )
 
 type ResetPasswordFixture struct {
-	CacheSpy *cache_spy.RedisCacheSpy
+	CacheSpy      *cache_spy.RedisCacheSpy
+	RepositorySpy *user_repository_spy.UserRepositorySpy
 }
 
 func NewSut() (reset_password.UseCase, *ResetPasswordFixture) {
 	cacheSpy := cache_spy.New()
+	repo := user_repository_spy.New()
 
-	return sut.New(cacheSpy), &ResetPasswordFixture{
-		CacheSpy: cacheSpy,
+	return sut.New(cacheSpy, repo), &ResetPasswordFixture{
+		CacheSpy:      cacheSpy,
+		RepositorySpy: repo,
 	}
+}
+
+func GetForgetPasswordFromGetSuccessCache(cacheSpy *cache_spy.RedisCacheSpy) *auth_model.ForgetPasswordModel {
+	expectedParam := &auth_model.ForgetPasswordModel{}
+	json.Unmarshal([]byte(cacheSpy.SuccessResult["Get"].(string)), expectedParam)
+
+	return expectedParam
 }
 
 type Option func(*reset_password.Input)
