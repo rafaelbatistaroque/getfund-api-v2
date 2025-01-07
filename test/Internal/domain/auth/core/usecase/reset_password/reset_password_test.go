@@ -258,3 +258,17 @@ func Test_GivenExecute_WhenGetByUserNameError_ThenEnsureReturnNotFoundError(t *t
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
 	verify.Should(t, err.Message).Be(spies.UserRepoSpy.ErrorResult["GetByUserName"])
 }
+
+func Test_GivenExecute_WhenGetByUserNameInvoked_ThenEnsureCallHashAndMergeWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+	expectedParam := fixture.GetInput()
+
+	// Act
+	sut.Execute(expectedParam)
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.Params["HashAndMerge:input"]).Be(expectedParam.Password)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashAndMerge:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+}
