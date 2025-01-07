@@ -193,6 +193,18 @@ func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallHashWithSaltWithCorrect
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
 
+func Test_GivenExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
+}
+
 func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
