@@ -272,3 +272,15 @@ func Test_GivenExecute_WhenGetByUserNameInvoked_ThenEnsureCallHashAndMergeWithCo
 	verify.Should(t, spies.HasherSpy.Params["HashAndMerge:input"]).Be(expectedParam.Password)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashAndMerge:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
+
+func Test_GivenExecute_WhenHashAndMergeInvoked_ThenEnsureCallOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["HashAndMerge"]).Be(1)
+}
