@@ -45,5 +45,7 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
 	}
 
+	r.userRepository.GetByUserName(forgetPasswordModel.Username)
+
 	return nil, nil
 }
