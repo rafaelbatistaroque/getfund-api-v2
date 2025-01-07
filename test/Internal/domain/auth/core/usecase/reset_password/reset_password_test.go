@@ -233,6 +233,18 @@ func Test_GivenExecute_WhenHashWithSaltSuccess_ThenEnsureCallGetByUserNameWithCo
 	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedValue)
 }
 
+func Test_GivenExecute_WhenGetByUserNameInvoked_ThenEnsureCallOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.UserRepoSpy.CallsCount["GetByUserName"]).Be(1)
+}
+
 func Test_GivenExecute_WhenGetByUserNameError_ThenEnsureReturnNotFoundError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
