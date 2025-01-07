@@ -60,7 +60,11 @@ func (r *RedisCacheSpy) Close() error {
 func (r *RedisCacheSpy) DefineCacheSetError()    { r.ErrorResult["Set"] = errors.New("fake-error") }
 func (r *RedisCacheSpy) DefineCacheDeleteError() { r.ErrorResult["Delete"] = errors.New("fake-error") }
 func (r *RedisCacheSpy) DefineCacheGetError()    { r.ErrorResult["Get"] = errors.New("fake-error") }
-func (r *RedisCacheSpy) DefineCacheGetSuccess() {
+func (r *RedisCacheSpy) DefineCacheGetSuccess(value string) {
+	if value != "" {
+		r.SuccessResult["Get"] = value
+		return
+	}
 	r.SuccessResult["Get"] = `{"fakeField": "fake-value"}`
 }
 func (r *RedisCacheSpy) DefineCacheGetSuccessWithValue(value string) { r.SuccessResult["Get"] = value }

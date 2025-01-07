@@ -58,7 +58,7 @@ func Test_GivenGetSession_WhenCacheGetError_ThenEnsureReturnError(t *testing.T) 
 func Test_GivenGetSession_WhenCacheGetSuccess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, hasherSpy, settingsSpy, cacheSpy := fixture.NewSut()
-	cacheSpy.DefineCacheGetSuccess()
+	cacheSpy.DefineCacheGetSuccess("")
 
 	// Act
 	sut.GetSession(fixture.GetGetSessionInputValid())
@@ -71,7 +71,7 @@ func Test_GivenGetSession_WhenCacheGetSuccess_ThenEnsureCallDecryptMergedWithCor
 func Test_GivenGetSession_WhenDecryptMergedInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, hasherSpy, _, cacheSpy := fixture.NewSut()
-	cacheSpy.DefineCacheGetSuccess()
+	cacheSpy.DefineCacheGetSuccess("")
 
 	// Act
 	sut.GetSession(fixture.GetGetSessionInputValid())
@@ -83,7 +83,7 @@ func Test_GivenGetSession_WhenDecryptMergedInvoked_ThenEnsureCallsOnce(t *testin
 func Test_GivenGetSession_WhenDecryptMergedSuccess_ThenEnsureReturnSession(t *testing.T) {
 	// Arrange
 	sut, hasherSpy, _, cacheSpy := fixture.NewSut()
-	cacheSpy.DefineCacheGetSuccess()
+	cacheSpy.DefineCacheGetSuccess("")
 	hasherSpy.DefineDecryptMergedSuccess("valid-session")
 
 	// Act

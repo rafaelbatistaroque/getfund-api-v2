@@ -164,3 +164,16 @@ func Test_GivenExecute_WhenExecuteFinished_ThenEnsureCallDeleteCacheOnce(t *test
 	// Assert
 	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
 }
+
+func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(`{any-body}`)
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
+}

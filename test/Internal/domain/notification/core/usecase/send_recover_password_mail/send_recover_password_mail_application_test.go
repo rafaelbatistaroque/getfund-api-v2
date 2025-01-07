@@ -64,7 +64,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnApplicationErrorWithSe
 func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccess()
+	spies.CacheSpy.DefineCacheGetSuccess("")
 	spies.TemplateFileSpy.DefineGetRecoveryPasswordTemplateError()
 
 	// Act
@@ -95,7 +95,7 @@ func Test_GivenExecute_WhenGotTemplateAndRecoveryPasswordModel_ThenEnsureSendMai
 func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccess()
+	spies.CacheSpy.DefineCacheGetSuccess("")
 	spies.MailSpy.DefineSendMailError()
 
 	// Act
@@ -109,7 +109,7 @@ func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithSer
 func Test_GivenExecute_WhenSuccess_ThenEnsureReturnOutputWithCorrectMessage(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccess()
+	spies.CacheSpy.DefineCacheGetSuccess("")
 
 	// Act
 	result, _ := sut.Execute(fixture.GetValidInput())
