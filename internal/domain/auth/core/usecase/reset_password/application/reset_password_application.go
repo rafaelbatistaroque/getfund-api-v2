@@ -6,7 +6,9 @@ import (
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	auth_model "getfund-api-v2/internal/domain/auth/core/model"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
+	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
 )
 
@@ -17,12 +19,16 @@ var (
 type resetPasswordApplication struct {
 	cacheService   cache_service.Cache
 	userRepository auth_contract.UserRepository
+	settings       settings.ApplicationSettings
+	hasher         security.Hasher
 }
 
-func New(cacheService cache_service.Cache, userRepository auth_contract.UserRepository) *resetPasswordApplication {
+func New(cacheService cache_service.Cache, userRepository auth_contract.UserRepository, settings settings.ApplicationSettings, hasher security.Hasher) *resetPasswordApplication {
 	return &resetPasswordApplication{
 		cacheService:   cacheService,
 		userRepository: userRepository,
+		settings:       settings,
+		hasher:         hasher,
 	}
 }
 
@@ -44,6 +50,8 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 	if errUnmarshal != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
 	}
+
+	r.hasher.HashWithSalt(forgetPasswordModel.Username, r.settings.GetServerSalt())
 
 	_, errGetUser := r.userRepository.GetByUserName(forgetPasswordModel.Username)
 	if errGetUser != nil {
