@@ -205,6 +205,20 @@ func Test_GivenExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(t *testing.T)
 	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
 }
 
+func Test_GivenExecute_WhenHashWithSaltError_ThenEnsureReturnInternalError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.HasherSpy.DefineHashWithSaltError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
+}
+
 func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
