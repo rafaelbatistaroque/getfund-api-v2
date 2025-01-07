@@ -89,7 +89,7 @@ func Test_GivenRecoverPasswordExecute_WhenGetByUserNameInvoked_ThenEnsureCallsOn
 func Test_GivenRecoverPasswordExecute_WhenGetByUserNameError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineError()
+	spies.UserRepoSpy.DefineGetByUserNameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetValidInput())
@@ -164,7 +164,7 @@ func Test_GivenRecoverPasswordExecute_WhenHashSuccess_ThenEnsureCallCacheSetWith
 	// Arrange
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetValidInput()
-	spies.UserRepoSpy.DefineSuccess()
+	spies.UserRepoSpy.DefineGetByUserNameSuccess()
 	spies.HasherSpy.DefineDecryptMergedSuccess("fake-first-name")
 	spies.HasherSpy.DefineHashSuccess()
 	hashCode := spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data

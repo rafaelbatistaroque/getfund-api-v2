@@ -54,7 +54,7 @@ func Test_GivenAuthenticate_WhenHashWithSaltSuccess_ThenEnsureCallsGetByUserName
 	expectedValue := "fake-username-hashed"
 	sut, _, userRepo, hasherSpy, _ := fixture.NewSut()
 	hasherSpy.DefineHashWithSaltSuccess(expectedValue)
-	userRepo.DefineSuccess()
+	userRepo.DefineGetByUserNameSuccess()
 
 	// Act
 	sut.Authenticate("fake-username", "")
@@ -66,7 +66,7 @@ func Test_GivenAuthenticate_WhenHashWithSaltSuccess_ThenEnsureCallsGetByUserName
 func Test_GivenAuthenticate_WhenHashWithSaltSuccess_ThenEnsureCallsGetByUserNameOnce(t *testing.T) {
 	// Arrange
 	sut, _, userRepo, _, _ := fixture.NewSut()
-	userRepo.DefineSuccess()
+	userRepo.DefineGetByUserNameSuccess()
 
 	// Act
 	sut.Authenticate("fake-username", "")
@@ -78,7 +78,7 @@ func Test_GivenAuthenticate_WhenHashWithSaltSuccess_ThenEnsureCallsGetByUserName
 func Test_GivenAuthenticate_WhenGetByUserNameError_ThenEnsureReturnUnauthorizedError(t *testing.T) {
 	// Arrange
 	sut, _, userRepo, _, _ := fixture.NewSut()
-	userRepo.DefineError()
+	userRepo.DefineGetByUserNameError()
 
 	// Act
 	_, err := sut.Authenticate("fake-username", "")
@@ -93,7 +93,7 @@ func Test_GivenAuthenticate_WhenGetByUserNameSuccess_ThenCallIsMatchWithCorrectP
 	// Arrange
 	expectedPassword := "fake-password"
 	sut, settingsSpy, userRepo, hasherSpy, _ := fixture.NewSut()
-	userRepo.DefineSuccess()
+	userRepo.DefineGetByUserNameSuccess()
 
 	// Act
 	sut.Authenticate("fake-username", expectedPassword)
@@ -108,7 +108,7 @@ func Test_GivenAuthenticate_WhenGetByUserNameSuccess_ThenCallIsMatchWithCorrectP
 func Test_GivenAuthenticate_WhenGetByUserNameSuccess_ThenCallIsMatchOnce(t *testing.T) {
 	// Arrange
 	sut, _, userRepo, hasherSpy, _ := fixture.NewSut()
-	userRepo.DefineSuccess()
+	userRepo.DefineGetByUserNameSuccess()
 
 	// Act
 	sut.Authenticate("fake-username", "fake-password")
@@ -121,7 +121,7 @@ func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t
 	// Arrange
 	expectedPasswordError := errors.New("invalid password")
 	sut, _, userRepo, hasherSpy, _ := fixture.NewSut()
-	userRepo.DefineSuccess()
+	userRepo.DefineGetByUserNameSuccess()
 	hasherSpy.DefineIsMatchError()
 
 	// Act
@@ -136,7 +136,7 @@ func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t
 func Test_GivenAuthenticate_WhenIsMatchSuccess_ThenEnsureCallToSessionModelWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, _, userRepo, hasherSpy, mapperSpy := fixture.NewSut()
-	userRepo.DefineSuccess()
+	userRepo.DefineGetByUserNameSuccess()
 	hasherSpy.DefineIsMatchSuccess()
 
 	// Act
@@ -149,7 +149,7 @@ func Test_GivenAuthenticate_WhenIsMatchSuccess_ThenEnsureCallToSessionModelWithC
 func Test_GivenAuthenticate_WhenSuccess_ThenEnsureReturnoSessionModelFilled(t *testing.T) {
 	// Arrange
 	sut, _, userRepo, hasherSpy, mapperSpy := fixture.NewSut()
-	userRepo.DefineSuccess()
+	userRepo.DefineGetByUserNameSuccess()
 	hasherSpy.DefineIsMatchSuccess()
 	user := userRepo.SuccessResult["GetByUserName"].(*authmodel.UserModel)
 	mapperSpy.DefineToSessionModelSuccess(user)

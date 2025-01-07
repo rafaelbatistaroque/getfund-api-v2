@@ -190,3 +190,17 @@ func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetByUserNameWithCorrec
 	// Assert
 	verify.Should(t, spies.RepositorySpy.Params["GetByUserName:username"]).Be(expectedParam.Username)
 }
+
+func Test_GivenExecute_WhenGetByUserNameError_ThenEnsureReturnNotFoundError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.RepositorySpy.DefineGetByUserNameError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Message).Be(spies.RepositorySpy.ErrorResult["GetByUserName"])
+}

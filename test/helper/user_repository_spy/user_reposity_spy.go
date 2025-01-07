@@ -26,14 +26,14 @@ func (r *UserRepositorySpy) GetByUserName(username string) (*model.UserModel, er
 	if sucess != nil {
 		return sucess.(*model.UserModel), r.ErrorResult["GetByUserName"]
 	}
-	r.DefineSuccess()
+	r.DefineGetByUserNameSuccess()
 	return r.SuccessResult["GetByUserName"].(*model.UserModel), r.ErrorResult["GetByUserName"]
 }
 
-func (r *UserRepositorySpy) DefineError() {
+func (r *UserRepositorySpy) DefineGetByUserNameError() {
 	r.ErrorResult["GetByUserName"] = errors.New("fake-error")
 }
 
-func (r *UserRepositorySpy) DefineSuccess() {
+func (r *UserRepositorySpy) DefineGetByUserNameSuccess() {
 	r.SuccessResult["GetByUserName"] = &model.UserModel{Password: "fake-password-hashed", FirstName: "fake-username", Id: "fake-id", IsAdmin: 0}
 }
