@@ -51,12 +51,12 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
 	}
 
-	_, errHasher := r.hasher.HashWithSalt(forgetPasswordModel.Username, r.settings.GetServerSalt())
+	usernameHashed, errHasher := r.hasher.HashWithSalt(forgetPasswordModel.Username, r.settings.GetServerSalt())
 	if errHasher != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errHasher)
 	}
 
-	_, errGetUser := r.userRepository.GetByUserName(forgetPasswordModel.Username)
+	_, errGetUser := r.userRepository.GetByUserName(usernameHashed)
 	if errGetUser != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errGetUser)
 	}
