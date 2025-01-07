@@ -219,17 +219,18 @@ func Test_GivenExecute_WhenHashWithSaltError_ThenEnsureReturnInternalError(t *te
 	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
 }
 
-func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenHashWithSaltSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
 	// Arrange
+	expectedValue := "fake-username-hashed"
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(`{"username":"fake-username","first_name":"fake-first-name","recovery_link":"fake-recovery-link"}`)
-	expectedParam := fixture.GetForgetPasswordFromGetSuccessCache(spies.CacheSpy)
+	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.HasherSpy.DefineHashWithSaltSuccess(expectedValue)
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedParam.Username)
+	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedValue)
 }
 
 func Test_GivenExecute_WhenGetByUserNameError_ThenEnsureReturnNotFoundError(t *testing.T) {
