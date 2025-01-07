@@ -1,6 +1,10 @@
 package reset_password_application
 
 import (
+	"encoding/json"
+	"errors"
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	auth_model "getfund-api-v2/internal/domain/auth/core/model"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
@@ -11,12 +15,14 @@ var (
 )
 
 type resetPasswordApplication struct {
-	cacheService cache_service.Cache
+	cacheService   cache_service.Cache
+	userRepository auth_contract.UserRepository
 }
 
-func New(cacheService cache_service.Cache) *resetPasswordApplication {
+func New(cacheService cache_service.Cache, userRepository auth_contract.UserRepository) *resetPasswordApplication {
 	return &resetPasswordApplication{
-		cacheService: cacheService,
+		cacheService:   cacheService,
+		userRepository: userRepository,
 	}
 }
 
@@ -28,9 +34,15 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 
 	keyRecoveryCode := _KEY_CACHE_PREFIX + input.RecoveryCode
 	defer r.cacheService.Delete(keyRecoveryCode)
-	_, errCache := r.cacheService.Get(keyRecoveryCode)
+	cacheData, errCache := r.cacheService.Get(keyRecoveryCode)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errCache)
+	}
+
+	forgetPasswordModel := &auth_model.ForgetPasswordModel{}
+	errUnmarshal := json.Unmarshal([]byte(cacheData), forgetPasswordModel)
+	if errUnmarshal != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
 	}
 
 	return nil, nil
