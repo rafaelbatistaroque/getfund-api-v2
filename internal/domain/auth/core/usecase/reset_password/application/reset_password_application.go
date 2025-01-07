@@ -61,5 +61,7 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errGetUser)
 	}
 
+	r.hasher.HashAndMerge(input.Password, r.settings.GetServerSalt())
+
 	return nil, nil
 }
