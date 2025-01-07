@@ -1,6 +1,7 @@
 package reset_password_test
 
 import (
+	"bytes"
 	"fmt"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/reset_password/reset_password_fixture"
@@ -178,6 +179,20 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
 }
 
+func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(`{"username":"fake-username"}`)
+	expectedParam := fixture.GetForgetPasswordFromGetSuccessCache(spies.CacheSpy)
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.Params["HashWithSalt:inputText"]).Be(expectedParam.Username)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+}
+
 func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
@@ -188,19 +203,19 @@ func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetByUserNameWithCorrec
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepositorySpy.Params["GetByUserName:username"]).Be(expectedParam.Username)
+	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedParam.Username)
 }
 
 func Test_GivenExecute_WhenGetByUserNameError_ThenEnsureReturnNotFoundError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.RepositorySpy.DefineGetByUserNameError()
+	spies.UserRepoSpy.DefineGetByUserNameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
-	verify.Should(t, err.Message).Be(spies.RepositorySpy.ErrorResult["GetByUserName"])
+	verify.Should(t, err.Message).Be(spies.UserRepoSpy.ErrorResult["GetByUserName"])
 }
