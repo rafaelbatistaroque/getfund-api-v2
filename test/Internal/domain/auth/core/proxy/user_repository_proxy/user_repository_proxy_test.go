@@ -31,3 +31,15 @@ func Test_GivenGetByUserName_WhenInit_ThenEnsureCallHashWithSaltOnce(t *testing.
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
 }
+
+func Test_GivenGetByUserName_WhenHashWithSaltError_ThenEnsureReturnServerError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltError()
+
+	// Act
+	_, err := sut.GetByUserName("fake-username")
+
+	// Assert
+	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
+}
