@@ -1,7 +1,7 @@
 package user_repository_fixture
 
 import (
-	authuserrepository "getfund-api-v2/internal/domain/auth/adapter/repository"
+	authuserrepository "getfund-api-v2/internal/domain/auth/adapter/auth_user_repository"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/test/helper/db_fixture"
 	"math/rand"
