@@ -35,7 +35,7 @@ func GetHandlers(
 
 	//dependencies
 	hasher := security.New()
-	mapper := mapper.New(hasher, settings)
+	mapper := mapper.New()
 	userRepositoryProxy := user_repository_proxy.New(userRepository.New(db), settings, hasher)
 	authService := auth_service.New(userRepositoryProxy, settings, hasher, mapper)
 

@@ -1,20 +1,17 @@
 package signin_mapper_test
 
 import (
-	"bytes"
 	"encoding/json"
 	fixture "getfund-api-v2/test/internal/domain/auth/main/signin_mapper/signin_mapper_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"
-
-	"github.com/google/uuid"
 )
 
 func Test_GivenSigninMapper_WhenToOutput_ThenEnsureCorrectMapToSigninOutput(t *testing.T) {
 	// Arrange
 	expectedToken := "fake-token"
-	sut, expectedResult, _, _ := fixture.NewSut()
+	sut, expectedResult := fixture.NewSut()
 
 	// Act
 	result := sut.ToOutput(expectedToken, expectedResult)
@@ -29,7 +26,7 @@ func Test_GivenSigninMapper_WhenToOutput_ThenEnsureCorrectMapToSigninOutput(t *t
 
 func Test_GivenSigninMapper_WhenSessionToStringSuccess_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut, toSerialized, _, _ := fixture.NewSut()
+	sut, toSerialized := fixture.NewSut()
 	expectedResult, _ := json.Marshal(toSerialized)
 
 	// Act
@@ -39,30 +36,16 @@ func Test_GivenSigninMapper_WhenSessionToStringSuccess_ThenEnsureReturnError(t *
 	verify.Should(t, result).Be(string(expectedResult))
 }
 
-func Test_GivenSigninMapper_WhenToSessionModelMap_ThenEnsureCallDecryptWithCorrectParameter(t *testing.T) {
-	// Arrange
-	sut, _, hasherSpy, settingsSpy := fixture.NewSut()
-	user := fixture.GetUserModel()
-
-	// Act
-	sut.ToSessionModel(user)
-
-	// Assert
-	verify.Should(t, hasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(user.FirstName)
-	verify.Should(t, bytes.Equal(hasherSpy.Params["DecryptMerged:secretKey"].([]byte), settingsSpy.GetSecretKey())).BeTrue()
-}
-
 func Test_GivenSigninMapper_WhenToSessionModelMapped_ThenEnsureReturnSessionModel(t *testing.T) {
 	// Arrange
-	sut, _, hasherSpy, _ := fixture.NewSut()
+	sut, _ := fixture.NewSut()
 	user := fixture.GetUserModel()
-	hasherSpy.DefineDecryptMergedSuccess(uuid.NewString())
 
 	// Act
 	result := sut.ToSessionModel(user)
 
 	// Assert
 	verify.Should(t, result.ID).Be(user.Id)
+	verify.Should(t, result.FirstName).Be(user.FirstName)
 	verify.Should(t, result.IsAdmin).Be(user.IsAdmin)
-	verify.Should(t, result.FirstName).Be(hasherSpy.SuccessResult["DecryptMerged"])
 }
