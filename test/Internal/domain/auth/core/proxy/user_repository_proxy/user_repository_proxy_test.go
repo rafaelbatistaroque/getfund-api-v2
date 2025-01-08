@@ -2,6 +2,7 @@ package user_repository_proxy_test
 
 import (
 	"bytes"
+	auth_model "getfund-api-v2/internal/domain/auth/core/model"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/proxy/user_repository_proxy/user_repository_proxy_fixture"
 	"testing"
 
@@ -78,4 +79,18 @@ func Test_GivenGetByUserName_WhenGetByUserNameError_ThenEnsureReturnErrorFrom(t 
 
 	// Assert
 	verify.Should(t, err).Be(spies.UserRepoSpy.ErrorResult["GetByUserName"])
+}
+
+func Test_GivenGetByUserName_WhenGetByUserNameSucess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+
+	// Act
+	sut.GetByUserName("fake-username")
+
+	// Assert
+	user := spies.UserRepoSpy.SuccessResult["GetByUserName"].(*auth_model.UserModel)
+	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(user.FirstName)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
 }
