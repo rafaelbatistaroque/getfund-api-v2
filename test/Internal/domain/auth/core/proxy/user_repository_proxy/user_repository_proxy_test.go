@@ -56,3 +56,14 @@ func Test_GivenGetByUserName_WhenHashWithSaltSuccess_ThenEnsureCallRepositoryGet
 	// Assert
 	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedParameter)
 }
+
+func Test_GivenGetByUserName_WhenGetByUserNameInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.GetByUserName("fake-username")
+
+	// Assert
+	verify.Should(t, spies.UserRepoSpy.CallsCount["GetByUserName"]).Be(1)
+}
