@@ -8,7 +8,7 @@ import (
 	signin_application "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
 	signout_application "getfund-api-v2/internal/domain/auth/core/usecase/signout/application"
 	mapper "getfund-api-v2/internal/domain/auth/main/mapper/signin_mapper"
-	"getfund-api-v2/internal/proxy"
+	"getfund-api-v2/internal/proxy/response_proxy"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
@@ -47,8 +47,8 @@ func GetHandlers(
 	auth_gateway := auth_gateway.New(signin, signout, recoverPassword, nil)
 
 	return AuthComposer{
-		Signin:          proxy.New(auth_gateway.Signin),
-		Signout:         proxy.New(auth_gateway.Signout),
-		RecoverPassword: proxy.New(auth_gateway.RecoverPassword),
+		Signin:          response_proxy.New(auth_gateway.Signin),
+		Signout:         response_proxy.New(auth_gateway.Signout),
+		RecoverPassword: response_proxy.New(auth_gateway.RecoverPassword),
 	}
 }

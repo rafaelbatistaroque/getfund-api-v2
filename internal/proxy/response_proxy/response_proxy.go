@@ -1,4 +1,4 @@
-package proxy
+package response_proxy
 
 import (
 	"encoding/json"

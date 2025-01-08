@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"getfund-api-v2/internal/proxy"
+	"getfund-api-v2/internal/proxy/response_proxy"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/session_service"
 	"net/http"
@@ -32,13 +32,13 @@ func (a *authMiddleware) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := extractToken(r)
 		if token == "" {
-			proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
 		sessionSerialized, err := a.session.GetSession(token)
 		if err != nil || sessionSerialized == "" {
-			proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
@@ -53,20 +53,20 @@ func (a *authMiddleware) AuthenticateAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := extractToken(r)
 		if token == "" {
-			proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
 		sessionSerialized, err := a.session.GetSession(token)
 		if err != nil || sessionSerialized == "" {
-			proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
 		session := &sessionModel{}
 		errSession := json.Unmarshal([]byte(sessionSerialized), &session)
 		if errSession != nil || session.IdAdmin == 1 {
-			proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
