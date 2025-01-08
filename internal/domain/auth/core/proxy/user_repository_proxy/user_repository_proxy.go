@@ -32,7 +32,10 @@ func (r *userRepositoryProxy) GetByUserName(username string) (*auth_model.UserMo
 		return nil, errRepo
 	}
 
-	r.hasher.DecryptMerged(userModel.FirstName, r.settings.GetSecretKey())
-
-	return nil, nil
+	return &auth_model.UserModel{
+		Id:        userModel.Id,
+		FirstName: r.hasher.DecryptMerged(userModel.FirstName, r.settings.GetSecretKey()),
+		IsAdmin:   userModel.IsAdmin,
+		Password:  userModel.Password,
+	}, nil
 }
