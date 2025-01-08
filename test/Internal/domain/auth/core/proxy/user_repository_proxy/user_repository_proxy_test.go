@@ -67,3 +67,15 @@ func Test_GivenGetByUserName_WhenGetByUserNameInvoked_ThenEnsureCallsOnce(t *tes
 	// Assert
 	verify.Should(t, spies.UserRepoSpy.CallsCount["GetByUserName"]).Be(1)
 }
+
+func Test_GivenGetByUserName_WhenGetByUserNameError_ThenEnsureReturnErrorFrom(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.UserRepoSpy.DefineGetByUserNameError()
+
+	// Act
+	_, err := sut.GetByUserName("fake-username")
+
+	// Assert
+	verify.Should(t, err).Be(spies.UserRepoSpy.ErrorResult["GetByUserName"])
+}
