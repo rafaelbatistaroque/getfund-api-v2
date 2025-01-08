@@ -22,10 +22,12 @@ func New(userRepository auth_contract.UserRepository, settings settings.Applicat
 }
 
 func (r *userRepositoryProxy) GetByUserName(username string) (*auth_model.UserModel, error) {
-	_, err := r.hasher.HashWithSalt(username, r.settings.GetServerSalt())
+	usernameHashed, err := r.hasher.HashWithSalt(username, r.settings.GetServerSalt())
 	if err != nil {
 		return nil, err
 	}
+
+	r.userRepository.GetByUserName(usernameHashed)
 
 	return nil, nil
 }
