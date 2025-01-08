@@ -27,10 +27,12 @@ func (r *userRepositoryProxy) GetByUserName(username string) (*auth_model.UserMo
 		return nil, err
 	}
 
-	_, errRepo := r.userRepository.GetByUserName(usernameHashed)
+	userModel, errRepo := r.userRepository.GetByUserName(usernameHashed)
 	if errRepo != nil {
 		return nil, errRepo
 	}
+
+	r.hasher.DecryptMerged(userModel.FirstName, r.settings.GetSecretKey())
 
 	return nil, nil
 }
