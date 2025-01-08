@@ -27,7 +27,10 @@ func (r *userRepositoryProxy) GetByUserName(username string) (*auth_model.UserMo
 		return nil, err
 	}
 
-	r.userRepository.GetByUserName(usernameHashed)
+	_, errRepo := r.userRepository.GetByUserName(usernameHashed)
+	if errRepo != nil {
+		return nil, errRepo
+	}
 
 	return nil, nil
 }
