@@ -8,15 +8,24 @@ import (
 	"getfund-api-v2/test/helper/settings_spy"
 )
 
-func NewSut() (auth_service.AuthService, *settings_spy.ApplicationSettingsSpy, *user_repository_proxy_spy.UserRepositoryProxySpy, *security_spy.HasherSpy, *signin_mapper_spy.SigninMapperSpy) {
+type AuthServiceFixture struct {
+	HasherSpy   *security_spy.HasherSpy
+	SettingsSpy *settings_spy.ApplicationSettingsSpy
+	UserRepoSpy *user_repository_proxy_spy.UserRepositoryProxySpy
+	MapperSpy   *signin_mapper_spy.SigninMapperSpy
+}
+
+func NewSut() (auth_service.AuthService, *AuthServiceFixture) {
 	settingsSpy := settings_spy.New()
 	userRepositoryProxySpy := user_repository_proxy_spy.New()
 	hasherSpy := security_spy.New()
 	mapperSpy := signin_mapper_spy.New()
 
 	return auth_service.New(userRepositoryProxySpy, settingsSpy, hasherSpy, mapperSpy),
-		settingsSpy,
-		userRepositoryProxySpy,
-		hasherSpy,
-		mapperSpy
+		&AuthServiceFixture{
+			HasherSpy:   hasherSpy,
+			SettingsSpy: settingsSpy,
+			UserRepoSpy: userRepositoryProxySpy,
+			MapperSpy:   mapperSpy,
+		}
 }

@@ -36,12 +36,7 @@ func New(
 }
 
 func (a *authService) Authenticate(username string, password string) (*authmodel.SessionModel, *result_app.ApplicationError) {
-	usernameHashed, err := a.hasher.HashWithSalt(username, a.settings.GetServerSalt())
-	if err != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
-	}
-
-	user, repoErr := a.userRepository.GetByUserName(usernameHashed)
+	user, repoErr := a.userRepository.GetByUserName(username)
 	if repoErr != nil {
 		return nil, result_app.New(result_app.UNAUTHORIZED_CODE, repoErr)
 	}
