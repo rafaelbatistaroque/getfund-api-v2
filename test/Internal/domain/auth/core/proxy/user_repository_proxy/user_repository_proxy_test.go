@@ -43,3 +43,16 @@ func Test_GivenGetByUserName_WhenHashWithSaltError_ThenEnsureReturnServerError(t
 	// Assert
 	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
 }
+
+func Test_GivenGetByUserName_WhenHashWithSaltSuccess_ThenEnsureCallRepositoryGetByUserNameWithCorrectParameter(t *testing.T) {
+	// Arrange
+	expectedParameter := "fake-username-hashed"
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess(expectedParameter)
+
+	// Act
+	sut.GetByUserName("fake-username")
+
+	// Assert
+	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedParameter)
+}
