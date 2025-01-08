@@ -94,3 +94,20 @@ func Test_GivenGetByUserName_WhenGetByUserNameSucess_ThenEnsureCallDecryptMerged
 	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(user.FirstName)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
 }
+
+func Test_GivenGetByUserName_WhenGetByUserNameSucess_ThenEnsureReturnModelDeserialized(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.HasherSpy.DefineDecryptMergedSuccess("fake-first-name")
+
+	// Act
+	userModel, _ := sut.GetByUserName("fake-username")
+
+	// Assert
+	user := spies.UserRepoSpy.SuccessResult["GetByUserName"].(*auth_model.UserModel)
+	verify.Should(t, userModel.Id).Be(user.Id)
+	verify.Should(t, userModel.FirstName).Be(spies.HasherSpy.SuccessResult["DecryptMerged"])
+	verify.Should(t, userModel.IsAdmin).Be(user.IsAdmin)
+	verify.Should(t, userModel.Password).Be(user.Password)
+}
