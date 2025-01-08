@@ -20,3 +20,14 @@ func Test_GivenGetByUserName_WhenInit_ThenEnsureCallHashWithSaltWithCorrectParam
 	verify.Should(t, spies.HasherSpy.Params["HashWithSalt:inputText"]).Be(expectedInputText)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
+
+func Test_GivenGetByUserName_WhenInit_ThenEnsureCallHashWithSaltOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.GetByUserName("fake-username")
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
+}
