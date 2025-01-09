@@ -35,5 +35,10 @@ func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*model
 }
 
 func (r *authRepository) UpdatePassword(id, value string) error {
+	result := r.db.Table(table_USER).Where("id=?", id).Update("password", value)
+	if result.Error != nil {
+		return result.Error
+	}
+
 	return nil
 }
