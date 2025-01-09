@@ -1,7 +1,7 @@
 package auth_user_repository_test
 
 import (
-	fixture "getfund-api-v2/test/internal/domain/auth/adapter/repository/user_repository_fixture"
+	fixture "getfund-api-v2/test/internal/domain/auth/adapter/repository/auth_repository_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"
@@ -47,4 +47,16 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenQuerySuccess_ThenEnsureReturnU
 
 	// Assert
 	verify.Should(t, authenticatedUser.Id).Be(expectedId)
+}
+
+func Test_GivenUpdatePassword_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	fixture.AddUser(db, 1, true)
+
+	// Act
+	err := sut.UpdatePassword("invalid-id", "invalid-password")
+
+	// Assert
+	verify.Should(t, err).NotNil()
 }
