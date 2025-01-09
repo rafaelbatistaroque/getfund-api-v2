@@ -111,3 +111,16 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsername
 	verify.Should(t, result.IsAdmin).Be(authenticatedUser.IsAdmin)
 	verify.Should(t, result.Password).Be(authenticatedUser.Password)
 }
+
+func Test_GivenUpdatePassword_WhenInit_ThenEnsureCallHashAndMergeWithCorrectParameter(t *testing.T) {
+	// Arrange
+	expectedInput := "fake-username"
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.UpdatePassword("", expectedInput)
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.Params["HashAndMerge:input"]).Be(expectedInput)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashAndMerge:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+}
