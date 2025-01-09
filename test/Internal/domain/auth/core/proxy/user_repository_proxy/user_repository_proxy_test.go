@@ -22,7 +22,7 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenInit_ThenEnsureCallHashWithSal
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
 
-func Test_GivenGetAuthenticatedUserByUsername_WhenInit_ThenEnsureCallHashWithSaltOnce(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenHashWithSaltInvoked_ThenEnsureCallHashWithSaltOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
@@ -123,4 +123,15 @@ func Test_GivenUpdatePassword_WhenInit_ThenEnsureCallHashAndMergeWithCorrectPara
 	// Assert
 	verify.Should(t, spies.HasherSpy.Params["HashAndMerge:input"]).Be(expectedInput)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashAndMerge:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+}
+
+func Test_GivenUpdatePassword_WhenHashAndMergeInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.UpdatePassword("", "fake-username")
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["HashAndMerge"]).Be(1)
 }
