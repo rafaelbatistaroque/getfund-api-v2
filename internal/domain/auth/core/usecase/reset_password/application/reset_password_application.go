@@ -60,5 +60,5 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errUpdate)
 	}
 
-	return nil, nil
+	return &reset_password.Output{Message: "password updated"}, nil
 }
