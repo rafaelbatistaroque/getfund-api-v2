@@ -149,3 +149,14 @@ func Test_GivenUpdatePassword_WhenHashAndMergeSuccess_ThenEnsureCallRepositoryUp
 	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:id"]).Be(expectedParamId)
 	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:value"]).Be(spies.HasherSpy.SuccessResult["HashAndMerge"].(string))
 }
+
+func Test_GivenUpdatePassword_WhenUpdatePasswordInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.UpdatePassword("", "")
+
+	// Assert
+	verify.Should(t, spies.AuthRepoSpy.CallsCount["UpdatePassword"]).Be(1)
+}
