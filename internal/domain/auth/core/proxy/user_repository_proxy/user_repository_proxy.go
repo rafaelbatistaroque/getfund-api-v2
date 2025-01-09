@@ -41,6 +41,9 @@ func (r *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*
 }
 
 func (r *authRepositoryProxy) UpdatePassword(id, value string) error {
-	r.hasher.HashAndMerge(value, r.settings.GetServerSalt())
+	passwordHashed := r.hasher.HashAndMerge(value, r.settings.GetServerSalt())
+
+	r.authRepository.UpdatePassword(id, passwordHashed)
+
 	return nil
 }
