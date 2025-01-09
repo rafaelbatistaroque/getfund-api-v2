@@ -233,3 +233,16 @@ func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallU
 	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:id"]).Be(authenticatedUser.Id)
 	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:value"]).Be(expectedParamPassword.Password)
 }
+
+func Test_GivenExecute_WhenUpdatePasswordInvoke_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.AuthRepoSpy.CallsCount["UpdatePassword"]).Be(1)
+}
