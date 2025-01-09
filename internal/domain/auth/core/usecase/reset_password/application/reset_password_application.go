@@ -56,7 +56,9 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errGetUser)
 	}
 
-	r.authRepository.UpdatePassword(authenticatedUser.Id, input.Password)
+	if errUpdate := r.authRepository.UpdatePassword(authenticatedUser.Id, input.Password); errUpdate != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errUpdate)
+	}
 
 	return nil, nil
 }
