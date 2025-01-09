@@ -12,7 +12,7 @@ import (
 func Test_GivenGetAuthenticatedUserByUsername_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	fixture.AddUser(db, 1, false)
+	fixture.AddRandomUser(db, 1, false)
 
 	// Act
 	_, err := sut.GetAuthenticatedUserByUsername("invalid-username")
@@ -52,11 +52,29 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenQuerySuccess_ThenEnsureReturnU
 func Test_GivenUpdatePassword_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	fixture.AddUser(db, 1, true)
+	fixture.AddRandomUser(db, 1, true)
 
 	// Act
 	err := sut.UpdatePassword("invalid-id", "invalid-password")
 
 	// Assert
 	verify.Should(t, err).NotNil()
+}
+
+func Test_GivenUpdatePassword_WhenSuccess_ThenEnsureNull(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	expectedId := uuid.NewString()
+	newPassword := uuid.NewString()
+	db.Create(&fixture.FakeUser{ID: expectedId, Password: uuid.NewString()})
+
+	// Act
+	result := sut.UpdatePassword(expectedId, newPassword)
+
+	// Assert
+	user := fixture.FakeUser{}
+	db.Where("id = ?", expectedId).First(&user)
+
+	verify.Should(t, result).Nil()
+	verify.Should(t, user.Password).Be(newPassword)
 }
