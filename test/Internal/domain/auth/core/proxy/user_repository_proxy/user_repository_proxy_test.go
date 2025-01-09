@@ -130,8 +130,22 @@ func Test_GivenUpdatePassword_WhenHashAndMergeInvoked_ThenEnsureCallsOnce(t *tes
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.UpdatePassword("", "fake-username")
+	sut.UpdatePassword("", "")
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["HashAndMerge"]).Be(1)
+}
+
+func Test_GivenUpdatePassword_WhenHashAndMergeSuccess_ThenEnsureCallRepositoryUpdatePasswordWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	expectedParamId := "fake-id"
+	spies.HasherSpy.DefineHashAndMergeSuccess("fake-password-hashed")
+
+	// Act
+	sut.UpdatePassword(expectedParamId, "")
+
+	// Assert
+	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:id"]).Be(expectedParamId)
+	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:value"]).Be(spies.HasherSpy.SuccessResult["HashAndMerge"].(string))
 }
