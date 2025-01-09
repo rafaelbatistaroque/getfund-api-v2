@@ -172,3 +172,14 @@ func Test_GivenUpdatePassword_WhenUpdatePasswordError_ThenEnsureErrorFrom(t *tes
 	// Assert
 	verify.Should(t, err).Be(spies.AuthRepoSpy.ErrorResult["UpdatePassword"])
 }
+
+func Test_GivenUpdatePassword_WhenUpdatePasswordSuccess_ThenEnsureNull(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+
+	// Act
+	result := sut.UpdatePassword("", "")
+
+	// Assert
+	verify.Should(t, result).Nil()
+}
