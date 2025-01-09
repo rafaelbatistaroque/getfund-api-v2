@@ -261,3 +261,17 @@ func Test_GivenExecute_WhenUpdatePasswordError_ThenEnsureReturnServerError(t *te
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.AuthRepoSpy.ErrorResult["UpdatePassword"])
 }
+
+func Test_GivenExecute_WhenResetPasswordSuccess_ThenEnsureReturnAppropriateSuccessMessage(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+
+	// Act
+	result, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err).Nil()
+	verify.Should(t, result.Message).Be("password updated")
+}
