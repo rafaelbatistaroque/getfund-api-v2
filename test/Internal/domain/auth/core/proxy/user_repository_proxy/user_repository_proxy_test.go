@@ -160,3 +160,15 @@ func Test_GivenUpdatePassword_WhenUpdatePasswordInvoked_ThenEnsureCallsOnce(t *t
 	// Assert
 	verify.Should(t, spies.AuthRepoSpy.CallsCount["UpdatePassword"]).Be(1)
 }
+
+func Test_GivenUpdatePassword_WhenUpdatePasswordError_ThenEnsureErrorFrom(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.AuthRepoSpy.DefineUpdatePasswordError()
+
+	// Act
+	err := sut.UpdatePassword("", "")
+
+	// Assert
+	verify.Should(t, err).Be(spies.AuthRepoSpy.ErrorResult["UpdatePassword"])
+}
