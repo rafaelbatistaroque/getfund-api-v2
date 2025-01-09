@@ -2,6 +2,7 @@ package recover_password_test
 
 import (
 	"bytes"
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/pkg/bus/event"
@@ -26,7 +27,7 @@ func Test_GivenRecoverPasswordExecute_WhenInputTokenInvalid_ThenEnsureReturnErro
 	verify.Should(t, err.Message).Be(expectedError.Message)
 }
 
-func Test_GivenRecoverPasswordExecute_WhenValidInput_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenValidInput_ThenEnsureCallGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedInput := fixture.GetValidInput()
 	sut, spies := fixture.NewSut()
@@ -35,11 +36,10 @@ func Test_GivenRecoverPasswordExecute_WhenValidInput_ThenEnsureCallHashWithSaltW
 	sut.Execute(expectedInput)
 
 	// Assert
-	verify.Should(t, spies.HasherSpy.Params["HashWithSalt:inputText"]).Be(expectedInput.Username)
-	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+	verify.Should(t, spies.AuthRepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedInput.Username)
 }
 
-func Test_GivenRecoverPasswordExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
@@ -47,59 +47,23 @@ func Test_GivenRecoverPasswordExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnc
 	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
+	verify.Should(t, spies.AuthRepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
 }
 
-func Test_GivenRecoverPasswordExecute_WhenHashWithSaltError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.HasherSpy.DefineHashWithSaltError()
-
-	// Act
-	_, err := sut.Execute(fixture.GetValidInput())
-
-	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
-}
-
-func Test_GivenRecoverPasswordExecute_WhenHashWithSaltSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.HasherSpy.DefineHashWithSaltSuccess("fake-success-result")
-
-	// Act
-	sut.Execute(fixture.GetValidInput())
-
-	// Assert
-	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
-}
-
-func Test_GivenRecoverPasswordExecute_WhenGetByUserNameInvoked_ThenEnsureCallsOnce(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-
-	// Act
-	sut.Execute(fixture.GetValidInput())
-
-	// Assert
-	verify.Should(t, spies.UserRepoSpy.CallsCount["GetByUserName"]).Be(1)
-}
-
-func Test_GivenRecoverPasswordExecute_WhenGetByUserNameError_ThenEnsureReturnErrorFrom(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameError()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
-	verify.Should(t, err.Message).Be(spies.UserRepoSpy.ErrorResult["GetByUserName"])
+	verify.Should(t, err.Message).Be(spies.AuthRepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
-func Test_GivenRecoverPasswordExecute_WhenGetByUserNameSuccess_ThenEnsureCallGetRandomCodeWithCorrectParameter(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameSuccess_ThenEnsureCallGetRandomCodeWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
@@ -164,15 +128,15 @@ func Test_GivenRecoverPasswordExecute_WhenHashSuccess_ThenEnsureCallCacheSetWith
 	// Arrange
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetValidInput()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineDecryptMergedSuccess("fake-first-name")
 	spies.HasherSpy.DefineHashSuccess()
 	hashCode := spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data
 	expectedKey := "recovery_password_" + hashCode
-	expectedValue := map[string]interface{}{
-		"username":      validInput.Username,
-		"first_name":    spies.HasherSpy.SuccessResult["DecryptMerged"].(string),
-		"recovery_link": spies.SettingsSpy.GetBaseUrl() + "/new-password/" + hashCode,
+	expectedValue := auth_dto.ForgetPasswordDto{
+		Username:     validInput.Username,
+		FirstName:    spies.HasherSpy.SuccessResult["DecryptMerged"].(string),
+		RecoveryLink: spies.SettingsSpy.GetBaseUrl() + "/new-password/" + hashCode,
 	}
 
 	// Act
@@ -197,7 +161,7 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetError_ThenEnsureReturnErrorFro
 	verify.Should(t, err.Message).Be(spies.CacheSpy.ErrorResult["Set"])
 }
 
-func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallCreateAndPublishWithCorrectParameter(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallPublishWithPayloadWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashSuccess()
@@ -207,11 +171,11 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallCreateAn
 	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.EventBusSpy.Params["CreateAndPublish:event"]).Be(&event.RecoverPasswordStarted{})
-	verify.Should(t, spies.EventBusSpy.Params["CreateAndPublish:payload"]).Be(expectedPaylod)
+	verify.Should(t, spies.EventBusSpy.Params["PublishWithPayload:event"]).Be(&event.RecoverPasswordStarted{})
+	verify.Should(t, spies.EventBusSpy.Params["PublishWithPayload:payload"]).Be(expectedPaylod)
 }
 
-func Test_GivenRecoverPasswordExecute_WhenCreateAndPublish_ThenEnsureReturnOutput(t *testing.T) {
+func Test_GivenRecoverPasswordExecute_WhenPublishWithPayload_ThenEnsureReturnOutput(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
 

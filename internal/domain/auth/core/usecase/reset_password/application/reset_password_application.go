@@ -3,8 +3,8 @@ package reset_password_application
 import (
 	"encoding/json"
 	"errors"
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	auth_model "getfund-api-v2/internal/domain/auth/core/model"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/result_app"
@@ -18,15 +18,15 @@ var (
 
 type resetPasswordApplication struct {
 	cacheService   cache_service.Cache
-	userRepository auth_contract.UserRepository
+	authRepository auth_contract.AuthRepository
 	settings       settings.ApplicationSettings
 	hasher         security.Hasher
 }
 
-func New(cacheService cache_service.Cache, userRepository auth_contract.UserRepository, settings settings.ApplicationSettings, hasher security.Hasher) *resetPasswordApplication {
+func New(cacheService cache_service.Cache, authRepository auth_contract.AuthRepository, settings settings.ApplicationSettings, hasher security.Hasher) *resetPasswordApplication {
 	return &resetPasswordApplication{
 		cacheService:   cacheService,
-		userRepository: userRepository,
+		authRepository: authRepository,
 		settings:       settings,
 		hasher:         hasher,
 	}
@@ -45,23 +45,18 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errCache)
 	}
 
-	forgetPasswordModel := &auth_model.ForgetPasswordModel{}
-	errUnmarshal := json.Unmarshal([]byte(cacheData), forgetPasswordModel)
+	forgetPasswordDto := &auth_dto.ForgetPasswordDto{}
+	errUnmarshal := json.Unmarshal([]byte(cacheData), forgetPasswordDto)
 	if errUnmarshal != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
 	}
 
-	usernameHashed, errHasher := r.hasher.HashWithSalt(forgetPasswordModel.Username, r.settings.GetServerSalt())
-	if errHasher != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errHasher)
-	}
-
-	_, errGetUser := r.userRepository.GetByUserName(usernameHashed)
+	authenticatedUser, errGetUser := r.authRepository.GetAuthenticatedUserByUsername(forgetPasswordDto.Username)
 	if errGetUser != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errGetUser)
 	}
 
-	r.hasher.HashAndMerge(input.Password, r.settings.GetServerSalt())
+	r.authRepository.UpdatePassword(authenticatedUser.Id, input.Password)
 
 	return nil, nil
 }

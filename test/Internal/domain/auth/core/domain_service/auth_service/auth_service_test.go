@@ -2,7 +2,7 @@ package auth_service_test
 
 import (
 	"errors"
-	authmodel "getfund-api-v2/internal/domain/auth/core/model"
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/domain_service/auth_service/auth_service_fixture"
 	"testing"
@@ -10,20 +10,20 @@ import (
 	"github.com/rafaelbatistaroque/verify"
 )
 
-func Test_GivenAuthenticate_WhenInit_ThenEnsureCallsGetByUserNameWithCorrectParameter(t *testing.T) {
+func Test_GivenAuthenticate_WhenInit_ThenEnsureCallsGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedInputText := "fake-username"
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Authenticate(expectedInputText, "")
 
 	// Assert
-	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedInputText)
+	verify.Should(t, spies.AuthRepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedInputText)
 }
 
-func Test_GivenAuthenticate_WhenGetByUserNameInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenAuthenticate_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
@@ -31,42 +31,42 @@ func Test_GivenAuthenticate_WhenGetByUserNameInvoked_ThenEnsureCallsOnce(t *test
 	sut.Authenticate("fake-username", "")
 
 	// Assert
-	verify.Should(t, spies.UserRepoSpy.CallsCount["GetByUserName"]).Be(1)
+	verify.Should(t, spies.AuthRepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
 }
 
-func Test_GivenAuthenticate_WhenGetByUserNameError_ThenEnsureReturnUnauthorizedError(t *testing.T) {
+func Test_GivenAuthenticate_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnUnauthorizedError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameError()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameError()
 
 	// Act
 	_, err := sut.Authenticate("fake-username", "")
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, spies.UserRepoSpy.ErrorResult["GetByUserName"]).Be(err.Message)
+	verify.Should(t, spies.AuthRepoSpy.ErrorResult["GetAuthenticatedUserByUsername"]).Be(err.Message)
 	verify.Should(t, result_app.UNAUTHORIZED_CODE).Be(err.Code)
 }
 
-func Test_GivenAuthenticate_WhenGetByUserNameSuccess_ThenCallIsMatchWithCorrectParameter(t *testing.T) {
+func Test_GivenAuthenticate_WhenGetAuthenticatedUserByUsernameSuccess_ThenCallIsMatchWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedPassword := "fake-password"
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Authenticate("fake-username", expectedPassword)
 
 	// Assert
-	user := spies.UserRepoSpy.SuccessResult["GetByUserName"].(*authmodel.UserModel)
-	verify.Should(t, spies.HasherSpy.Params["IsMatch:inputHashed"]).Be(user.Password)
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	verify.Should(t, spies.HasherSpy.Params["IsMatch:inputHashed"]).Be(authenticatedUser.Password)
 	verify.Should(t, spies.HasherSpy.Params["IsMatch:inputText"]).Be(expectedPassword)
 }
 
 func Test_GivenAuthenticate_WhenIsMatchInvoked_ThenCallIsMatchOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Authenticate("fake-username", "fake-password")
@@ -79,7 +79,7 @@ func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t
 	// Arrange
 	expectedPasswordError := errors.New("invalid password")
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineIsMatchError()
 
 	// Act
@@ -94,28 +94,28 @@ func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t
 func Test_GivenAuthenticate_WhenIsMatchSuccess_ThenEnsureCallToSessionModelWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineIsMatchSuccess()
 
 	// Act
 	sut.Authenticate("fake-username", "fake-password")
 
 	// Assert
-	verify.Should(t, spies.MapperSpy.Params["ToSessionModel:user"]).Be(spies.UserRepoSpy.SuccessResult["GetByUserName"])
+	verify.Should(t, spies.MapperSpy.Params["ToSessionModel:authenticatedUser"]).Be(spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"])
 }
 
 func Test_GivenAuthenticate_WhenSuccess_ThenEnsureReturnoSessionModelFilled(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineIsMatchSuccess()
-	user := spies.UserRepoSpy.SuccessResult["GetByUserName"].(*authmodel.UserModel)
-	spies.MapperSpy.DefineToSessionModelSuccess(user)
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	spies.MapperSpy.DefineToSessionModelSuccess(authenticatedUser)
 
 	// Act
 	result, _ := sut.Authenticate("fake-username", "fake-password")
 
 	// Assert
-	verify.Should(t, result.ID).Be(user.Id)
-	verify.Should(t, result.IsAdmin).Be(user.IsAdmin)
+	verify.Should(t, result.ID).Be(authenticatedUser.Id)
+	verify.Should(t, result.IsAdmin).Be(authenticatedUser.IsAdmin)
 }

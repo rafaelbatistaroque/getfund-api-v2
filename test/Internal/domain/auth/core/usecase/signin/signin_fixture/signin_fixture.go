@@ -2,7 +2,7 @@ package signin_fixture
 
 import (
 	"fmt"
-	authmodel "getfund-api-v2/internal/domain/auth/core/model"
+	auth_dto "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
 	"getfund-api-v2/internal/shared/result_app"
@@ -39,11 +39,11 @@ type authServiceSpy struct {
 
 	CallsCount int
 
-	SuccessResult *authmodel.SessionModel
+	SuccessResult *auth_dto.SessionDto
 	errorResult   *result_app.ApplicationError
 }
 
-func (a *authServiceSpy) Authenticate(username string, password string) (*authmodel.SessionModel, *result_app.ApplicationError) {
+func (a *authServiceSpy) Authenticate(username string, password string) (*auth_dto.SessionDto, *result_app.ApplicationError) {
 	a.Params["username"] = username
 	a.Params["password"] = password
 
@@ -57,5 +57,5 @@ func (a *authServiceSpy) DefineNotAuthenticate(code int, message error) {
 }
 
 func (a *authServiceSpy) DefineAuthenticate() {
-	a.SuccessResult = &authmodel.SessionModel{ID: "fake-id", FirstName: "fake-first-name", IsAdmin: 0}
+	a.SuccessResult = &auth_dto.SessionDto{ID: "fake-id", FirstName: "fake-first-name", IsAdmin: 0}
 }

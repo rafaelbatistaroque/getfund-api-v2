@@ -2,14 +2,14 @@ package signin_mapper
 
 import (
 	"encoding/json"
-	model "getfund-api-v2/internal/domain/auth/core/model"
+	model "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
 
 type SigninMapper interface {
-	ToOutput(token string, session *model.SessionModel) *signin.Output
-	SessionToString(session *model.SessionModel) (string, error)
-	ToSessionModel(user *model.UserModel) *model.SessionModel
+	ToOutput(token string, session *model.SessionDto) *signin.Output
+	SessionToString(session *model.SessionDto) (string, error)
+	ToSessionModel(authenticatedUser *model.AuthenticatedUserDto) *model.SessionDto
 }
 
 type signinMapper struct {
@@ -20,7 +20,7 @@ func New() SigninMapper {
 	return &signinMapper{}
 }
 
-func (m *signinMapper) ToOutput(token string, session *model.SessionModel) *signin.Output {
+func (m *signinMapper) ToOutput(token string, session *model.SessionDto) *signin.Output {
 	return &signin.SigninOutput{
 		Token: token,
 		Session: signin.SessionOutput{
@@ -31,7 +31,7 @@ func (m *signinMapper) ToOutput(token string, session *model.SessionModel) *sign
 	}
 }
 
-func (m *signinMapper) SessionToString(session *model.SessionModel) (string, error) {
+func (m *signinMapper) SessionToString(session *model.SessionDto) (string, error) {
 	sessionSerialized, err := json.Marshal(session)
 	if err != nil {
 		return "", err
@@ -40,10 +40,10 @@ func (m *signinMapper) SessionToString(session *model.SessionModel) (string, err
 	return string(sessionSerialized), nil
 }
 
-func (m *signinMapper) ToSessionModel(user *model.UserModel) *model.SessionModel {
-	return &model.SessionModel{
-		ID:        user.Id,
-		FirstName: user.FirstName,
-		IsAdmin:   user.IsAdmin,
+func (m *signinMapper) ToSessionModel(authenticatedUser *model.AuthenticatedUserDto) *model.SessionDto {
+	return &model.SessionDto{
+		ID:        authenticatedUser.Id,
+		FirstName: authenticatedUser.FirstName,
+		IsAdmin:   authenticatedUser.IsAdmin,
 	}
 }

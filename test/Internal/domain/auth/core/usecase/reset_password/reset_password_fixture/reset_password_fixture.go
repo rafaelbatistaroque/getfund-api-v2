@@ -2,38 +2,38 @@ package reset_password_fixture
 
 import (
 	"encoding/json"
-	auth_model "getfund-api-v2/internal/domain/auth/core/model"
+	auth_model "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/reset_password/application"
+	"getfund-api-v2/test/helper/auth_repository_spy"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
-	"getfund-api-v2/test/helper/user_repository_spy"
 )
 
 type ResetPasswordFixture struct {
 	CacheSpy    *cache_spy.RedisCacheSpy
-	UserRepoSpy *user_repository_spy.UserRepositorySpy
+	AuthRepoSpy *auth_repository_spy.AuthRepositorySpy
 	SettingsSpy *settings_spy.ApplicationSettingsSpy
 	HasherSpy   *security_spy.HasherSpy
 }
 
 func NewSut() (reset_password.UseCase, *ResetPasswordFixture) {
 	cacheSpy := cache_spy.New()
-	userRepoSpy := user_repository_spy.New()
+	AuthRepoSpy := auth_repository_spy.New()
 	settingsSpy := settings_spy.New()
 	hasherSpy := security_spy.New()
 
-	return sut.New(cacheSpy, userRepoSpy, settingsSpy, hasherSpy), &ResetPasswordFixture{
+	return sut.New(cacheSpy, AuthRepoSpy, settingsSpy, hasherSpy), &ResetPasswordFixture{
 		CacheSpy:    cacheSpy,
-		UserRepoSpy: userRepoSpy,
+		AuthRepoSpy: AuthRepoSpy,
 		SettingsSpy: settingsSpy,
 		HasherSpy:   hasherSpy,
 	}
 }
 
-func GetForgetPasswordFromGetSuccessCache(cacheSpy *cache_spy.RedisCacheSpy) *auth_model.ForgetPasswordModel {
-	expectedParam := &auth_model.ForgetPasswordModel{}
+func GetForgetPasswordFromGetSuccessCache(cacheSpy *cache_spy.RedisCacheSpy) *auth_model.ForgetPasswordDto {
+	expectedParam := &auth_model.ForgetPasswordDto{}
 	json.Unmarshal([]byte(cacheSpy.SuccessResult["Get"].(string)), expectedParam)
 
 	return expectedParam

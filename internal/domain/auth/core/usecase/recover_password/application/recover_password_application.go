@@ -1,8 +1,9 @@
 package recover_password_application
 
 import (
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	recoverpassword "getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
+	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
@@ -19,7 +20,7 @@ var (
 type recoverPasswordApplication struct {
 	hasher         security.Hasher
 	settings       settings.ApplicationSettings
-	userRepository auth_contract.UserRepository
+	authRepository auth_contract.AuthRepository
 	cacheService   cache_service.Cache
 	eventBus       bus.EventBus
 }
@@ -27,31 +28,26 @@ type recoverPasswordApplication struct {
 func New(
 	hasher security.Hasher,
 	settings settings.ApplicationSettings,
-	userRepository auth_contract.UserRepository,
+	authRepository auth_contract.AuthRepository,
 	cacheService cache_service.Cache,
-	eventBus bus.EventBus) recoverpassword.UseCase {
+	eventBus bus.EventBus) recover_password.UseCase {
 
 	return &recoverPasswordApplication{
 		hasher:         hasher,
 		settings:       settings,
-		userRepository: userRepository,
+		authRepository: authRepository,
 		cacheService:   cacheService,
 		eventBus:       eventBus,
 	}
 }
 
-func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*recoverpassword.Output, *result_app.ApplicationError) {
+func (uc *recoverPasswordApplication) Execute(input *recover_password.Input) (*recover_password.Output, *result_app.ApplicationError) {
 	validated := input.Validate()
 	if validated.IsInvalid() {
 		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
-	usernameHashed, err := uc.hasher.HashWithSalt(input.Username, uc.settings.GetServerSalt())
-	if err != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
-	}
-
-	userModel, errRepo := uc.userRepository.GetByUserName(usernameHashed)
+	authenticatedUser, errRepo := uc.authRepository.GetAuthenticatedUserByUsername(input.Username)
 	if errRepo != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errRepo)
 	}
@@ -66,10 +62,10 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errHash)
 	}
 
-	data := map[string]interface{}{
-		"username":      input.Username,
-		"first_name":    uc.hasher.DecryptMerged(userModel.FirstName, uc.settings.GetSecretKey()),
-		"recovery_link": buildRecoverLink(uc.settings, recoveryCode.Data),
+	data := auth_dto.ForgetPasswordDto{
+		Username:     input.Username,
+		FirstName:    uc.hasher.DecryptMerged(authenticatedUser.FirstName, uc.settings.GetSecretKey()),
+		RecoveryLink: buildRecoverLink(uc.settings, recoveryCode.Data),
 	}
 
 	keyCache := buildKeyCache(recoveryCode.Data)
@@ -78,9 +74,9 @@ func (uc *recoverPasswordApplication) Execute(input *recoverpassword.Input) (*re
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, cacheErr)
 	}
 
-	uc.eventBus.CreateAndPublish(&event.RecoverPasswordStarted{}, keyCache)
+	uc.eventBus.PublishWithPayload(&event.RecoverPasswordStarted{}, keyCache)
 
-	return &recoverpassword.RecoverPasswordOutput{Message: "recover password started"}, nil
+	return &recover_password.Output{Message: "recover password started"}, nil
 }
 
 func buildRecoverLink(applicationSettings settings.ApplicationSettings, recoveryCode string) string {

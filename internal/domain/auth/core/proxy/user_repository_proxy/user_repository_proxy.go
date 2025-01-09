@@ -1,41 +1,45 @@
 package user_repository_proxy
 
 import (
+	auth_model "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	auth_model "getfund-api-v2/internal/domain/auth/core/model"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
 )
 
-type userRepositoryProxy struct {
-	userRepository auth_contract.UserRepository
+type authRepositoryProxy struct {
+	authRepository auth_contract.AuthRepository
 	settings       settings.ApplicationSettings
 	hasher         security.Hasher
 }
 
-func New(userRepository auth_contract.UserRepository, settings settings.ApplicationSettings, hasher security.Hasher) auth_contract.UserRepository {
-	return &userRepositoryProxy{
-		userRepository: userRepository,
+func New(authRepository auth_contract.AuthRepository, settings settings.ApplicationSettings, hasher security.Hasher) auth_contract.AuthRepository {
+	return &authRepositoryProxy{
+		authRepository: authRepository,
 		settings:       settings,
 		hasher:         hasher,
 	}
 }
 
-func (r *userRepositoryProxy) GetByUserName(username string) (*auth_model.UserModel, error) {
+func (r *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*auth_model.AuthenticatedUserDto, error) {
 	usernameHashed, err := r.hasher.HashWithSalt(username, r.settings.GetServerSalt())
 	if err != nil {
 		return nil, err
 	}
 
-	userModel, errRepo := r.userRepository.GetByUserName(usernameHashed)
+	authenticatedUser, errRepo := r.authRepository.GetAuthenticatedUserByUsername(usernameHashed)
 	if errRepo != nil {
 		return nil, errRepo
 	}
 
-	return &auth_model.UserModel{
-		Id:        userModel.Id,
-		FirstName: r.hasher.DecryptMerged(userModel.FirstName, r.settings.GetSecretKey()),
-		IsAdmin:   userModel.IsAdmin,
-		Password:  userModel.Password,
+	return &auth_model.AuthenticatedUserDto{
+		Id:        authenticatedUser.Id,
+		FirstName: r.hasher.DecryptMerged(authenticatedUser.FirstName, r.settings.GetSecretKey()),
+		IsAdmin:   authenticatedUser.IsAdmin,
+		Password:  authenticatedUser.Password,
 	}, nil
+}
+
+func (r *authRepositoryProxy) UpdatePassword(id, value string) error {
+	return nil
 }

@@ -39,13 +39,13 @@ func Test_GivenSigninMapper_WhenSessionToStringSuccess_ThenEnsureReturnError(t *
 func Test_GivenSigninMapper_WhenToSessionModelMapped_ThenEnsureReturnSessionModel(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	user := fixture.GetUserModel()
+	authenticatedUser := fixture.GetauthenticatedUser()
 
 	// Act
-	result := sut.ToSessionModel(user)
+	result := sut.ToSessionModel(authenticatedUser)
 
 	// Assert
-	verify.Should(t, result.ID).Be(user.Id)
-	verify.Should(t, result.FirstName).Be(user.FirstName)
-	verify.Should(t, result.IsAdmin).Be(user.IsAdmin)
+	verify.Should(t, result.ID).Be(authenticatedUser.Id)
+	verify.Should(t, result.FirstName).Be(authenticatedUser.FirstName)
+	verify.Should(t, result.IsAdmin).Be(authenticatedUser.IsAdmin)
 }

@@ -9,19 +9,19 @@ import (
 	"github.com/google/uuid"
 )
 
-func Test_GivenGetByUserName_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
 	fixture.AddUser(db, 1, false)
 
 	// Act
-	_, err := sut.GetByUserName("invalid-username")
+	_, err := sut.GetAuthenticatedUserByUsername("invalid-username")
 
 	// Assert
 	verify.Should(t, err).NotNil()
 }
 
-func Test_GivenGetByUserName_WhenInactivedUser_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenInactivedUser_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
 	expectedId := uuid.NewString()
@@ -29,13 +29,13 @@ func Test_GivenGetByUserName_WhenInactivedUser_ThenEnsureReturnError(t *testing.
 	db.Create(&fixture.FakeUser{ID: expectedId, Username: username, IsActive: 0})
 
 	// Act
-	_, err := sut.GetByUserName(username)
+	_, err := sut.GetAuthenticatedUserByUsername(username)
 
 	// Assert
 	verify.Should(t, err).NotNil()
 }
 
-func Test_GivenGetByUserName_WhenQuerySuccess_ThenEnsureReturnUserFound(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenQuerySuccess_ThenEnsureReturnUserFound(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
 	expectedId := uuid.NewString()
@@ -43,8 +43,8 @@ func Test_GivenGetByUserName_WhenQuerySuccess_ThenEnsureReturnUserFound(t *testi
 	db.Create(&fixture.FakeUser{ID: expectedId, Username: username, IsActive: 1})
 
 	// Act
-	user, _ := sut.GetByUserName(username)
+	authenticatedUser, _ := sut.GetAuthenticatedUserByUsername(username)
 
 	// Assert
-	verify.Should(t, user.Id).Be(expectedId)
+	verify.Should(t, authenticatedUser.Id).Be(expectedId)
 }

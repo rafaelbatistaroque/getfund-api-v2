@@ -1,7 +1,7 @@
 package user_repository_fixture
 
 import (
-	authuserrepository "getfund-api-v2/internal/domain/auth/adapter/auth_user_repository"
+	authauthRepository "getfund-api-v2/internal/domain/auth/adapter/auth_repository"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/test/helper/db_fixture"
 	"math/rand"
@@ -10,10 +10,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewSUT() (auth_contract.UserRepository, *gorm.DB) {
+func NewSUT() (auth_contract.AuthRepository, *gorm.DB) {
 	db := db_fixture.NewMemoryDB(&FakeUser{})
 
-	return authuserrepository.New(db), db
+	return authauthRepository.New(db), db
 }
 
 type FakeUser struct {

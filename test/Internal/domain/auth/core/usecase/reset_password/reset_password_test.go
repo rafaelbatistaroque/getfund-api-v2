@@ -1,8 +1,8 @@
 package reset_password_test
 
 import (
-	"bytes"
 	"fmt"
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/reset_password/reset_password_fixture"
 	"testing"
@@ -179,7 +179,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
 }
 
-func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(`{"username":"fake-username"}`)
@@ -189,11 +189,10 @@ func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallHashWithSaltWithCorrect
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.HasherSpy.Params["HashWithSalt:inputText"]).Be(expectedParam.Username)
-	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+	verify.Should(t, spies.AuthRepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedParam.Username)
 }
 
-func Test_GivenExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
@@ -202,85 +201,35 @@ func Test_GivenExecute_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(t *testing.T)
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
+	verify.Should(t, spies.AuthRepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
 }
 
-func Test_GivenExecute_WhenHashWithSaltError_ThenEnsureReturnInternalError(t *testing.T) {
+func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.HasherSpy.DefineHashWithSaltError()
-
-	// Act
-	_, err := sut.Execute(fixture.GetInput())
-
-	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
-}
-
-func Test_GivenExecute_WhenHashWithSaltSuccess_ThenEnsureCallGetByUserNameWithCorrectParameter(t *testing.T) {
-	// Arrange
-	expectedValue := "fake-username-hashed"
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.HasherSpy.DefineHashWithSaltSuccess(expectedValue)
-
-	// Act
-	sut.Execute(fixture.GetInput())
-
-	// Assert
-	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedValue)
-}
-
-func Test_GivenExecute_WhenGetByUserNameInvoked_ThenEnsureCallOnce(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess("")
-
-	// Act
-	sut.Execute(fixture.GetInput())
-
-	// Assert
-	verify.Should(t, spies.UserRepoSpy.CallsCount["GetByUserName"]).Be(1)
-}
-
-func Test_GivenExecute_WhenGetByUserNameError_ThenEnsureReturnNotFoundError(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.UserRepoSpy.DefineGetByUserNameError()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
-	verify.Should(t, err.Message).Be(spies.UserRepoSpy.ErrorResult["GetByUserName"])
+	verify.Should(t, err.Message).Be(spies.AuthRepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
-func Test_GivenExecute_WhenGetByUserNameInvoked_ThenEnsureCallHashAndMergeWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallUpdatePasswordWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	expectedParam := fixture.GetInput()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+	expectedParamPassword := fixture.GetInput()
 
 	// Act
-	sut.Execute(expectedParam)
+	sut.Execute(expectedParamPassword)
 
 	// Assert
-	verify.Should(t, spies.HasherSpy.Params["HashAndMerge:input"]).Be(expectedParam.Password)
-	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashAndMerge:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
-}
-
-func Test_GivenExecute_WhenHashAndMergeInvoked_ThenEnsureCallOnce(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess("")
-
-	// Act
-	sut.Execute(fixture.GetInput())
-
-	// Assert
-	verify.Should(t, spies.HasherSpy.CallsCount["HashAndMerge"]).Be(1)
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:id"]).Be(authenticatedUser.Id)
+	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:value"]).Be(expectedParamPassword.Password)
 }

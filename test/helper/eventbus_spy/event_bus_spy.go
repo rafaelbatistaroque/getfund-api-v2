@@ -24,10 +24,10 @@ func (eb *EventBusSpy) Publish(event bus.Event) {
 
 }
 
-// CreateAndPublish após incluir o payload ao evento dispara para todos os handlers
-func (eb *EventBusSpy) CreateAndPublish(event bus.Event, payload any) {
-	eb.Params["CreateAndPublish:event"] = event
-	eb.Params["CreateAndPublish:payload"] = payload
+// PublishWithPayload após incluir o payload ao evento dispara para todos os handlers
+func (eb *EventBusSpy) PublishWithPayload(event bus.Event, payload any) {
+	eb.Params["PublishWithPayload:event"] = event
+	eb.Params["PublishWithPayload:payload"] = payload
 
-	eb.CallsCount["CreateAndPublish"]++
+	eb.CallsCount["PublishWithPayload"]++
 }

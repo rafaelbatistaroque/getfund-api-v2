@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	contract "getfund-api-v2/internal/domain/notification/core/contract"
-	notification_model "getfund-api-v2/internal/domain/notification/core/model"
+	"getfund-api-v2/internal/domain/notification/core/notification_dto"
+
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail"
 	"strings"
 
@@ -40,7 +41,7 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCache)
 	}
 
-	userToRecoverPasswordMailModel := &notification_model.RecoverPasswordMailModel{}
+	userToRecoverPasswordMailModel := &notification_dto.RecoverPasswordMailDto{}
 	errUnmarshal := json.Unmarshal([]byte(userCached), userToRecoverPasswordMailModel)
 	if errUnmarshal != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
@@ -65,7 +66,7 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 	return &send_recover_password_mail.Output{Messagem: "Email sent successfully"}, nil
 }
 
-func replaceTags(template string, model *notification_model.RecoverPasswordMailModel) string {
+func replaceTags(template string, model *notification_dto.RecoverPasswordMailDto) string {
 	template = strings.ReplaceAll(template, "{{first_name}}", model.FirstName)
 	template = strings.ReplaceAll(template, "{{recovery_link}}", model.RecoveryLink)
 

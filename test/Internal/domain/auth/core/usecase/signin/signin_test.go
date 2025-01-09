@@ -2,7 +2,7 @@ package signin_application_test
 
 import (
 	"errors"
-	authmodel "getfund-api-v2/internal/domain/auth/core/model"
+	auth_dto "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixtures "getfund-api-v2/test/internal/domain/auth/core/usecase/signin/signin_fixture"
 	"testing"
@@ -88,7 +88,7 @@ func Test_GivenSigninExecute_WhenAuthenticateSuccess_ThenEnsureCallsMapperSessio
 	// Assert
 
 	verify.
-		Should(t, mapper.Params["SessionToString:session"].(*authmodel.SessionModel)).
+		Should(t, mapper.Params["SessionToString:session"].(*auth_dto.SessionDto)).
 		Be(authService.SuccessResult)
 }
 

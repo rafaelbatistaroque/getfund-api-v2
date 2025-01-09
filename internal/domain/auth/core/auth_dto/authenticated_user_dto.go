@@ -1,6 +1,6 @@
-package auth_model
+package auth_dto
 
-type UserModel struct {
+type AuthenticatedUserDto struct {
 	Id        string `json:"id"`
 	FirstName string `json:"first_name"`
 	IsAdmin   int    `json:"is_admin"`

@@ -1,7 +1,7 @@
 package auth_composer
 
 import (
-	userRepository "getfund-api-v2/internal/domain/auth/adapter/auth_user_repository"
+	authRepository "getfund-api-v2/internal/domain/auth/adapter/auth_repository"
 	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/auth_service"
 	"getfund-api-v2/internal/domain/auth/core/proxy/user_repository_proxy"
@@ -36,13 +36,13 @@ func GetHandlers(
 	//dependencies
 	hasher := security.New()
 	mapper := mapper.New()
-	userRepositoryProxy := user_repository_proxy.New(userRepository.New(db), settings, hasher)
-	authService := auth_service.New(userRepositoryProxy, settings, hasher, mapper)
+	authRepositoryProxy := user_repository_proxy.New(authRepository.New(db), settings, hasher)
+	authService := auth_service.New(authRepositoryProxy, settings, hasher, mapper)
 
 	//applications
 	signin := signin_application.New(authService, sessionServive, mapper)
 	signout := signout_application.New(sessionServive)
-	recoverPassword := recover_password_application.New(hasher, settings, userRepositoryProxy, cache, eventBus)
+	recoverPassword := recover_password_application.New(hasher, settings, authRepositoryProxy, cache, eventBus)
 
 	//gateway
 	auth_gateway := auth_gateway.New(signin, signout, recoverPassword, nil)

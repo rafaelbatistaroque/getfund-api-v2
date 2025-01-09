@@ -2,112 +2,112 @@ package user_repository_proxy_test
 
 import (
 	"bytes"
-	auth_model "getfund-api-v2/internal/domain/auth/core/model"
-	fixture "getfund-api-v2/test/internal/domain/auth/core/proxy/user_repository_proxy/user_repository_proxy_fixture"
+	auth_model "getfund-api-v2/internal/domain/auth/core/auth_dto"
+	fixture "getfund-api-v2/test/internal/domain/auth/core/proxy/user_repository_proxy/auth_repository_proxy_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"
 )
 
-func Test_GivenGetByUserName_WhenInit_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenInit_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedInputText := "fake-username"
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.GetByUserName(expectedInputText)
+	sut.GetAuthenticatedUserByUsername(expectedInputText)
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.Params["HashWithSalt:inputText"]).Be(expectedInputText)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
 
-func Test_GivenGetByUserName_WhenInit_ThenEnsureCallHashWithSaltOnce(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenInit_ThenEnsureCallHashWithSaltOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.GetByUserName("fake-username")
+	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
 }
 
-func Test_GivenGetByUserName_WhenHashWithSaltError_ThenEnsureReturnServerError(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenHashWithSaltError_ThenEnsureReturnServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltError()
 
 	// Act
-	_, err := sut.GetByUserName("fake-username")
+	_, err := sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
 	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
 }
 
-func Test_GivenGetByUserName_WhenHashWithSaltSuccess_ThenEnsureCallRepositoryGetByUserNameWithCorrectParameter(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenHashWithSaltSuccess_ThenEnsureCallRepositoryGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedParameter := "fake-username-hashed"
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess(expectedParameter)
 
 	// Act
-	sut.GetByUserName("fake-username")
+	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	verify.Should(t, spies.UserRepoSpy.Params["GetByUserName:username"]).Be(expectedParameter)
+	verify.Should(t, spies.AuthRepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedParameter)
 }
 
-func Test_GivenGetByUserName_WhenGetByUserNameInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.GetByUserName("fake-username")
+	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	verify.Should(t, spies.UserRepoSpy.CallsCount["GetByUserName"]).Be(1)
+	verify.Should(t, spies.AuthRepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
 }
 
-func Test_GivenGetByUserName_WhenGetByUserNameError_ThenEnsureReturnErrorFrom(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameError()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameError()
 
 	// Act
-	_, err := sut.GetByUserName("fake-username")
+	_, err := sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	verify.Should(t, err).Be(spies.UserRepoSpy.ErrorResult["GetByUserName"])
+	verify.Should(t, err).Be(spies.AuthRepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
-func Test_GivenGetByUserName_WhenGetByUserNameSucess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameSucess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
-	sut.GetByUserName("fake-username")
+	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	user := spies.UserRepoSpy.SuccessResult["GetByUserName"].(*auth_model.UserModel)
-	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(user.FirstName)
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_model.AuthenticatedUserDto)
+	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(authenticatedUser.FirstName)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
 }
 
-func Test_GivenGetByUserName_WhenGetByUserNameSucess_ThenEnsureReturnModelDeserialized(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameSucess_ThenEnsureReturnModelDeserialized(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.UserRepoSpy.DefineGetByUserNameSuccess()
+	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineDecryptMergedSuccess("fake-first-name")
 
 	// Act
-	userModel, _ := sut.GetByUserName("fake-username")
+	result, _ := sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	user := spies.UserRepoSpy.SuccessResult["GetByUserName"].(*auth_model.UserModel)
-	verify.Should(t, userModel.Id).Be(user.Id)
-	verify.Should(t, userModel.FirstName).Be(spies.HasherSpy.SuccessResult["DecryptMerged"])
-	verify.Should(t, userModel.IsAdmin).Be(user.IsAdmin)
-	verify.Should(t, userModel.Password).Be(user.Password)
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_model.AuthenticatedUserDto)
+	verify.Should(t, result.Id).Be(authenticatedUser.Id)
+	verify.Should(t, result.FirstName).Be(spies.HasherSpy.SuccessResult["DecryptMerged"])
+	verify.Should(t, result.IsAdmin).Be(authenticatedUser.IsAdmin)
+	verify.Should(t, result.Password).Be(authenticatedUser.Password)
 }

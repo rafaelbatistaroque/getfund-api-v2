@@ -20,7 +20,7 @@ type Handler interface {
 type EventBus interface {
 	Subscribe(eventName string, handler Handler)
 	Publish(event Event)
-	CreateAndPublish(event Event, payload any)
+	PublishWithPayload(event Event, payload any)
 }
 
 type eventBus struct {
@@ -58,8 +58,8 @@ func (eb *eventBus) Publish(event Event) {
 	}
 }
 
-// CreateAndPublish após incluir o payload ao evento dispara para todos os handlers
-func (eb *eventBus) CreateAndPublish(event Event, payload any) {
+// PublishWithPayload após incluir o payload ao evento dispara para todos os handlers
+func (eb *eventBus) PublishWithPayload(event Event, payload any) {
 	var data []byte
 	var err error
 

@@ -5,11 +5,11 @@ import (
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/recover_password/application"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/test/helper/auth_repository_spy"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
-	"getfund-api-v2/test/helper/user_repository_spy"
 
 	"github.com/rafaelbatistaroque/validation"
 )
@@ -17,7 +17,7 @@ import (
 type RecoverPasswordFixture struct {
 	HasherSpy   *security_spy.HasherSpy
 	SettingsSpy *settings_spy.ApplicationSettingsSpy
-	UserRepoSpy *user_repository_spy.UserRepositorySpy
+	AuthRepoSpy *auth_repository_spy.AuthRepositorySpy
 	CacheSpy    *cache_spy.RedisCacheSpy
 	EventBusSpy *eventbus_spy.EventBusSpy
 }
@@ -25,15 +25,15 @@ type RecoverPasswordFixture struct {
 func NewSut() (recover_password.UseCase, *RecoverPasswordFixture) {
 	hasherSpy := security_spy.New()
 	settingsSpy := settings_spy.New()
-	userRepoSpy := user_repository_spy.New()
+	AuthRepoSpy := auth_repository_spy.New()
 	cacheSpy := cache_spy.New()
 	eventBusSpy := eventbus_spy.New()
 
-	return sut.New(hasherSpy, settingsSpy, userRepoSpy, cacheSpy, eventBusSpy),
+	return sut.New(hasherSpy, settingsSpy, AuthRepoSpy, cacheSpy, eventBusSpy),
 		&RecoverPasswordFixture{
 			HasherSpy:   hasherSpy,
 			SettingsSpy: settingsSpy,
-			UserRepoSpy: userRepoSpy,
+			AuthRepoSpy: AuthRepoSpy,
 			CacheSpy:    cacheSpy,
 			EventBusSpy: eventBusSpy,
 		}
