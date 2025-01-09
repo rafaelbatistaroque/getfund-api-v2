@@ -46,3 +46,7 @@ func (r *AuthRepositorySpy) DefineGetAuthenticatedUserByUsernameError() {
 func (r *AuthRepositorySpy) DefineGetAuthenticatedUserByUsernameSuccess() {
 	r.SuccessResult["GetAuthenticatedUserByUsername"] = &model.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: "fake-id", IsAdmin: 0}
 }
+
+func (r *AuthRepositorySpy) DefineUpdatePasswordError() {
+	r.ErrorResult["UpdatePassword"] = errors.New("fake-error")
+}
