@@ -1,7 +1,7 @@
 package user_repository_proxy
 
 import (
-	auth_model "getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
@@ -21,7 +21,7 @@ func New(authRepository auth_contract.AuthRepository, settings settings.Applicat
 	}
 }
 
-func (r *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*auth_model.AuthenticatedUserDto, error) {
+func (r *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
 	usernameHashed, err := r.hasher.HashWithSalt(username, r.settings.GetServerSalt())
 	if err != nil {
 		return nil, err
@@ -32,7 +32,7 @@ func (r *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*
 		return nil, errRepo
 	}
 
-	return &auth_model.AuthenticatedUserDto{
+	return &auth_dto.AuthenticatedUserDto{
 		Id:        authenticatedUser.Id,
 		FirstName: r.hasher.DecryptMerged(authenticatedUser.FirstName, r.settings.GetSecretKey()),
 		IsAdmin:   authenticatedUser.IsAdmin,
@@ -41,5 +41,6 @@ func (r *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*
 }
 
 func (r *authRepositoryProxy) UpdatePassword(id, value string) error {
+	r.hasher.HashAndMerge(value, r.settings.GetServerSalt())
 	return nil
 }
