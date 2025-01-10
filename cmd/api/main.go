@@ -47,6 +47,7 @@ func main() {
 		api.Post("/sign-in", authHandlers.Signin)
 		api.With(authMiddleware.Authenticate).Get("/sign-out", authHandlers.Signout)
 		api.Post("/recover-password", authHandlers.RecoverPassword)
+		api.Post("/reset-password", authHandlers.ResetPassword)
 	})
 
 	http.ListenAndServe(appSettings.GetPort(), r)

@@ -7,28 +7,20 @@ import (
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/reset_password/application"
 	"getfund-api-v2/test/helper/auth_repository_spy"
 	"getfund-api-v2/test/helper/cache_spy"
-	"getfund-api-v2/test/helper/security_spy"
-	"getfund-api-v2/test/helper/settings_spy"
 )
 
 type ResetPasswordFixture struct {
 	CacheSpy    *cache_spy.RedisCacheSpy
 	AuthRepoSpy *auth_repository_spy.AuthRepositorySpy
-	SettingsSpy *settings_spy.ApplicationSettingsSpy
-	HasherSpy   *security_spy.HasherSpy
 }
 
 func NewSut() (reset_password.UseCase, *ResetPasswordFixture) {
 	cacheSpy := cache_spy.New()
 	AuthRepoSpy := auth_repository_spy.New()
-	settingsSpy := settings_spy.New()
-	hasherSpy := security_spy.New()
 
-	return sut.New(cacheSpy, AuthRepoSpy, settingsSpy, hasherSpy), &ResetPasswordFixture{
+	return sut.New(cacheSpy, AuthRepoSpy), &ResetPasswordFixture{
 		CacheSpy:    cacheSpy,
 		AuthRepoSpy: AuthRepoSpy,
-		SettingsSpy: settingsSpy,
-		HasherSpy:   hasherSpy,
 	}
 }
 

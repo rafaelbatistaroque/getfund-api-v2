@@ -6,6 +6,7 @@ import (
 	"getfund-api-v2/internal/domain/auth/core/domain_service/auth_service"
 	"getfund-api-v2/internal/domain/auth/core/proxy/user_repository_proxy"
 	recover_password_application "getfund-api-v2/internal/domain/auth/core/usecase/recover_password/application"
+	reset_password_application "getfund-api-v2/internal/domain/auth/core/usecase/reset_password/application"
 	signin_application "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
 	signout_application "getfund-api-v2/internal/domain/auth/core/usecase/signout/application"
 	mapper "getfund-api-v2/internal/domain/auth/main/mapper/signin_mapper"
@@ -24,6 +25,7 @@ type AuthComposer struct {
 	Signin          http.HandlerFunc
 	Signout         http.HandlerFunc
 	RecoverPassword http.HandlerFunc
+	ResetPassword   http.HandlerFunc
 }
 
 func GetHandlers(
@@ -43,13 +45,15 @@ func GetHandlers(
 	signin := signin_application.New(authService, sessionServive, mapper)
 	signout := signout_application.New(sessionServive)
 	recoverPassword := recover_password_application.New(hasher, settings, authRepositoryProxy, cache, eventBus)
+	resetPassword := reset_password_application.New(cache, authRepositoryProxy)
 
 	//gateway
-	auth_gateway := auth_gateway.New(signin, signout, recoverPassword, nil)
+	auth_gateway := auth_gateway.New(signin, signout, recoverPassword, resetPassword)
 
 	return AuthComposer{
 		Signin:          response_proxy.New(auth_gateway.Signin),
 		Signout:         response_proxy.New(auth_gateway.Signout),
 		RecoverPassword: response_proxy.New(auth_gateway.RecoverPassword),
+		ResetPassword:   response_proxy.New(auth_gateway.ResetPassword),
 	}
 }
