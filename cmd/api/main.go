@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	auth_composer "getfund-api-v2/internal/domain/auth/main/composer"
+	"getfund-api-v2/internal/domain/auth/main/auth_entry_point"
 	"getfund-api-v2/internal/domain/notification/main/notification_composer"
 	"getfund-api-v2/internal/middleware/auth_middleware"
 	"getfund-api-v2/internal/settings"
@@ -34,8 +34,8 @@ func main() {
 	//Subscriber
 	notification_composer.SubscribeEventHandlers(appSettings, eventBus, cacheService)
 
-	//Composer
-	authHandlers := auth_composer.GetHandlers(appSettings, cacheService, sessionService, db, eventBus)
+	//Entry Points
+	authEntryPoints := auth_entry_point.Get(appSettings, cacheService, sessionService, db, eventBus)
 
 	//Routes
 	r := chi.NewRouter()
@@ -44,10 +44,10 @@ func main() {
 
 		//Auth
 		authMiddleware := auth_middleware.New(sessionService)
-		api.Post("/sign-in", authHandlers.Signin)
-		api.With(authMiddleware.Authenticate).Get("/sign-out", authHandlers.Signout)
-		api.Post("/recover-password", authHandlers.RecoverPassword)
-		api.Post("/reset-password", authHandlers.ResetPassword)
+		api.Post("/sign-in", authEntryPoints.Signin)
+		api.With(authMiddleware.Authenticate).Get("/sign-out", authEntryPoints.Signout)
+		api.Post("/recover-password", authEntryPoints.RecoverPassword)
+		api.Post("/reset-password", authEntryPoints.ResetPassword)
 	})
 
 	http.ListenAndServe(appSettings.GetPort(), r)
