@@ -64,7 +64,7 @@ func (uc *recoverPasswordApplication) Execute(input *recover_password.Input) (*r
 
 	data := auth_dto.ForgetPasswordDto{
 		Username:     input.Username,
-		FirstName:    uc.hasher.DecryptMerged(authenticatedUser.FirstName, uc.settings.GetSecretKey()),
+		FirstName:    authenticatedUser.FirstName,
 		RecoveryLink: buildRecoverLink(uc.settings, recoveryCode.Data),
 	}
 

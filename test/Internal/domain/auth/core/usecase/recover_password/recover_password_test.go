@@ -133,9 +133,10 @@ func Test_GivenRecoverPasswordExecute_WhenHashSuccess_ThenEnsureCallCacheSetWith
 	spies.HasherSpy.DefineHashSuccess()
 	hashCode := spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data
 	expectedKey := "recovery_password_" + hashCode
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
 	expectedValue := auth_dto.ForgetPasswordDto{
 		Username:     validInput.Username,
-		FirstName:    spies.HasherSpy.SuccessResult["DecryptMerged"].(string),
+		FirstName:    authenticatedUser.FirstName,
 		RecoveryLink: spies.SettingsSpy.GetBaseUrl() + "/new-password/" + hashCode,
 	}
 
