@@ -52,10 +52,11 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenQuerySuccess_ThenEnsureReturnU
 func Test_GivenUpdatePassword_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	fixture.AddRandomUser(db, 1, true)
+	currentDb, _ := db.DB()
+	currentDb.Close()
 
 	// Act
-	err := sut.UpdatePassword("invalid-id", "invalid-password")
+	err := sut.UpdatePassword("", "")
 
 	// Assert
 	verify.Should(t, err).NotNil()
