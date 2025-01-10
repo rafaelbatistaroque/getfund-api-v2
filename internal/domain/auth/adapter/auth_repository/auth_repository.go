@@ -2,7 +2,7 @@ package auth_repository
 
 import (
 	"errors"
-	model "getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 
 	"gorm.io/gorm"
@@ -10,6 +10,8 @@ import (
 
 var (
 	table_USER = "user"
+	active     = 1
+	first      = 1
 )
 
 type authRepository struct {
@@ -20,15 +22,21 @@ func New(db *gorm.DB) auth_contract.AuthRepository {
 	return &authRepository{db: db}
 }
 
-func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*model.AuthenticatedUserDto, error) {
-	var authenticatedUser = model.AuthenticatedUserDto{}
-	err := r.db.
+func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
+	var authenticatedUser = auth_dto.AuthenticatedUserDto{}
+	result := r.db.
 		Table(table_USER).
-		Where("username = ? AND is_active = 1", username).
-		First(&authenticatedUser)
+		Select("id, first_name, is_admin, password, username").
+		Where("is_active=? AND username=?", active, username).
+		Limit(first).
+		Scan(&authenticatedUser)
 
-	if err.Error != nil {
+	if result.RowsAffected == 0 {
 		return nil, errors.New("user not found")
+	}
+
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return &authenticatedUser, nil

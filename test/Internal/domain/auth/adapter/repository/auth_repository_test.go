@@ -12,7 +12,8 @@ import (
 func Test_GivenGetAuthenticatedUserByUsername_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	fixture.AddRandomUser(db, 1, false)
+	currentDb, _ := db.DB()
+	currentDb.Close()
 
 	// Act
 	_, err := sut.GetAuthenticatedUserByUsername("invalid-username")

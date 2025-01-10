@@ -17,10 +17,12 @@ func NewSUT() (auth_contract.AuthRepository, *gorm.DB) {
 }
 
 type FakeUser struct {
-	ID       string `json:"id"`
-	Username string `json:"username"`
-	IsActive int    `json:"is_active"`
-	Password string `json:"password"`
+	ID        string `json:"id"`
+	Username  string `json:"username"`
+	FirstName string `json:"first_name"`
+	IsActive  int    `json:"is_active"`
+	Password  string `json:"password"`
+	IsAdmin   int    `json:"is_admin"`
 }
 
 func (FakeUser) TableName() string {
