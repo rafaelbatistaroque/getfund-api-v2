@@ -1,9 +1,12 @@
 package session_service
 
 import (
+	"encoding/json"
 	"errors"
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
-	"strings"
 	"time"
 )
 
@@ -15,42 +18,40 @@ type SessionKey struct{}
 type TokenKey struct{}
 
 type SessionService interface {
-	SaveSession(session string) (string, error)
+	SaveSession(session *auth_dto.SessionDto) (string, error)
 	GetSession(token string) (string, error)
 	DeleteSession(token string) error
 }
 
 type sessionService struct {
-	cache cache_service.Cache
+	cache    cache_service.Cache
+	hasher   security.Hasher
+	settings settings.ApplicationSettings
 }
 
-func New(cache cache_service.Cache) SessionService {
+func New(cache cache_service.Cache, hasher security.Hasher, settings settings.ApplicationSettings) SessionService {
 	return &sessionService{
-		cache: cache,
+		cache:    cache,
+		hasher:   hasher,
+		settings: settings,
 	}
 }
 
-func (s *sessionService) SaveSession(session string) (string, error) {
-	if session == "" {
-		return "", errors.New("save-session: parameter cannot be null or empty")
+func (s *sessionService) SaveSession(session *auth_dto.SessionDto) (string, error) {
+	if session == nil {
+		return "", errors.New("save-session: session cannot be null or empty")
 	}
 
-	if notContain(session, "@") {
-		return "", errors.New("save-session: parameter invalid")
-	}
+	sessionSerialized, _ := json.Marshal(session)
+	sessionEncrypted := s.hasher.Encrypt(string(sessionSerialized), s.settings.GetSecretKey())
+	token := s.hasher.HashAndMerge(sessionEncrypted, s.settings.GetServerSalt())
 
-	sessionData := strings.Split(session, "@")
-
-	errCache := s.cache.Set(sessionData[0], sessionData[1], time_24_HOURS)
+	errCache := s.cache.Set(token, sessionEncrypted, time_24_HOURS)
 	if errCache != nil {
 		return "", errCache
 	}
 
-	return sessionData[0], nil
-}
-
-func notContain(value, param string) bool {
-	return !strings.Contains(value, param)
+	return token, nil
 }
 
 func (s *sessionService) DeleteSession(token string) error {
@@ -66,5 +67,10 @@ func (s *sessionService) GetSession(token string) (string, error) {
 		return "", errors.New("get-session: parameter cannot be null or empty")
 	}
 
-	return s.cache.Get(token)
+	sessionEncrypted, err := s.cache.Get(token)
+	if err != nil {
+		return "", err
+	}
+
+	return s.hasher.DecryptMerged(sessionEncrypted, s.settings.GetSecretKey()), nil
 }

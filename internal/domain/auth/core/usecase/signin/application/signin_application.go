@@ -33,12 +33,7 @@ func (uc *signinApplication) Execute(input *signin.Input) (*signin.Output, *resu
 		return nil, authErr
 	}
 
-	sessionSerialized, toStringErr := uc.mapper.SessionToString(session)
-	if toStringErr != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, toStringErr)
-	}
-
-	token, saveSessionErr := uc.sessionService.SaveSession(sessionSerialized)
+	token, saveSessionErr := uc.sessionService.SaveSession(session)
 	if saveSessionErr != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, saveSessionErr)
 	}

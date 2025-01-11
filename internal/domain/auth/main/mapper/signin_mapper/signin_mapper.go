@@ -1,14 +1,12 @@
 package signin_mapper
 
 import (
-	"encoding/json"
 	model "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
 
 type SigninMapper interface {
 	ToOutput(token string, session *model.SessionDto) *signin.Output
-	SessionToString(session *model.SessionDto) (string, error)
 	ToSessionModel(authenticatedUser *model.AuthenticatedUserDto) *model.SessionDto
 }
 
@@ -29,15 +27,6 @@ func (m *signinMapper) ToOutput(token string, session *model.SessionDto) *signin
 			IsAdmin:   session.IsAdmin == 1,
 		},
 	}
-}
-
-func (m *signinMapper) SessionToString(session *model.SessionDto) (string, error) {
-	sessionSerialized, err := json.Marshal(session)
-	if err != nil {
-		return "", err
-	}
-
-	return string(sessionSerialized), nil
 }
 
 func (m *signinMapper) ToSessionModel(authenticatedUser *model.AuthenticatedUserDto) *model.SessionDto {

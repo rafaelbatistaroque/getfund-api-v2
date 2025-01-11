@@ -2,22 +2,33 @@ package signin_fixture
 
 import (
 	"fmt"
-	auth_dto "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/test/helper/auth_service_spy"
 	"getfund-api-v2/test/helper/mapper_spy/signin_mapper_spy"
 	"getfund-api-v2/test/helper/session_spy"
 
 	validation "github.com/rafaelbatistaroque/validation"
 )
 
-func NewSut() (signin.UseCase, *authServiceSpy, *session_spy.SessionServiceSpy, *signin_mapper_spy.SigninMapperSpy) {
-	mapperSpy := signin_mapper_spy.New()
-	authServiceSpy := &authServiceSpy{Params: make(map[string]string), CallsCount: 0}
-	sessionServiceSpy := session_spy.New()
+type SigninFixture struct {
+	AuthServiceSpy *auth_service_spy.AuthServiceSpy
+	SessionSpy     *session_spy.SessionServiceSpy
+	MapperSpy      *signin_mapper_spy.SigninMapperSpy
+}
 
-	return sut.New(authServiceSpy, sessionServiceSpy, mapperSpy), authServiceSpy, sessionServiceSpy, mapperSpy
+func NewSut() (signin.UseCase, *SigninFixture) {
+	authServiceSpy := auth_service_spy.New()
+	sessionServiceSpy := session_spy.New()
+	mapperSpy := signin_mapper_spy.New()
+
+	return sut.New(authServiceSpy, sessionServiceSpy, mapperSpy),
+		&SigninFixture{
+			AuthServiceSpy: authServiceSpy,
+			SessionSpy:     sessionServiceSpy,
+			MapperSpy:      mapperSpy,
+		}
 }
 
 func GetValidInput() *signin.Input {
@@ -32,30 +43,4 @@ func GetInputWithUserNameInvalid() (*signin.Input, *result_app.ApplicationError)
 func GetInputWithPasswordInvalid() (*signin.Input, *result_app.ApplicationError) {
 	return &signin.Input{Password: "", UserName: "fake-username"},
 		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
-}
-
-type authServiceSpy struct {
-	Params map[string]string
-
-	CallsCount int
-
-	SuccessResult *auth_dto.SessionDto
-	errorResult   *result_app.ApplicationError
-}
-
-func (a *authServiceSpy) Authenticate(username string, password string) (*auth_dto.SessionDto, *result_app.ApplicationError) {
-	a.Params["username"] = username
-	a.Params["password"] = password
-
-	a.CallsCount++
-
-	return a.SuccessResult, a.errorResult
-}
-
-func (a *authServiceSpy) DefineNotAuthenticate(code int, message error) {
-	a.errorResult = result_app.New(code, message)
-}
-
-func (a *authServiceSpy) DefineAuthenticate() {
-	a.SuccessResult = &auth_dto.SessionDto{ID: "fake-id", FirstName: "fake-first-name", IsAdmin: 0}
 }

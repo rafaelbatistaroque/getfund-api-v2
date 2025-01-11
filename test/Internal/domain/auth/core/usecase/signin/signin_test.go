@@ -2,7 +2,6 @@ package signin_application_test
 
 import (
 	"errors"
-	auth_dto "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixtures "getfund-api-v2/test/internal/domain/auth/core/usecase/signin/signin_fixture"
 	"testing"
@@ -12,7 +11,7 @@ import (
 
 func Test_GivenSigninExecute_WhenSigninInputUserNameInvalid_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut, _, _, _ := fixtures.NewSut()
+	sut, _ := fixtures.NewSut()
 	invalidInput, errorInput := fixtures.GetInputWithUserNameInvalid()
 
 	// Act
@@ -25,7 +24,7 @@ func Test_GivenSigninExecute_WhenSigninInputUserNameInvalid_ThenEnsureReturnErro
 
 func Test_GivenSigninExecute_WhenSigninInputPasswordInvalid_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut, _, _, _ := fixtures.NewSut()
+	sut, _ := fixtures.NewSut()
 	invalidInput, errorInput := fixtures.GetInputWithPasswordInvalid()
 
 	// Act
@@ -38,35 +37,35 @@ func Test_GivenSigninExecute_WhenSigninInputPasswordInvalid_ThenEnsureReturnErro
 
 func Test_GivenSigninExecute_WhenAuthenticateInvoke_ThenEnsureCallsWithCorrectParameters(t *testing.T) {
 	// Arrange
+	sut, spies := fixtures.NewSut()
 	correctParam := fixtures.GetValidInput()
-	sut, authService, _, _ := fixtures.NewSut()
 
 	// Act
 	sut.Execute(correctParam)
 
 	// Assert
-	verify.Should(t, authService.Params["password"]).Be(correctParam.Password)
-	verify.Should(t, authService.Params["username"]).Be(correctParam.UserName)
-	verify.Should(t, authService.Params).Len(2)
+	verify.Should(t, spies.AuthServiceSpy.Params["password"]).Be(correctParam.Password)
+	verify.Should(t, spies.AuthServiceSpy.Params["username"]).Be(correctParam.UserName)
+	verify.Should(t, spies.AuthServiceSpy.Params).Len(2)
 }
 
 func Test_GivenSigninExecute_WhenAuthenticateInvoke_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
+	sut, spies := fixtures.NewSut()
 	correctParam := fixtures.GetValidInput()
-	sut, authService, _, _ := fixtures.NewSut()
 
 	// Act
 	sut.Execute(correctParam)
 
 	// Assert
-	verify.Should(t, authService.CallsCount).Be(1)
+	verify.Should(t, spies.AuthServiceSpy.CallsCount).Be(1)
 }
 
 func Test_GivenSigninExecute_WhenAuthenticateError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
-	sut, authService, _, _ := fixtures.NewSut()
+	sut, spies := fixtures.NewSut()
 	anyError := result_app.New(result_app.UNAUTHORIZED_CODE, errors.New("fake-message"))
-	authService.DefineNotAuthenticate(anyError.Code, anyError.Message)
+	spies.AuthServiceSpy.DefineNotAuthenticate(anyError.Code, anyError.Message)
 
 	// Act
 	_, err := sut.Execute(fixtures.GetValidInput())
@@ -77,75 +76,33 @@ func Test_GivenSigninExecute_WhenAuthenticateError_ThenEnsureReturnErrorFrom(t *
 	verify.Should(t, err.Message.Error()).Be(anyError.Message.Error())
 }
 
-func Test_GivenSigninExecute_WhenAuthenticateSuccess_ThenEnsureCallsMapperSessionToStringWithCorrectParameter(t *testing.T) {
+func Test_GivenSigninExecute_WhenAuthenticateSuccess_ThenEnsureCallsSaveSessionWithCorrectParameter(t *testing.T) {
 	// Arrange
-	sut, authService, _, mapper := fixtures.NewSut()
-	authService.DefineAuthenticate()
+	sut, spies := fixtures.NewSut()
+	spies.AuthServiceSpy.DefineAuthenticate()
 
 	// Act
 	sut.Execute(fixtures.GetValidInput())
 
 	// Assert
-
-	verify.
-		Should(t, mapper.Params["SessionToString:session"].(*auth_dto.SessionDto)).
-		Be(authService.SuccessResult)
-}
-
-func Test_GivenSigninExecute_WhenMapperSessionToStringInvoke_ThenEnsureCallsOnce(t *testing.T) {
-	// Arrange
-	sut, _, _, mapper := fixtures.NewSut()
-
-	// Act
-	sut.Execute(fixtures.GetValidInput())
-
-	// Assert
-	verify.Should(t, mapper.CallsCount["SessionToString"]).Be(1)
-}
-
-func Test_GivenSigninExecute_WhenMapperSessionToStringError_ThenEnsureReturnServerError(t *testing.T) {
-	// Arrange
-	sut, _, _, mapper := fixtures.NewSut()
-	mapper.DefineError()
-
-	// Act
-	_, err := sut.Execute(fixtures.GetValidInput())
-
-	// Assert
-	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).NotNil()
-}
-
-func Test_GivenSigninExecute_WhenSessionToStringSuccess_ThenEnsureCallsSaveSessionWithCorrectParameter(t *testing.T) {
-	// Arrange
-	sut, _, sessionService, mapper := fixtures.NewSut()
-	mapper.DefineSuccess()
-
-	// Act
-	sut.Execute(fixtures.GetValidInput())
-
-	// Assert
-	verify.
-		Should(t, sessionService.Params["SaveSession:session"]).
-		Be(mapper.SuccessResult["SessionToString"])
+	verify.Should(t, spies.SessionSpy.Params["SaveSession:session"]).Be(spies.AuthServiceSpy.SuccessResult)
 }
 
 func Test_GivenSigninExecute_WhenSaveSessionInvoke_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
-	sut, _, sessionService, _ := fixtures.NewSut()
+	sut, spies := fixtures.NewSut()
 
 	// Act
 	sut.Execute(fixtures.GetValidInput())
 
 	// Assert
-	verify.Should(t, sessionService.CallsCount["SaveSession"]).Be(1)
+	verify.Should(t, spies.SessionSpy.CallsCount["SaveSession"]).Be(1)
 }
 
 func Test_GivenSigninExecute_WhenSaveSessionError_ThenEnsureReturnServerError(t *testing.T) {
 	// Arrange
-	sut, _, sessionService, _ := fixtures.NewSut()
-	sessionService.DefineSaveSessionError()
+	sut, spies := fixtures.NewSut()
+	spies.SessionSpy.DefineSaveSessionError()
 
 	// Act
 	_, err := sut.Execute(fixtures.GetValidInput())
@@ -158,43 +115,43 @@ func Test_GivenSigninExecute_WhenSaveSessionError_ThenEnsureReturnServerError(t 
 
 func Test_GivenSigninExecute_WhenSaveSessionSuccess_ThenEnsureCallsMapperWithCorrectParameters(t *testing.T) {
 	// Arrange
-	sut, authService, sessionService, mapper := fixtures.NewSut()
-	sessionService.DefineSaveSessionSuccess()
-	authService.DefineAuthenticate()
+	sut, spies := fixtures.NewSut()
+	spies.SessionSpy.DefineSaveSessionSuccess()
+	spies.AuthServiceSpy.DefineAuthenticate()
 
 	// Act
 	sut.Execute(fixtures.GetValidInput())
 
 	// Assert
-	verify.Should(t, mapper.Params["ToOutput:token"]).Be(sessionService.SuccessResult["SaveSession"])
-	verify.Should(t, mapper.Params["ToOutput:session"]).Be(authService.SuccessResult)
+	verify.Should(t, spies.MapperSpy.Params["ToOutput:token"]).Be(spies.SessionSpy.SuccessResult["SaveSession"])
+	verify.Should(t, spies.MapperSpy.Params["ToOutput:session"]).Be(spies.AuthServiceSpy.SuccessResult)
 }
 
 func Test_GivenSigninExecute_WhenSaveSessionSuccess_ThenEnsureCallsMapperToOutputOnce(t *testing.T) {
 	// Arrange
-	sut, _, _, mapper := fixtures.NewSut()
+	sut, spies := fixtures.NewSut()
 
 	// Act
 	sut.Execute(fixtures.GetValidInput())
 
 	// Assert
-	verify.Should(t, mapper.CallsCount["ToOutput"]).Be(1)
+	verify.Should(t, spies.MapperSpy.CallsCount["ToOutput"]).Be(1)
 }
 
 func Test_GivenSigninExecute_WhenMapperInvoke_ThenEnsureReturnOutputWithSession(t *testing.T) {
 	// Arrange
-	sut, authService, sessionService, mapper := fixtures.NewSut()
-	mapper.ForceReturn = false
-	authService.DefineAuthenticate()
-	sessionService.DefineSaveSessionSuccess()
+	sut, spies := fixtures.NewSut()
+	spies.MapperSpy.ForceReturn = false
+	spies.AuthServiceSpy.DefineAuthenticate()
+	spies.SessionSpy.DefineSaveSessionSuccess()
 
 	// Act
 	result, _ := sut.Execute(fixtures.GetValidInput())
 
 	// Assert
 	verify.Should(t, result).NotNil()
-	verify.Should(t, result.Token).Be(sessionService.SuccessResult["SaveSession"])
-	verify.Should(t, result.Session.ID).Be(authService.SuccessResult.ID)
-	verify.Should(t, result.Session.FirstName).Be(authService.SuccessResult.FirstName)
-	verify.Should(t, result.Session.IsAdmin).Be(authService.SuccessResult.IsAdmin == 1)
+	verify.Should(t, result.Token).Be(spies.SessionSpy.SuccessResult["SaveSession"])
+	verify.Should(t, result.Session.ID).Be(spies.AuthServiceSpy.SuccessResult.ID)
+	verify.Should(t, result.Session.FirstName).Be(spies.AuthServiceSpy.SuccessResult.FirstName)
+	verify.Should(t, result.Session.IsAdmin).Be(spies.AuthServiceSpy.SuccessResult.IsAdmin == 1)
 }

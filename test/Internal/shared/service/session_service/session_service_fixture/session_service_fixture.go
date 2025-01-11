@@ -1,26 +1,39 @@
 package session_service_fixture
 
 import (
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/shared/service/session_service"
 	"getfund-api-v2/test/helper/cache_spy"
+	"getfund-api-v2/test/helper/security_spy"
+	"getfund-api-v2/test/helper/settings_spy"
 )
 
 type SessionServiceFixture struct {
 	RedisCacheSpy *cache_spy.RedisCacheSpy
+	HasherSpy     *security_spy.HasherSpy
+	SettingsSpy   *settings_spy.ApplicationSettingsSpy
 }
 
 func NewSut() (session_service.SessionService, *SessionServiceFixture) {
 	redisSpy := cache_spy.New()
+	hasherSpy := security_spy.New()
+	settingsSpy := settings_spy.New()
 
-	return session_service.New(redisSpy),
+	return session_service.New(redisSpy, hasherSpy, settingsSpy),
 		&SessionServiceFixture{
 			RedisCacheSpy: redisSpy,
+			HasherSpy:     hasherSpy,
+			SettingsSpy:   settingsSpy,
 		}
 }
 
-func GetSaveSessionInputEmpty() string   { return "" }
-func GetSaveSessionInputInvalid() string { return "invalid" }
-func GetSaveSessionInputValid() string   { return `fake-token@fake-session-hashed` }
+func GetSaveSessionInputNull() *auth_dto.SessionDto { return nil }
+func GetSaveSessionInputValid() *auth_dto.SessionDto {
+	return &auth_dto.SessionDto{}
+}
+func GetSaveSessionInputValidSerialized() string {
+	return "{\"id\":\"\",\"first_name\":\"\",\"is_admin\":0}"
+}
 
 func GetDeleteSessionInputInvalid() string { return "" }
 func GetDeleteSessionInputValid() string   { return `fake-token` }

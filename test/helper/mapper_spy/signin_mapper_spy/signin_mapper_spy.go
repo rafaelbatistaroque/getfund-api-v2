@@ -1,7 +1,6 @@
 package signin_mapper_spy
 
 import (
-	"errors"
 	model "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
@@ -45,19 +44,6 @@ func (m *SigninMapperSpy) ToOutput(token string, session *model.SessionDto) *sig
 	return m.SuccessResult["ToOutput"].(*signin.Output)
 }
 
-func (m *SigninMapperSpy) SessionToString(session *model.SessionDto) (string, error) {
-	m.Params["SessionToString:session"] = session
-
-	m.CallsCount["SessionToString"]++
-
-	success := m.SuccessResult["SessionToString"]
-	if success != nil {
-		return m.SuccessResult["SessionToString"].(string), m.ErrorResult["SessionToString"]
-	}
-
-	return "", m.ErrorResult["SessionToString"]
-}
-
 func (m *SigninMapperSpy) ToSessionModel(authenticatedUser *model.AuthenticatedUserDto) *model.SessionDto {
 	m.Params["ToSessionModel:authenticatedUser"] = authenticatedUser
 
@@ -67,14 +53,6 @@ func (m *SigninMapperSpy) ToSessionModel(authenticatedUser *model.AuthenticatedU
 	}
 
 	return nil
-}
-
-func (m *SigninMapperSpy) DefineError() {
-	m.ErrorResult["SessionToString"] = errors.New("any-error")
-}
-
-func (m *SigninMapperSpy) DefineSuccess() {
-	m.SuccessResult["SessionToString"] = "fake-success"
 }
 
 func (m *SigninMapperSpy) DefineToSessionModelSuccess(authenticatedUser *model.AuthenticatedUserDto) {

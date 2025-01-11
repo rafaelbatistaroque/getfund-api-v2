@@ -1,6 +1,7 @@
 package session_service_test
 
 import (
+	"bytes"
 	fixture "getfund-api-v2/test/internal/shared/service/session_service/session_service_fixture"
 	"testing"
 
@@ -55,14 +56,40 @@ func Test_GivenGetSession_WhenCacheGetError_ThenEnsureReturnError(t *testing.T) 
 	verify.Should(t, err).Be(spies.RedisCacheSpy.ErrorResult["Get"])
 }
 
-func Test_GivenGetSession_WhenCacheGetSuccess_ThenEnsureReturnSession(t *testing.T) {
+func Test_GivenGetSession_WhenCacheGetSuccess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RedisCacheSpy.DefineCacheGetSuccess("fake-session")
 
 	// Act
+	sut.GetSession(fixture.GetGetSessionInputValid())
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(spies.RedisCacheSpy.SuccessResult["Get"])
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
+}
+
+func Test_GivenGetSession_WhenDecryptMergedInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RedisCacheSpy.DefineCacheGetSuccess("fake-session")
+
+	// Act
+	sut.GetSession(fixture.GetGetSessionInputValid())
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["DecryptMerged"]).Be(1)
+}
+
+func Test_GivenGetSession_WhenDecryptMergedISuccess_ThenEnsureCallsResultFrom(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RedisCacheSpy.DefineCacheGetSuccess("fake-session")
+	spies.HasherSpy.DefineDecryptMergedSuccess("any-value")
+
+	// Act
 	result, _ := sut.GetSession(fixture.GetGetSessionInputValid())
 
 	// Assert
-	verify.Should(t, result).Be(spies.RedisCacheSpy.SuccessResult["Get"])
+	verify.Should(t, result).Be(spies.HasherSpy.SuccessResult["DecryptMerged"])
 }
