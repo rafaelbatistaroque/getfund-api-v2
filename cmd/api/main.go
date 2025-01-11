@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"getfund-api-v2/internal/domain/auth/main/auth_entry_point"
+	"getfund-api-v2/internal/domain/auth/main/auth_entry_point_composer"
 	"getfund-api-v2/internal/domain/notification/main/notification_composer"
 	"getfund-api-v2/internal/middleware/auth_middleware"
 	"getfund-api-v2/internal/settings"
@@ -36,7 +36,7 @@ func main() {
 	notification_composer.SubscribeEventHandlers(appSettings, eventBus, cacheService)
 
 	//Entry Points
-	authEntryPoints := auth_entry_point.Get(appSettings, cacheService, sessionServiceProxy, db, eventBus)
+	authEntryPoints := auth_entry_point_composer.Get(appSettings, cacheService, sessionServiceProxy, db, eventBus)
 
 	//Routes
 	r := chi.NewRouter()

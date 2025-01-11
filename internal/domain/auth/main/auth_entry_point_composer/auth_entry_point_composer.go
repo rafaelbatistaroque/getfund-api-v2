@@ -1,10 +1,10 @@
-package auth_entry_point
+package auth_entry_point_composer
 
 import (
 	authRepository "getfund-api-v2/internal/domain/auth/adapter/auth_repository"
 	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	"getfund-api-v2/internal/domain/auth/adapter/proxy/user_repository_proxy"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/auth_service"
-	"getfund-api-v2/internal/domain/auth/core/proxy/user_repository_proxy"
 	recover_password_application "getfund-api-v2/internal/domain/auth/core/usecase/recover_password/application"
 	reset_password_application "getfund-api-v2/internal/domain/auth/core/usecase/reset_password/application"
 	signin_application "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
@@ -21,7 +21,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type AuthEntryPoint struct {
+type AuthEntryPointComposer struct {
 	Signin          http.HandlerFunc
 	Signout         http.HandlerFunc
 	RecoverPassword http.HandlerFunc
@@ -33,7 +33,7 @@ func Get(
 	cache cache_service.Cache,
 	sessionServive sessionService.SessionService,
 	db *gorm.DB,
-	eventBus bus.EventBus) AuthEntryPoint {
+	eventBus bus.EventBus) AuthEntryPointComposer {
 
 	//dependencies
 	hasher := security.New()
@@ -50,7 +50,7 @@ func Get(
 	//gateway
 	auth_gateways := auth_gateway.New(signin, signout, recoverPassword, resetPassword)
 
-	return AuthEntryPoint{
+	return AuthEntryPointComposer{
 		Signin:          response_proxy.New(auth_gateways.Signin),
 		Signout:         response_proxy.New(auth_gateways.Signout),
 		RecoverPassword: response_proxy.New(auth_gateways.RecoverPassword),
