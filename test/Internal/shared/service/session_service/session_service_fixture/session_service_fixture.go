@@ -3,26 +3,27 @@ package session_service_fixture
 import (
 	"getfund-api-v2/internal/shared/service/session_service"
 	"getfund-api-v2/test/helper/cache_spy"
-	"getfund-api-v2/test/helper/security_spy"
-	"getfund-api-v2/test/helper/settings_spy"
 )
 
-func NewSut() (session_service.SessionService, *security_spy.HasherSpy, *settings_spy.ApplicationSettingsSpy, *cache_spy.RedisCacheSpy) {
-	settingsSpy := settings_spy.New()
-	hasherSpy := security_spy.New()
-	redisSpy := cache_spy.New()
-
-	return session_service.New(redisSpy, hasherSpy, settingsSpy),
-		hasherSpy,
-		settingsSpy,
-		redisSpy
+type SessionServiceFixture struct {
+	RedisCacheSpy *cache_spy.RedisCacheSpy
 }
 
-func GetSaveSessionInputInvalid() string { return "" }
-func GetSaveSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
+func NewSut() (session_service.SessionService, *SessionServiceFixture) {
+	redisSpy := cache_spy.New()
 
-func GetDeleteSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
+	return session_service.New(redisSpy),
+		&SessionServiceFixture{
+			RedisCacheSpy: redisSpy,
+		}
+}
+
+func GetSaveSessionInputEmpty() string   { return "" }
+func GetSaveSessionInputInvalid() string { return "invalid" }
+func GetSaveSessionInputValid() string   { return `fake-token@fake-session-hashed` }
+
 func GetDeleteSessionInputInvalid() string { return "" }
+func GetDeleteSessionInputValid() string   { return `fake-token` }
 
-func GetGetSessionInputValid() string   { return `{"fakeField": "fake-value"}` }
 func GetGetSessionInputInvalid() string { return "" }
+func GetGetSessionInputValid() string   { return `fake-token` }

@@ -9,7 +9,7 @@ import (
 
 func Test_GivenGetSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut, _, _, _ := fixture.NewSut()
+	sut, _ := fixture.NewSut()
 
 	// Act
 	_, err := sut.GetSession(fixture.GetGetSessionInputInvalid())
@@ -21,74 +21,48 @@ func Test_GivenGetSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T) {
 
 func Test_GivenGetSession_WhenValidInput_ThenEnsureCallCacheGetWithCorrectParameter(t *testing.T) {
 	// Arrange
+	sut, spies := fixture.NewSut()
 	expectedParameter := fixture.GetGetSessionInputValid()
-	sut, _, _, cacheSpy := fixture.NewSut()
 
 	// Act
 	sut.GetSession(expectedParameter)
 
 	// Assert
-	verify.Should(t, cacheSpy.Params["Get:key"]).Be(expectedParameter)
+	verify.Should(t, spies.RedisCacheSpy.Params["Get:key"]).Be(expectedParameter)
 }
 
 func Test_GivenGetSession_WhenCacheGetInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
-	sut, _, _, cacheSpy := fixture.NewSut()
+	sut, spies := fixture.NewSut()
 
 	// Act
 	sut.GetSession(fixture.GetGetSessionInputValid())
 
 	// Assert
-	verify.Should(t, cacheSpy.CallsCount["Get"]).Be(1)
+	verify.Should(t, spies.RedisCacheSpy.CallsCount["Get"]).Be(1)
 }
 
 func Test_GivenGetSession_WhenCacheGetError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	sut, _, _, cacheSpy := fixture.NewSut()
-	cacheSpy.DefineCacheGetError()
+	sut, spies := fixture.NewSut()
+	spies.RedisCacheSpy.DefineCacheGetError()
 
 	// Act
 	_, err := sut.GetSession(fixture.GetGetSessionInputValid())
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err).Be(cacheSpy.ErrorResult["Get"])
+	verify.Should(t, err).Be(spies.RedisCacheSpy.ErrorResult["Get"])
 }
 
-func Test_GivenGetSession_WhenCacheGetSuccess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
+func Test_GivenGetSession_WhenCacheGetSuccess_ThenEnsureReturnSession(t *testing.T) {
 	// Arrange
-	sut, hasherSpy, settingsSpy, cacheSpy := fixture.NewSut()
-	cacheSpy.DefineCacheGetSuccess("")
-
-	// Act
-	sut.GetSession(fixture.GetGetSessionInputValid())
-
-	// Assert
-	verify.Should(t, hasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(cacheSpy.SuccessResult["Get"])
-	verify.Should(t, hasherSpy.Params["DecryptMerged:secretKey"]).Be(settingsSpy.GetSecretKey())
-}
-
-func Test_GivenGetSession_WhenDecryptMergedInvoked_ThenEnsureCallsOnce(t *testing.T) {
-	// Arrange
-	sut, hasherSpy, _, cacheSpy := fixture.NewSut()
-	cacheSpy.DefineCacheGetSuccess("")
-
-	// Act
-	sut.GetSession(fixture.GetGetSessionInputValid())
-
-	// Assert
-	verify.Should(t, hasherSpy.CallsCount["DecryptMerged"]).Be(1)
-}
-
-func Test_GivenGetSession_WhenDecryptMergedSuccess_ThenEnsureReturnSession(t *testing.T) {
-	// Arrange
-	sut, hasherSpy, _, cacheSpy := fixture.NewSut()
-	cacheSpy.DefineCacheGetSuccess("")
-	hasherSpy.DefineDecryptMergedSuccess("valid-session")
+	sut, spies := fixture.NewSut()
+	spies.RedisCacheSpy.DefineCacheGetSuccess("fake-session")
 
 	// Act
 	result, _ := sut.GetSession(fixture.GetGetSessionInputValid())
 
 	// Assert
-	verify.Should(t, result).Be(hasherSpy.SuccessResult["DecryptMerged"])
+	verify.Should(t, result).Be(spies.RedisCacheSpy.SuccessResult["Get"])
 }

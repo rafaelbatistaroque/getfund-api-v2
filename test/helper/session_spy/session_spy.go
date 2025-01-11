@@ -36,7 +36,16 @@ func (s *SessionServiceSpy) DeleteSession(token string) error {
 }
 
 func (s *SessionServiceSpy) GetSession(session string) (string, error) {
-	return "", nil
+	s.Params["GetSession:token"] = session
+
+	s.CallsCount["GetSession"]++
+
+	success := s.SuccessResult["GetSession"]
+	if success != nil {
+		return s.SuccessResult["GetSession"].(string), s.ErrorResult["GetSession"]
+	}
+
+	return "", s.ErrorResult["GetSession"]
 }
 
 func (s *SessionServiceSpy) DefineSaveSessionError() {
@@ -53,4 +62,12 @@ func (s *SessionServiceSpy) DefineDeleteSessionError() {
 
 func (s *SessionServiceSpy) DefineDeleteSessionSuccess() {
 	s.SuccessResult["DeleteSession"] = "fake-success"
+}
+
+func (s *SessionServiceSpy) DefineGetSessionError() {
+	s.ErrorResult["GetSession"] = errors.New("any-error")
+}
+
+func (s *SessionServiceSpy) DefineGetSessionSuccess() {
+	s.SuccessResult["GetSession"] = "fake-data-hashed"
 }
