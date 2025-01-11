@@ -3,7 +3,7 @@ package user_repository_proxy_test
 import (
 	"bytes"
 	auth_model "getfund-api-v2/internal/domain/auth/core/auth_dto"
-	fixture "getfund-api-v2/test/internal/domain/auth/core/proxy/user_repository_proxy/auth_repository_proxy_fixture"
+	fixture "getfund-api-v2/test/internal/domain/auth/adapter/proxy/user_repository_proxy/auth_repository_proxy_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"
