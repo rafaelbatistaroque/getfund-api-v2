@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signout"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/internal/shared/service/session_service"
 	"net/http"
 	"net/http/httptest"
 )
@@ -44,7 +44,7 @@ func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.R
 		token = bodyString
 	}
 
-	ctx := context.WithValue(context.Background(), session_service.TokenKey{}, token)
+	ctx := context.WithValue(context.Background(), auth_contract.TokenKey{}, token)
 	req := httptest.NewRequest("FAKE", "/", nil).WithContext(ctx)
 	res := httptest.NewRecorder()
 

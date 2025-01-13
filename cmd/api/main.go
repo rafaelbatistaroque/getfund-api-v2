@@ -4,11 +4,8 @@ import (
 	"context"
 	"getfund-api-v2/internal/domain/auth/main/auth_entry_point_composer"
 	"getfund-api-v2/internal/domain/notification/main/notification_composer"
-	"getfund-api-v2/internal/middleware/auth_middleware"
 	"getfund-api-v2/internal/settings"
-	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/internal/shared/service/session_service"
 	"getfund-api-v2/pkg/bus"
 	redisconfig "getfund-api-v2/pkg/redis"
 	sqlitedb "getfund-api-v2/pkg/sqlite"
@@ -27,7 +24,6 @@ func main() {
 
 	//Services
 	cacheService := cache_service.New(redis, ctx)
-	sessionService := session_service.New(cacheService, security.New(), appSettings)
 
 	defer cacheService.Close()
 
@@ -35,7 +31,7 @@ func main() {
 	notification_composer.SubscribeEventHandlers(appSettings, eventBus, cacheService)
 
 	//Entry Points
-	authEntryPoints := auth_entry_point_composer.Get(appSettings, cacheService, sessionService, db, eventBus)
+	authEntryPoints := auth_entry_point_composer.Get(appSettings, cacheService, db, eventBus)
 
 	//Routes
 	r := chi.NewRouter()
@@ -43,9 +39,8 @@ func main() {
 		api.Get("/", HelloWorld)
 
 		//Auth
-		authMiddleware := auth_middleware.New(sessionService)
 		api.Post("/sign-in", authEntryPoints.Signin)
-		api.With(authMiddleware.Authenticate).Get("/sign-out", authEntryPoints.Signout)
+		api.With(authEntryPoints.MiddlewareAutenticate).Get("/sign-out", authEntryPoints.Signout)
 		api.Post("/recover-password", authEntryPoints.RecoverPassword)
 		api.Post("/reset-password", authEntryPoints.ResetPassword)
 	})

@@ -4,9 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/proxy/response_proxy"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/internal/shared/service/session_service"
 	"net/http"
 	"strings"
 )
@@ -21,10 +21,10 @@ type AuthMiddleware interface {
 }
 
 type authMiddleware struct {
-	session session_service.SessionService
+	session auth_contract.SessionService
 }
 
-func New(sessionService session_service.SessionService) AuthMiddleware {
+func New(sessionService auth_contract.SessionService) AuthMiddleware {
 	return &authMiddleware{session: sessionService}
 }
 
@@ -43,7 +43,7 @@ func (a *authMiddleware) Authenticate(next http.Handler) http.Handler {
 		}
 
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, session_service.TokenKey{}, token)
+		ctx = context.WithValue(ctx, auth_contract.TokenKey{}, token)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
@@ -71,8 +71,8 @@ func (a *authMiddleware) AuthenticateAdmin(next http.Handler) http.Handler {
 		}
 
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, session_service.SessionKey{}, sessionSerialized)
-		ctx = context.WithValue(ctx, session_service.TokenKey{}, token)
+		ctx = context.WithValue(ctx, auth_contract.SessionKey{}, sessionSerialized)
+		ctx = context.WithValue(ctx, auth_contract.TokenKey{}, token)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

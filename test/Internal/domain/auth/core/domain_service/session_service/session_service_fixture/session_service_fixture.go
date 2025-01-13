@@ -2,7 +2,8 @@ package session_service_fixture
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/shared/service/session_service"
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/domain_service/session_service"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
@@ -14,7 +15,7 @@ type SessionServiceFixture struct {
 	SettingsSpy   *settings_spy.ApplicationSettingsSpy
 }
 
-func NewSut() (session_service.SessionService, *SessionServiceFixture) {
+func NewSut() (auth_contract.SessionService, *SessionServiceFixture) {
 	redisSpy := cache_spy.New()
 	hasherSpy := security_spy.New()
 	settingsSpy := settings_spy.New()

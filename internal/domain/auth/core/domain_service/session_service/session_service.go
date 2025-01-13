@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
@@ -14,22 +15,13 @@ var (
 	time_24_HOURS = 24 * time.Hour
 )
 
-type SessionKey struct{}
-type TokenKey struct{}
-
-type SessionService interface {
-	SaveSession(session *auth_dto.SessionDto) (string, error)
-	GetSession(token string) (string, error)
-	DeleteSession(token string) error
-}
-
 type sessionService struct {
 	cache    cache_service.Cache
 	hasher   security.Hasher
 	settings settings.ApplicationSettings
 }
 
-func New(cache cache_service.Cache, hasher security.Hasher, settings settings.ApplicationSettings) SessionService {
+func New(cache cache_service.Cache, hasher security.Hasher, settings settings.ApplicationSettings) auth_contract.SessionService {
 	return &sessionService{
 		cache:    cache,
 		hasher:   hasher,

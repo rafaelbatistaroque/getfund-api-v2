@@ -1,16 +1,16 @@
 package signout_application
 
 import (
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signout"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/internal/shared/service/session_service"
 )
 
 type signoutApplication struct {
-	sessionService session_service.SessionService
+	sessionService auth_contract.SessionService
 }
 
-func New(sessionService session_service.SessionService) signout.UseCase {
+func New(sessionService auth_contract.SessionService) signout.UseCase {
 	return &signoutApplication{
 		sessionService: sessionService,
 	}

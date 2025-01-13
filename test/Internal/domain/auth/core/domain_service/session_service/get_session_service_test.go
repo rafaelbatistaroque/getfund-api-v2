@@ -2,7 +2,7 @@ package session_service_test
 
 import (
 	"bytes"
-	fixture "getfund-api-v2/test/internal/shared/service/session_service/session_service_fixture"
+	fixture "getfund-api-v2/test/internal/domain/auth/core/domain_service/session_service/session_service_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"

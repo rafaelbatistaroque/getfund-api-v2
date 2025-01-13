@@ -1,20 +1,20 @@
 package signin_application
 
 import (
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/auth_service"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	mapper "getfund-api-v2/internal/domain/auth/main/mapper/signin_mapper"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/internal/shared/service/session_service"
 )
 
 type signinApplication struct {
 	authService    auth_service.AuthService
-	sessionService session_service.SessionService
+	sessionService auth_contract.SessionService
 	mapper         mapper.SigninMapper
 }
 
-func New(authService auth_service.AuthService, sessionService session_service.SessionService, mapper mapper.SigninMapper) signin.UseCase {
+func New(authService auth_service.AuthService, sessionService auth_contract.SessionService, mapper mapper.SigninMapper) signin.UseCase {
 	return &signinApplication{
 		authService:    authService,
 		sessionService: sessionService,
