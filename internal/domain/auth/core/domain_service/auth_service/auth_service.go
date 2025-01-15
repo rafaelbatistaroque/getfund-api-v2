@@ -4,7 +4,6 @@ import (
 	"errors"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	"getfund-api-v2/internal/domain/auth/main/mapper/signin_mapper"
 	"getfund-api-v2/internal/shared/contract/settings"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
@@ -18,14 +17,14 @@ type authService struct {
 	settings       settings.ApplicationSettings
 	authRepository auth_contract.AuthRepository
 	hasher         security.Hasher
-	mapper         signin_mapper.SigninMapper
+	mapper         auth_contract.SigninMapper
 }
 
 func New(
 	authRepository auth_contract.AuthRepository,
 	settings settings.ApplicationSettings,
 	hasher security.Hasher,
-	mapper signin_mapper.SigninMapper) AuthService {
+	mapper auth_contract.SigninMapper) AuthService {
 
 	return &authService{
 		authRepository: authRepository,

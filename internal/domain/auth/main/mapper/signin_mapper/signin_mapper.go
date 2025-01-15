@@ -2,19 +2,15 @@ package signin_mapper
 
 import (
 	model "getfund-api-v2/internal/domain/auth/core/auth_dto"
+	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
-
-type SigninMapper interface {
-	ToOutput(token string, session *model.SessionDto) *signin.Output
-	ToSessionModel(authenticatedUser *model.AuthenticatedUserDto) *model.SessionDto
-}
 
 type signinMapper struct {
 }
 
 // Constructor
-func New() SigninMapper {
+func New() auth_contract.SigninMapper {
 	return &signinMapper{}
 }
 
