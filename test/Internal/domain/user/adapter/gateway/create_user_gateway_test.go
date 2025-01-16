@@ -33,3 +33,15 @@ func Test_GivenCreateUser_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectPara
 	// Assert
 	verify.Should(t, createUserSpy.Params["Execute:input"]).Be(expectedInput)
 }
+
+func Test_GivenCreateUser_WhenDecodeSuccess_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, signinSpy := fixture.NewSut()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	sut.CreateUser(res, req)
+
+	// Assert
+	verify.Should(t, signinSpy.CallsCount["Execute"]).Be(1)
+}
