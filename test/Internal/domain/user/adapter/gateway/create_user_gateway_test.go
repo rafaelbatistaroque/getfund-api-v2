@@ -20,3 +20,16 @@ func Test_GivenCreateUser_WhenDecodeError_ThenEnsureReturnBadRequestWithError(t 
 	verify.Should(t, code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err).NotNil()
 }
+
+func Test_GivenCreateUser_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, createUserSpy := fixture.NewSut()
+	expectedInput := fixture.GetCreateUserInput()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	sut.CreateUser(res, req)
+
+	// Assert
+	verify.Should(t, createUserSpy.Params["Execute:input"]).Be(expectedInput)
+}

@@ -46,12 +46,23 @@ func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.R
 	return res, req
 }
 
-func GetSigninInput() *create_user.Input {
-	return &create_user.Input{}
+func GetCreateUserInput() *create_user.Input {
+	return &create_user.Input{
+		FirstName:         "fake-first-name",
+		LastName:          "fake-last-name",
+		Email:             "fake@email.com",
+		Gender:            "male",
+		Password:          "fakaStrongPass123",
+		CountryId:         1,
+		UserCategoryId:    1,
+		MainSocialNetwork: "FakeSocial",
+		RegisteredUrl:     "https://social.com",
+		CuponCode:         "FAKE_DISCOUNT",
+	}
 }
 
 func GetSigninInputSerialized() string {
-	return `{}`
+	return `{"first_name":"fake-first-name","last_name":"fake-last-name","email":"fake@email.com","gender":"male","password":"fakaStrongPass123","country_id":1,"user_category_id":1,"main_social_network":"FakeSocial","registered_url":"https://social.com","cupon_code":"FAKE_DISCOUNT"}`
 }
 
 func (s *createUserUsecaseSpy) DefineError() {
