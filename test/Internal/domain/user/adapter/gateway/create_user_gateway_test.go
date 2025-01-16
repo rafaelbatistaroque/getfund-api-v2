@@ -59,3 +59,17 @@ func Test_GivenCreateUser_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t 
 	verify.Should(t, code).Be(createUserSpy.ErrorResult["Execute"].Code)
 	verify.Should(t, err).Be(createUserSpy.ErrorResult["Execute"].Message)
 }
+
+func Test_GivenCreateUser_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t *testing.T) {
+	// Arrange
+	sut, createUserSpy := fixture.NewSut()
+	createUserSpy.DefineSuccess()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	signed, code, _ := sut.CreateUser(res, req)
+
+	// Assert
+	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
+	verify.Should(t, signed).Be(createUserSpy.SuccessResult["Execute"])
+}
