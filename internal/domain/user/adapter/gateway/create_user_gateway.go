@@ -14,10 +14,10 @@ func (u *userGateway) CreateUser(w http.ResponseWriter, r *http.Request) (interf
 		return nil, result_app.BAD_REQUEST_CODE, err
 	}
 
-	_, err := u.createUser.Execute(&input)
+	output, err := u.createUser.Execute(&input)
 	if err != nil {
 		return nil, err.Code, err.Message
 	}
 
-	return nil, 0, nil
+	return output, result_app.SUCCESS_CODE, nil
 }
