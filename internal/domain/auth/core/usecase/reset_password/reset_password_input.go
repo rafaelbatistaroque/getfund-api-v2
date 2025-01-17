@@ -15,7 +15,7 @@ func (i *resetPasswordInput) Validate() validation.Validatable {
 	i.rules.
 		ApplyRules(i.RecoveryCode, "RecoveryCode",
 			&validation.RequiredRule{},
-			&validation.LengthRule{Length: 64},
+			&validation.LengthRule{Exactly: 64},
 		).
 		ApplyRules(i.Password, "Password",
 			&validation.RequiredRule{},
