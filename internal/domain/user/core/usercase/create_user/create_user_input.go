@@ -22,5 +22,8 @@ type createUserInput struct {
 }
 
 func (i *createUserInput) Validate() validation.Validatable {
-	return nil
+	i.rules.
+		ApplyRules(i.FirstName, "FirstName", &validation.RequiredRule{})
+
+	return i.rules.GetResult()
 }
