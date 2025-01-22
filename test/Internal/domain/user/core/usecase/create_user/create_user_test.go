@@ -61,3 +61,16 @@ func Test_GivenCreateUserExecute_WhenInputLastNameInvalidLength_ThenEnsureReturn
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_LENGHT_MAX_INVALID.Error(), "LastName", 50))
 }
+
+func Test_GivenCreateUserExecute_WhenInputEmailInvalid_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithEmailInvalid())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf("'%s' is not a valid email address", "Email"))
+}

@@ -48,3 +48,9 @@ func WithLastNameLengthInvalid() Option {
 		params.LastName = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" //51
 	}
 }
+
+func WithEmailInvalid() Option {
+	return func(params *create_user.Input) {
+		params.Email = ""
+	}
+}
