@@ -28,7 +28,9 @@ func (i *createUserInput) Validate() validation.Validatable {
 			&validation.LengthRule{Min: 1, Max: 50},
 		).
 		ApplyRules(i.LastName, "LastName",
-			&validation.RequiredRule{})
+			&validation.RequiredRule{},
+			&validation.LengthRule{Min: 1, Max: 50},
+		)
 
 	return i.rules.GetResult()
 }
