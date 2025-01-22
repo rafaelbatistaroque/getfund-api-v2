@@ -23,7 +23,9 @@ type createUserInput struct {
 
 func (i *createUserInput) Validate() validation.Validatable {
 	i.rules.
-		ApplyRules(i.FirstName, "FirstName", &validation.RequiredRule{})
+		ApplyRules(i.FirstName, "FirstName",
+			&validation.RequiredRule{},
+			&validation.LengthRule{Min: 1, Max: 50})
 
 	return i.rules.GetResult()
 }
