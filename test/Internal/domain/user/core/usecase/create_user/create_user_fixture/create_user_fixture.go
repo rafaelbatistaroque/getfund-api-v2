@@ -81,3 +81,9 @@ func WithInvalidGender() Option {
 		params.Gender = "z"
 	}
 }
+
+func WithEmptyPassword() Option {
+	return func(params *create_user.Input) {
+		params.Password = ""
+	}
+}

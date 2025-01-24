@@ -100,3 +100,16 @@ func Test_GivenCreateUserExecute_WhenInputGenderInvalid_ThenEnsureReturnError(t 
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_WITHIN_LIST.Error(), "Gender", "[f m u nb]"))
 }
+
+func Test_GivenCreateUserExecute_WhenInputPasswordEmpty_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithEmptyPassword())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
+}
