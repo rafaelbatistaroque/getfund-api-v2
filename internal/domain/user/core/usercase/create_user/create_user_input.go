@@ -35,7 +35,8 @@ func (i *createUserInput) Validate() validation.Validatable {
 			&validation.EmailRule{},
 		).
 		ApplyRules(i.Gender, "Gender",
-			&validation.RequiredRule{})
+			&validation.RequiredRule{},
+			&validation.ListRule{Contains: []string{"f", "m", "u", "nb"}})
 
 	return i.rules.GetResult()
 }
