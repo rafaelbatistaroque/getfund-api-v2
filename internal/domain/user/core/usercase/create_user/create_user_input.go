@@ -40,6 +40,7 @@ func (i *createUserInput) Validate() validation.Validatable {
 		).
 		ApplyRules(i.Password, "Password",
 			&validation.RequiredRule{},
+			&validation.PasswordRule{MinLength: 8, RequireLower: true, RequireUpper: true, RequireDigit: true},
 		)
 
 	return i.rules.GetResult()
