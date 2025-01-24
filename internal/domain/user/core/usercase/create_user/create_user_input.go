@@ -36,7 +36,11 @@ func (i *createUserInput) Validate() validation.Validatable {
 		).
 		ApplyRules(i.Gender, "Gender",
 			&validation.RequiredRule{},
-			&validation.ListRule{Contains: []string{"f", "m", "u", "nb"}})
+			&validation.ListRule{Contains: []string{"f", "m", "u", "nb"}},
+		).
+		ApplyRules(i.Password, "Password",
+			&validation.RequiredRule{},
+		)
 
 	return i.rules.GetResult()
 }
