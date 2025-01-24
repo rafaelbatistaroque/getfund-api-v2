@@ -13,7 +13,7 @@ import (
 func Test_GivenCreateUserExecute_WhenInputFirstNameEmpty_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	invalidInput := fixture.GetInput(fixture.WithFirstNameEmpty())
+	invalidInput := fixture.GetInput(fixture.WithEmptyFirstName())
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -26,7 +26,7 @@ func Test_GivenCreateUserExecute_WhenInputFirstNameEmpty_ThenEnsureReturnError(t
 func Test_GivenCreateUserExecute_WhenInputFirstNameInvalidLength_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	invalidInput := fixture.GetInput(fixture.WithFirstNameLengthInvalid())
+	invalidInput := fixture.GetInput(fixture.WithInvalidFirstNameLength())
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -39,7 +39,7 @@ func Test_GivenCreateUserExecute_WhenInputFirstNameInvalidLength_ThenEnsureRetur
 func Test_GivenCreateUserExecute_WhenInputLastNameEmpty_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	invalidInput := fixture.GetInput(fixture.WithLastNameEmpty())
+	invalidInput := fixture.GetInput(fixture.WithEmptyLastName())
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -52,7 +52,7 @@ func Test_GivenCreateUserExecute_WhenInputLastNameEmpty_ThenEnsureReturnError(t 
 func Test_GivenCreateUserExecute_WhenInputLastNameInvalidLength_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	invalidInput := fixture.GetInput(fixture.WithLastNameLengthInvalid())
+	invalidInput := fixture.GetInput(fixture.WithInvalidLastNameLength())
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -65,7 +65,7 @@ func Test_GivenCreateUserExecute_WhenInputLastNameInvalidLength_ThenEnsureReturn
 func Test_GivenCreateUserExecute_WhenInputEmailInvalid_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	invalidInput := fixture.GetInput(fixture.WithEmailInvalid())
+	invalidInput := fixture.GetInput(fixture.WithInvalidEmail())
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -73,4 +73,17 @@ func Test_GivenCreateUserExecute_WhenInputEmailInvalid_ThenEnsureReturnError(t *
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf("'%s' is not a valid email address", "Email"))
+}
+
+func Test_GivenCreateUserExecute_WhenInputGenderEmpty_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithEmptyGender())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Gender"))
 }

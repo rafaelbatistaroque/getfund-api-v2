@@ -5,6 +5,10 @@ import (
 	create_user_application "getfund-api-v2/internal/domain/user/core/usercase/create_user/application"
 )
 
+const (
+	_51_Chars = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+)
+
 type CreateUserFixture struct {
 }
 
@@ -25,32 +29,38 @@ func GetInput(options ...Option) *create_user.Input {
 	return input
 }
 
-func WithFirstNameEmpty() Option {
+func WithEmptyFirstName() Option {
 	return func(params *create_user.Input) {
 		params.FirstName = ""
 	}
 }
 
-func WithFirstNameLengthInvalid() Option {
+func WithInvalidFirstNameLength() Option {
 	return func(params *create_user.Input) {
-		params.FirstName = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" //51
+		params.FirstName = _51_Chars //51
 	}
 }
 
-func WithLastNameEmpty() Option {
+func WithEmptyLastName() Option {
 	return func(params *create_user.Input) {
 		params.LastName = ""
 	}
 }
 
-func WithLastNameLengthInvalid() Option {
+func WithInvalidLastNameLength() Option {
 	return func(params *create_user.Input) {
-		params.LastName = "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii" //51
+		params.LastName = _51_Chars
 	}
 }
 
-func WithEmailInvalid() Option {
+func WithInvalidEmail() Option {
 	return func(params *create_user.Input) {
 		params.Email = ""
+	}
+}
+
+func WithEmptyGender() Option {
+	return func(params *create_user.Input) {
+		params.Gender = ""
 	}
 }
