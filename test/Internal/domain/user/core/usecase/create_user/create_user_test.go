@@ -113,3 +113,26 @@ func Test_GivenCreateUserExecute_WhenInputPasswordEmpty_ThenEnsureReturnError(t 
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
 }
+
+func Test_GivenCreateUserExecute_WhenInputPasswordInvalid_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidPasswords := map[string]string{
+		"fake_p":               fmt.Sprintf(validation.Err_PARAMETER_LENGHT_INVALID.Error(), "Password", 8),           //invalid min length
+		"FAKE_STRONG_PASSWORD": fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_LOWER_CHARACTER.Error(), "Password"), //invalid required lower case
+		"fake_strong_password": fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_UPPER_CHARACTER.Error(), "Password"), //invalid required upper case
+		"fake_Strong_Password": fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_DIGIT_CHARACTER.Error(), "Password"), //invalid required upper case
+	}
+
+	for invalidPassword, messageError := range invalidPasswords {
+
+		invalidInput := fixture.GetInput(fixture.WithInvalidPassword(invalidPassword))
+
+		// Act
+		_, err := sut.Execute(invalidInput)
+
+		// Assert
+		verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+		verify.Should(t, err.Message.Error()).Contain(messageError)
+	}
+}

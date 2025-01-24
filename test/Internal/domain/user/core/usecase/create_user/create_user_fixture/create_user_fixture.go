@@ -87,3 +87,9 @@ func WithEmptyPassword() Option {
 		params.Password = ""
 	}
 }
+
+func WithInvalidPassword(value string) Option {
+	return func(params *create_user.Input) {
+		params.Password = value
+	}
+}
