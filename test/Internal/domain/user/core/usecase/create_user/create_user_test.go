@@ -72,7 +72,7 @@ func Test_GivenCreateUserExecute_WhenInputEmailInvalid_ThenEnsureReturnError(t *
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
-	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf("'%s' is not a valid email address", "Email"))
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_EMAIL_INVALID.Error(), "Email"))
 }
 
 func Test_GivenCreateUserExecute_WhenInputGenderEmpty_ThenEnsureReturnError(t *testing.T) {
@@ -86,4 +86,17 @@ func Test_GivenCreateUserExecute_WhenInputGenderEmpty_ThenEnsureReturnError(t *t
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Gender"))
+}
+
+func Test_GivenCreateUserExecute_WhenInputGenderInvalid_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithInvalidGender())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_WITHIN_LIST.Error(), "Gender", "[f m u nb]"))
 }

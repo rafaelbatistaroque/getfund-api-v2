@@ -20,7 +20,18 @@ func NewSut() (create_user.UseCase, *CreateUserFixture) {
 type Option func(*create_user.Input)
 
 func GetInput(options ...Option) *create_user.Input {
-	input := &create_user.Input{FirstName: "fakeFirstNameValid", Password: "strongPassword123"}
+	input := &create_user.Input{
+		FirstName:         "fakeFirstNameValid",
+		LastName:          "fakeLastNameValid",
+		Password:          "strongPassword123",
+		Email:             "fake@mail.com",
+		Gender:            "m",
+		CountryId:         1,
+		UserCategoryId:    1,
+		MainSocialNetwork: "@fakeUser",
+		RegisteredUrl:     "http://fakeurl.com",
+		CuponCode:         "fakeCuponCode",
+	}
 
 	for _, opt := range options {
 		opt(input)
@@ -62,5 +73,11 @@ func WithInvalidEmail() Option {
 func WithEmptyGender() Option {
 	return func(params *create_user.Input) {
 		params.Gender = ""
+	}
+}
+
+func WithInvalidGender() Option {
+	return func(params *create_user.Input) {
+		params.Gender = "z"
 	}
 }
