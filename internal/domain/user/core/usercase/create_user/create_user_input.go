@@ -33,7 +33,9 @@ func (i *createUserInput) Validate() validation.Validatable {
 		).
 		ApplyRules(i.Email, "Email",
 			&validation.EmailRule{},
-		)
+		).
+		ApplyRules(i.Gender, "Gender",
+			&validation.RequiredRule{})
 
 	return i.rules.GetResult()
 }
