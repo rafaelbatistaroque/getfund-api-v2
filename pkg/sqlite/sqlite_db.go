@@ -9,7 +9,7 @@ import (
 
 func New() *gorm.DB {
 	logger := logger.New("Sqlite config")
-	db, err := gorm.Open(sqlite.Open("../../getfund.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("getfund.db"), &gorm.Config{})
 	if err != nil {
 		logger.Errorf("Erro ao conectar ao banco de dados:", err)
 	}

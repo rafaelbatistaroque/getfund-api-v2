@@ -48,7 +48,7 @@ func Load() settings.ApplicationSettings {
 	logger := logger.New("Settings")
 	env := os.Getenv("GET_FUND_API_ENV")
 	if env != "production" {
-		if err := godotenv.Load("../../.env.development"); err != nil {
+		if err := godotenv.Load(".env.development"); err != nil {
 			panic(err.Error())
 		}
 
@@ -81,7 +81,7 @@ func Load() settings.ApplicationSettings {
 			userName:  getEnv("SMTP_USERNAME", ""),
 			from:      getEnv("SMTP_FROM", ""),
 		},
-		templateDir: "../../internal/domain/notification/gateway/template",
+		templateDir: "internal/domain/notification/adapter/template",
 	}
 }
 

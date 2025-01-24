@@ -15,10 +15,9 @@ func SubscribeEventHandlers(settings settings.ApplicationSettings, eventBus bus.
 	handlers := map[string]bus.Handler{
 		"RecoverPasswordStarted": recover_password_started_event_handler.New(
 			send_recover_password_mail_application.New(
-				cacheService,
 				mail_service.New(mail.New(settings)),
 				settings,
-				template_file_service.New(settings))),
+				template_file_service.New(settings)), cacheService),
 	}
 
 	for eventName, handler := range handlers {

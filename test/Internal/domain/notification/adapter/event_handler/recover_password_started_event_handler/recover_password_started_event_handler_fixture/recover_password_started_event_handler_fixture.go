@@ -1,12 +1,19 @@
 package recover_password_started_event_handler_fixture
 
 import (
+	"encoding/json"
 	sut "getfund-api-v2/internal/domain/notification/adapter/event_handler/recover_password_started_event_handler"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus"
 	"getfund-api-v2/pkg/bus/event"
+	"getfund-api-v2/test/helper/cache_spy"
 )
+
+type RecoverPasswordStartedEventHandlerFixture struct {
+	SendRecoverPasswordMailUsecaseSpy *SendRecoverPasswordMailUsecaseSpy
+	CacheSpy                          *cache_spy.RedisCacheSpy
+}
 
 type SendRecoverPasswordMailUsecaseSpy struct {
 	Params        map[string]*send_recover_password_mail.Input
@@ -15,14 +22,19 @@ type SendRecoverPasswordMailUsecaseSpy struct {
 	SuccessResult map[string]*send_recover_password_mail.Output
 }
 
-func NewSut() (bus.Handler, *SendRecoverPasswordMailUsecaseSpy) {
+func NewSut() (bus.Handler, *RecoverPasswordStartedEventHandlerFixture) {
 	sendRecoverPasswordMailUsecaseSpy := &SendRecoverPasswordMailUsecaseSpy{
 		Params:        make(map[string]*send_recover_password_mail.Input),
 		CallsCount:    make(map[string]int),
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*send_recover_password_mail.Output)}
 
-	return sut.New(sendRecoverPasswordMailUsecaseSpy), sendRecoverPasswordMailUsecaseSpy
+	cacheSpy := cache_spy.New()
+	return sut.New(sendRecoverPasswordMailUsecaseSpy, cacheSpy),
+		&RecoverPasswordStartedEventHandlerFixture{
+			SendRecoverPasswordMailUsecaseSpy: sendRecoverPasswordMailUsecaseSpy,
+			CacheSpy:                          cacheSpy,
+		}
 }
 
 func (uc *SendRecoverPasswordMailUsecaseSpy) Execute(input *send_recover_password_mail.Input) (*send_recover_password_mail.Output, *result_app.ApplicationError) {
@@ -31,6 +43,14 @@ func (uc *SendRecoverPasswordMailUsecaseSpy) Execute(input *send_recover_passwor
 	uc.CallsCount["Execute"]++
 
 	return uc.SuccessResult["Execute"], uc.ErrorResult["Execute"]
+}
+
+func (uc *SendRecoverPasswordMailUsecaseSpy) DefineSendRecoverPasswordMailUsecaseSuccess() {
+	uc.SuccessResult["Execute"] = &send_recover_password_mail.Output{}
+}
+
+func (uc *SendRecoverPasswordMailUsecaseSpy) DefineSendRecoverPasswordMailUsecaseError() {
+	uc.ErrorResult["Execute"] = &result_app.ApplicationError{}
 }
 
 func GetInvalidRecoverPasswordStartedEvent() *event.RecoverPasswordStarted {
@@ -44,6 +64,14 @@ func GetValidRecoverPasswordStartedEvent(withValue string) *event.RecoverPasswor
 	return event
 }
 
-func GetSendRecoverPasswordMailInput(withValue string) *send_recover_password_mail.Input {
-	return &send_recover_password_mail.Input{KeyCache: withValue}
+func GetValidCacheData() string {
+	return `{"username":"fake-username", "first_name":"fake-first-name", "recovery_link":"fake-recovery_link"}`
+}
+
+func GetSendRecoverPasswordMailInput() *send_recover_password_mail.Input {
+	var input = &send_recover_password_mail.Input{}
+
+	json.Unmarshal([]byte(GetValidCacheData()), input)
+
+	return input
 }

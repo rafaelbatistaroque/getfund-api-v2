@@ -9,23 +9,77 @@ import (
 	"github.com/google/uuid"
 )
 
-func Test_GivenHandler_WhenPayloadParseError_ThenEnsurePanic(t *testing.T) {
+func Test_GivenHandler_WhenPayloadParseError_ThenEnsureNeverCallGetCache(t *testing.T) {
 	// Arrange
-	sut, _ := fixture.NewSut()
+	sut, spies := fixture.NewSut()
 
 	// Act & Assert
-	verify.Should(t, nil).Panic(func() { sut.Handle(fixture.GetInvalidRecoverPasswordStartedEvent()) })
+	sut.Handle(fixture.GetInvalidRecoverPasswordStartedEvent())
+
+	//Assert
+	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(0)
 }
 
-func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallUSecaseWithCorrectParameter(t *testing.T) {
+func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetCacheWithCorrectParameter(t *testing.T) {
 	// Arrange
+	sut, spies := fixture.NewSut()
 	expectedPayload := uuid.NewString()
-	usecaseInput := fixture.GetSendRecoverPasswordMailInput(expectedPayload)
-	sut, usecaseSpy := fixture.NewSut()
 
 	// Act
 	sut.Handle(fixture.GetValidRecoverPasswordStartedEvent(expectedPayload))
 
 	//Assert
-	verify.Should(t, usecaseSpy.Params["Execute:input"]).Be(usecaseInput)
+	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(expectedPayload)
+}
+
+func Test_GivenHandler_WhenGetCacheInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Handle(fixture.GetValidRecoverPasswordStartedEvent(uuid.NewString()))
+
+	//Assert
+	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(1)
+}
+
+func Test_GivenHandler_WhenCacheError_ThenEnsureNeverCallUsecaseExecute(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetError()
+
+	// Act
+	sut.Handle(fixture.GetValidRecoverPasswordStartedEvent(uuid.NewString()))
+
+	//Assert
+	verify.Should(t, spies.SendRecoverPasswordMailUsecaseSpy.CallsCount["Execute"]).Be(0)
+}
+
+func Test_GivenHandler_WhenUnmarshalError_ThenEnsureNeverCallUsecaseExecute(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccessWithValue("invalid-serialized-json")
+
+	// Act
+	sut.Handle(fixture.GetValidRecoverPasswordStartedEvent(uuid.NewString()))
+
+	// Assert
+	verify.Should(t, spies.SendRecoverPasswordMailUsecaseSpy.CallsCount["Execute"]).Be(0)
+}
+
+func Test_GivenHandler_WhenUnmarshalSuccess_ThenEnsureCallUsecaseWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetValidCacheData())
+	spies.SendRecoverPasswordMailUsecaseSpy.DefineSendRecoverPasswordMailUsecaseSuccess()
+	expectedInput := fixture.GetSendRecoverPasswordMailInput()
+
+	// Act
+	sut.Handle(fixture.GetValidRecoverPasswordStartedEvent(uuid.NewString()))
+
+	//Assert
+	input := spies.SendRecoverPasswordMailUsecaseSpy.Params["Execute:input"]
+	verify.Should(t, input.FirstName).Be(expectedInput.FirstName)
+	verify.Should(t, input.Username).Be(expectedInput.Username)
+	verify.Should(t, input.RecoveryLink).Be(expectedInput.RecoveryLink)
 }

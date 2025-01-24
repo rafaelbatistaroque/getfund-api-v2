@@ -20,51 +20,25 @@ func Test_GivenExecute_WhenInvalidInput_ThenEnsureReturnApplicationErrorWithBadR
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
-	verify.Should(t, err.Message.Error()).Be(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "KeyCache"))
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "Username"))
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "FirstName"))
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "RecoveryLink"))
 }
 
-func Test_GivenExecute_WhenValidInput_ThenEnsureCallCacheWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenValidInput_ThenEnsureCallGetRecoveryPasswordTemplateOnce(t *testing.T) {
 	// Arrange
-	validInput := fixture.GetValidInput()
 	sut, spies := fixture.NewSUT()
 
 	// Act
-	sut.Execute(validInput)
+	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(validInput.KeyCache)
-}
-
-func Test_GivenExecute_WhenCacheError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetError()
-
-	// Act
-	_, err := sut.Execute(fixture.GetValidInput())
-
-	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.CacheSpy.ErrorResult["Get"])
-}
-
-func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccessWithValue("invalid-serialized-json")
-
-	// Act
-	_, err := sut.Execute(fixture.GetValidInput())
-
-	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
+	verify.Should(t, spies.TemplateFileSpy.CallsCount["GetRecoveryPasswordTemplate"]).Be(1)
 }
 
 func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccess("")
 	spies.TemplateFileSpy.DefineGetRecoveryPasswordTemplateError()
 
 	// Act
@@ -78,16 +52,15 @@ func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnAppl
 func Test_GivenExecute_WhenGotTemplateAndRecoveryPasswordModel_ThenEnsureSendMailWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
-	data, expectedValue := fixture.GetValidRecoverPasswordModeToSendMail()
-	spies.CacheSpy.DefineCacheGetSuccessWithValue(expectedValue)
+	validInput := fixture.GetValidInput()
 	spies.TemplateFileSpy.DefineGetRecoveryPasswordTemplateSuccess()
-	templateReplaced := spies.TemplateFileSpy.GetRecoveryPasswordTemplateReplaced(data.FirstName, data.RecoveryLink)
+	templateReplaced := spies.TemplateFileSpy.GetRecoveryPasswordTemplateReplaced(validInput.FirstName, validInput.RecoveryLink)
 
 	// Act
-	sut.Execute(fixture.GetValidInput())
+	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.MailSpy.Params["SendMail:to"]).Be(data.Username)
+	verify.Should(t, spies.MailSpy.Params["SendMail:to"]).Be(validInput.Username)
 	verify.Should(t, spies.MailSpy.Params["SendMail:subject"]).Be("Password Recovery")
 	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
 }
@@ -95,7 +68,6 @@ func Test_GivenExecute_WhenGotTemplateAndRecoveryPasswordModel_ThenEnsureSendMai
 func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccess("")
 	spies.MailSpy.DefineSendMailError()
 
 	// Act
@@ -108,8 +80,7 @@ func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithSer
 
 func Test_GivenExecute_WhenSuccess_ThenEnsureReturnOutputWithCorrectMessage(t *testing.T) {
 	// Arrange
-	sut, spies := fixture.NewSUT()
-	spies.CacheSpy.DefineCacheGetSuccess("")
+	sut, _ := fixture.NewSUT()
 
 	// Act
 	result, _ := sut.Execute(fixture.GetValidInput())
