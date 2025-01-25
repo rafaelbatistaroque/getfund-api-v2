@@ -8,7 +8,7 @@ require github.com/joho/godotenv v1.5.1
 
 require (
 	github.com/google/uuid v1.6.0
-	github.com/rafaelbatistaroque/validation v1.3.0
+	github.com/rafaelbatistaroque/validation v1.3.5
 	github.com/redis/go-redis/v9 v9.7.0
 	gorm.io/gorm v1.25.12
 )
