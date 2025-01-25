@@ -22,7 +22,7 @@ type recoverPasswordApplication struct {
 	settings       settings.ApplicationSettings
 	authRepository auth_contract.AuthRepository
 	cacheService   cache_service.Cache
-	eventBus       bus.EventBus
+	bus            bus.EventBus
 }
 
 func New(
@@ -30,14 +30,14 @@ func New(
 	settings settings.ApplicationSettings,
 	authRepository auth_contract.AuthRepository,
 	cacheService cache_service.Cache,
-	eventBus bus.EventBus) recover_password.UseCase {
+	bus bus.EventBus) recover_password.UseCase {
 
 	return &recoverPasswordApplication{
 		hasher:         hasher,
 		settings:       settings,
 		authRepository: authRepository,
 		cacheService:   cacheService,
-		eventBus:       eventBus,
+		bus:            bus,
 	}
 }
 
@@ -74,7 +74,7 @@ func (uc *recoverPasswordApplication) Execute(input *recover_password.Input) (*r
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, cacheErr)
 	}
 
-	uc.eventBus.PublishWithPayload(&event.RecoverPasswordStarted{}, keyCache)
+	uc.bus.EmitWithPayload(&event.RecoverPasswordStarted{}, keyCache)
 
 	return &recover_password.Output{Message: "recover password started"}, nil
 }

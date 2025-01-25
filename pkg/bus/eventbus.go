@@ -19,8 +19,8 @@ type Handler interface {
 
 type EventBus interface {
 	Subscribe(eventName string, handler Handler)
-	Publish(event Event)
-	PublishWithPayload(event Event, payload any)
+	Emit(event Event)
+	EmitWithPayload(event Event, payload any)
 }
 
 type eventBus struct {
@@ -45,8 +45,8 @@ func (eb *eventBus) Subscribe(eventName string, handler Handler) {
 	eb.logger.Infof("Event %s subscribed", eventName)
 }
 
-// Publish dispara um evento para todos os handlers associados
-func (eb *eventBus) Publish(event Event) {
+// Emit dispara um evento para todos os handlers associados
+func (eb *eventBus) Emit(event Event) {
 	eb.lock.RLock()
 	defer eb.lock.RUnlock()
 
@@ -58,8 +58,8 @@ func (eb *eventBus) Publish(event Event) {
 	}
 }
 
-// PublishWithPayload após incluir o payload ao evento dispara para todos os handlers
-func (eb *eventBus) PublishWithPayload(event Event, payload any) {
+// EmitWithPayload após incluir o payload ao evento dispara para todos os handlers
+func (eb *eventBus) EmitWithPayload(event Event, payload any) {
 	var data []byte
 	var err error
 
@@ -75,5 +75,5 @@ func (eb *eventBus) PublishWithPayload(event Event, payload any) {
 
 	event.SetPayload(data)
 
-	eb.Publish(event)
+	eb.Emit(event)
 }

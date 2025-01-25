@@ -19,13 +19,13 @@ func (eb *EventBusSpy) Subscribe(eventName string, handler bus.Handler) {
 
 }
 
-// Publish dispara um evento para todos os handlers associados
-func (eb *EventBusSpy) Publish(event bus.Event) {
+func (eb *EventBusSpy) Emit(event bus.Event) {
+	eb.Params["Publish:event"] = event
 
+	eb.CallsCount["Publish"]++
 }
 
-// PublishWithPayload após incluir o payload ao evento dispara para todos os handlers
-func (eb *EventBusSpy) PublishWithPayload(event bus.Event, payload any) {
+func (eb *EventBusSpy) EmitWithPayload(event bus.Event, payload any) {
 	eb.Params["PublishWithPayload:event"] = event
 	eb.Params["PublishWithPayload:payload"] = payload
 
