@@ -55,14 +55,14 @@ func GetCreateUserInput() *create_user.Input {
 		Password:          "fakaStrongPass123",
 		CountryId:         1,
 		UserCategoryId:    1,
-		MainSocialNetwork: "FakeSocial",
+		MainSocialNetwork: "@FakeSocial",
 		RegisteredUrl:     "https://social.com",
 		CouponCode:        "COUPONCD",
 	}
 }
 
 func GetSigninInputSerialized() string {
-	return `{"first_name":"fake-first-name","last_name":"fake-last-name","email":"fake@email.com","gender":"male","password":"fakaStrongPass123","country_id":1,"user_category_id":1,"main_social_network":"FakeSocial","registered_url":"https://social.com","cupon_code":"FAKE_DISCOUNT"}`
+	return `{"first_name":"fake-first-name","last_name":"fake-last-name","email":"fake@email.com","gender":"male","password":"fakaStrongPass123","country_id":1,"user_category_id":1,"main_social_network":"@FakeSocial","registered_url":"https://social.com","cupon_code":"COUPONCD"}`
 }
 
 func (s *createUserUsecaseSpy) DefineError() {
