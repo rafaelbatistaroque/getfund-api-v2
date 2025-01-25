@@ -136,3 +136,17 @@ func Test_GivenCreateUserExecute_WhenInputPasswordInvalid_ThenEnsureReturnError(
 		verify.Should(t, err.Message.Error()).Contain(messageError)
 	}
 }
+
+func Test_GivenCreateUserExecute_WhenInputMainSocialNetworkEmpty_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithEmptyMainSocialNetwork())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "MainSocialNetwork"))
+}

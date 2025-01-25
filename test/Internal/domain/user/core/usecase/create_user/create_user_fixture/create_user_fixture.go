@@ -93,3 +93,9 @@ func WithInvalidPassword(value string) Option {
 		params.Password = value
 	}
 }
+
+func WithEmptyMainSocialNetwork() Option {
+	return func(params *create_user.Input) {
+		params.MainSocialNetwork = ""
+	}
+}
