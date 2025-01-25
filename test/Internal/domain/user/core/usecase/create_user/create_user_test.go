@@ -150,3 +150,41 @@ func Test_GivenCreateUserExecute_WhenInputMainSocialNetworkEmpty_ThenEnsureRetur
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "MainSocialNetwork"))
 }
+
+func Test_GivenCreateUserExecute_WhenInputMainSocialNetworkEInvalid_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	defaultError := fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_SOCIAL_URL_INVALID.Error(), "MainSocialNetwork")
+	sut, _ := fixture.NewSut()
+	invalidMainNetworks := map[string]string{
+		// Invalid protocol
+		"http://example.com":         defaultError, // Protocol http is not allowed
+		"ftp://example.com":          defaultError, // Protocol ftp is not allowed
+		"file://example.com":         defaultError, // Protocol file is not allowed
+		"mailto:user@example.com":    defaultError, // Protocol mailto is not allowed
+		"data:text/plain;base64,...": defaultError, // Protocol data is not allowed
+
+		// Invalid domain
+		"https://-example.com": defaultError, // Domain starts with an invalid character (-)
+		"https://example-.com": defaultError, // Domain ends with an invalid character (-)
+		"https://example..com": defaultError, // Domain contains consecutive dots
+		"https://example_com":  defaultError, // Underscore (_) is not allowed in the domain
+
+		// Invalid path
+		"https://example.com/pa th": defaultError, // Path contains a space
+		"https://example.com/<tag>": defaultError, // Path contains invalid characters (< >)
+		"https://example.com//path": defaultError, // Path contains consecutive slashes
+		"https://example.com/|path": defaultError, // Path contains an invalid character (|)
+	}
+
+	for invalidMainNetwork, messageError := range invalidMainNetworks {
+
+		invalidInput := fixture.GetInput(fixture.WithInvalidMainSocialNetwork(invalidMainNetwork))
+
+		// Act
+		_, err := sut.Execute(invalidInput)
+
+		// Assert
+		verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+		verify.Should(t, err.Message.Error()).Contain(messageError)
+	}
+}

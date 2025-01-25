@@ -99,3 +99,9 @@ func WithEmptyMainSocialNetwork() Option {
 		params.MainSocialNetwork = ""
 	}
 }
+
+func WithInvalidMainSocialNetwork(value string) Option {
+	return func(params *create_user.Input) {
+		params.MainSocialNetwork = value
+	}
+}
