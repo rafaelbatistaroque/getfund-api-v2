@@ -1,0 +1,18 @@
+//TODO: event_handler > UserCriationWithCouponStardedEventHandler
+//[ ]: parse event to get payload
+//[ ]: invoke usecase ValidateCouponCode to validate coupon code
+//[ ]: if return error save error in cache with key e user_activation_{activation code}_coupon
+//[ ]: if return success save coupon in cache with key user_activation_{activation code}_coupon
+
+//TODO: usecase > ValidateCouponCode
+//[ ]: validate input correctly (fail-fast)
+//[ ]: validate coupon not found
+//[ ]: validate expired coupon
+//[ ]: validate coupon applied if individual type (lacks definition)
+
+//TODO: event_handler > UserWithCouponConfirmedEventHandler
+//[ ]: parse event to get payload
+//[ ]: get data in cache with key user_activation_{activation code}_coupon
+//[ ]: include defer after above item in cache with key user_activation_{activation code}_coupon
+//[ ]: if return error expired or not found or invalid CouponErrorConfirmed must be emited (Payload: coupon code and user_id)
+//[ ]: if return success CouponValidated must be emited (Payload: coupon data and user_id)
