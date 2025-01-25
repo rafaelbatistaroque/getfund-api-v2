@@ -57,7 +57,7 @@ func GetCreateUserInput() *create_user.Input {
 		UserCategoryId:    1,
 		MainSocialNetwork: "FakeSocial",
 		RegisteredUrl:     "https://social.com",
-		CuponCode:         "FAKE_DISCOUNT",
+		CouponCode:        "COUPONCD",
 	}
 }
 

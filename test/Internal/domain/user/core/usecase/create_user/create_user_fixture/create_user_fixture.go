@@ -29,8 +29,8 @@ func GetInput(options ...Option) *create_user.Input {
 		CountryId:         1,
 		UserCategoryId:    1,
 		MainSocialNetwork: "@fakeUser",
-		RegisteredUrl:     "http://fakeurl.com",
-		CuponCode:         "fakeCuponCode",
+		RegisteredUrl:     "https://fakeurl.com",
+		CouponCode:        "CouponCd",
 	}
 
 	for _, opt := range options {
@@ -109,5 +109,11 @@ func WithInvalidMainSocialNetwork(value string) Option {
 func WithEmptyRegisteredUrl() Option {
 	return func(params *create_user.Input) {
 		params.RegisteredUrl = ""
+	}
+}
+
+func WithInvalidCouponCode(value string) Option {
+	return func(params *create_user.Input) {
+		params.CouponCode = value
 	}
 }
