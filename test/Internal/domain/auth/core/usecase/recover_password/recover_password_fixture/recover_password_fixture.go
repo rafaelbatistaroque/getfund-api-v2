@@ -5,9 +5,9 @@ import (
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/recover_password/application"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/test/helper/auth_repository_spy"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/eventbus_spy"
+	"getfund-api-v2/test/helper/repository_spy/auth_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
 

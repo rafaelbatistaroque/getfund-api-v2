@@ -139,7 +139,6 @@ func Test_GivenCreateUserExecute_WhenInputPasswordInvalid_ThenEnsureReturnError(
 
 func Test_GivenCreateUserExecute_WhenInputMainSocialNetworkEmpty_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	// Arrange
 	sut, _ := fixture.NewSut()
 	invalidInput := fixture.GetInput(fixture.WithEmptyMainSocialNetwork())
 
@@ -191,7 +190,6 @@ func Test_GivenCreateUserExecute_WhenInputMainSocialNetworkEInvalid_ThenEnsureRe
 
 func Test_GivenCreateUserExecute_WhenInputRegisteredUrlEmpty_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	// Arrange
 	sut, _ := fixture.NewSut()
 	invalidInput := fixture.GetInput(fixture.WithEmptyRegisteredUrl())
 
@@ -205,7 +203,6 @@ func Test_GivenCreateUserExecute_WhenInputRegisteredUrlEmpty_ThenEnsureReturnErr
 
 func Test_GivenCreateUserExecute_WhenInputCouponCodeInvalid_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	// Arrange
 	sut, _ := fixture.NewSut()
 	invalidInput := fixture.GetInput(fixture.WithInvalidCouponCode("invalid"))
 
@@ -215,4 +212,16 @@ func Test_GivenCreateUserExecute_WhenInputCouponCodeInvalid_ThenEnsureReturnErro
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "CouponCode", 8))
+}
+
+func Test_GivenCreateUserExecute_WhenInputValid_ThenEnsureCallGetUserByUsernameWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	validInput := fixture.GetInput()
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.Params["GetUserByUsername:username"]).Be(validInput.Email)
 }

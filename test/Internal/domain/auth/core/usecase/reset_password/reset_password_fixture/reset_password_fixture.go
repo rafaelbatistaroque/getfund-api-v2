@@ -5,8 +5,8 @@ import (
 	auth_model "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/reset_password/application"
-	"getfund-api-v2/test/helper/auth_repository_spy"
 	"getfund-api-v2/test/helper/cache_spy"
+	"getfund-api-v2/test/helper/repository_spy/auth_repository_spy"
 )
 
 type ResetPasswordFixture struct {

@@ -3,7 +3,7 @@ package auth_repository_proxy_fixture
 import (
 	"getfund-api-v2/internal/domain/auth/adapter/proxy/user_repository_proxy"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	"getfund-api-v2/test/helper/auth_repository_spy"
+	"getfund-api-v2/test/helper/repository_spy/auth_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
 )
