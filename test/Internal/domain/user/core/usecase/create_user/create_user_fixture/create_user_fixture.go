@@ -105,3 +105,9 @@ func WithInvalidMainSocialNetwork(value string) Option {
 		params.MainSocialNetwork = value
 	}
 }
+
+func WithEmptyRegisteredUrl() Option {
+	return func(params *create_user.Input) {
+		params.RegisteredUrl = ""
+	}
+}
