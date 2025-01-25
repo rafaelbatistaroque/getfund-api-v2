@@ -45,6 +45,9 @@ func (i *createUserInput) Validate() validation.Validatable {
 		ApplyRules(i.MainSocialNetwork, "MainSocialNetwork",
 			&validation.RequiredRule{},
 			&validation.SocialURLRule{},
+		).
+		ApplyRules(i.RegisteredUrl, "RegisteredUrl",
+			&validation.RequiredRule{},
 		)
 
 	return i.rules.GetResult()
