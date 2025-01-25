@@ -10,7 +10,7 @@ import (
 	"getfund-api-v2/internal/shared/service/cache_service"
 )
 
-var (
+const (
 	_KEY_CACHE_PREFIX = "recovery_password_"
 )
 
@@ -36,7 +36,7 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 	defer r.cacheService.Delete(keyRecoveryCode)
 	cacheData, errCache := r.cacheService.Get(keyRecoveryCode)
 	if errCache != nil {
-		return nil, result_app.New(result_app.NOT_FOUND_CODE, errCache)
+		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("recovery code not found"))
 	}
 
 	forgetPasswordDto := &auth_dto.ForgetPasswordDto{}
