@@ -16,7 +16,7 @@ type createUserInput struct {
 	UserCategoryId    int    `json:"user_category_id"`
 	MainSocialNetwork string `json:"main_social_network"`
 	RegisteredUrl     string `json:"registered_url"`
-	CuponCode         string `json:"cupon_code"`
+	CouponCode        string `json:"cupon_code"`
 
 	rules validation.Rule
 }
@@ -48,6 +48,9 @@ func (i *createUserInput) Validate() validation.Validatable {
 		).
 		ApplyRules(i.RegisteredUrl, "RegisteredUrl",
 			&validation.RequiredRule{},
+		).
+		ApplyRules(i.CouponCode, "CouponCode",
+			&validation.LengthRule{Exactly: 8},
 		)
 
 	return i.rules.GetResult()
