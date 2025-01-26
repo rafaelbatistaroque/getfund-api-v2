@@ -6,7 +6,7 @@ import (
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail"
 	"strings"
 
-	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
 )
 

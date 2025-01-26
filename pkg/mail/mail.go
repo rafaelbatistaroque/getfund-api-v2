@@ -1,7 +1,7 @@
 package mail
 
 import (
-	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/settings"
 	logger "getfund-api-v2/pkg/log"
 
 	"gopkg.in/gomail.v2"

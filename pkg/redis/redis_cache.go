@@ -2,7 +2,7 @@ package redisconfig
 
 import (
 	"context"
-	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/settings"
 	logger "getfund-api-v2/pkg/log"
 
 	"github.com/redis/go-redis/v9"

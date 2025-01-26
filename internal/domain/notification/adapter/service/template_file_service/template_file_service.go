@@ -2,7 +2,7 @@ package template_file_service
 
 import (
 	"errors"
-	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/settings"
 	"os"
 )
 

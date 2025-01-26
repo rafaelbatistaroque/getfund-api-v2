@@ -2,13 +2,27 @@ package settings
 
 import (
 	"encoding/hex"
-	"getfund-api-v2/internal/shared/contract/settings"
 	logger "getfund-api-v2/pkg/log"
 	"os"
 	"strconv"
 
 	"github.com/joho/godotenv"
 )
+
+type ApplicationSettings interface {
+	GetPort() string
+	GetApiUrl() string
+	GetBaseUrl() string
+	GetAddrRedis() string
+	GetServerSalt() []byte
+	GetSecretKey() []byte
+	GetSMTPHost() string
+	GetSMTPPort() int
+	GetSMTPPassword() string
+	GetSMTPUsername() string
+	GetSMTPFrom() string
+	GetTemplateDir() string
+}
 
 type applicationSettings struct {
 	port            string
@@ -44,7 +58,7 @@ func (s *applicationSettings) GetSMTPUsername() string { return s.smtp.userName 
 func (s *applicationSettings) GetSMTPFrom() string     { return s.smtp.from }
 func (s *applicationSettings) GetTemplateDir() string  { return s.templateDir }
 
-func Load() settings.ApplicationSettings {
+func Load() ApplicationSettings {
 	logger := logger.New("Settings")
 	env := os.Getenv("GET_FUND_API_ENV")
 	if env != "production" {

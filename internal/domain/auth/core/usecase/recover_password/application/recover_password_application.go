@@ -4,7 +4,7 @@ import (
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
-	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"

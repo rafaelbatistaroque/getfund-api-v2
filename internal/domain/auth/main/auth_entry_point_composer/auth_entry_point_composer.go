@@ -13,7 +13,7 @@ import (
 	signin_application "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
 	signout_application "getfund-api-v2/internal/domain/auth/core/usecase/signout/application"
 	"getfund-api-v2/internal/proxy/response_proxy"
-	"getfund-api-v2/internal/shared/contract/settings"
+	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
