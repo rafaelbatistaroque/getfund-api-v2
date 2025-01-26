@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"errors"
 	user_gateway "getfund-api-v2/internal/domain/user/adapter/gateway"
-	"getfund-api-v2/internal/domain/user/core/usercase/create_user"
+	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
 	"net/http/httptest"

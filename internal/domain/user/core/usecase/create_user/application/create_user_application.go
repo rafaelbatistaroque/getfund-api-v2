@@ -2,7 +2,7 @@ package create_user_application
 
 import (
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
-	"getfund-api-v2/internal/domain/user/core/usercase/create_user"
+	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 )
 

@@ -2,7 +2,7 @@ package user_gateway
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/user/core/usercase/create_user"
+	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
 )

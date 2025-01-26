@@ -1,7 +1,7 @@
 package user_gateway
 
 import (
-	"getfund-api-v2/internal/domain/user/core/usercase/create_user"
+	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"net/http"
 )
 

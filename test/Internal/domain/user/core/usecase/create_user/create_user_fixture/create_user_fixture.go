@@ -1,8 +1,8 @@
 package create_user_fixture
 
 import (
-	"getfund-api-v2/internal/domain/user/core/usercase/create_user"
-	create_user_application "getfund-api-v2/internal/domain/user/core/usercase/create_user/application"
+	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
+	create_user_application "getfund-api-v2/internal/domain/user/core/usecase/create_user/application"
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
 )
 
