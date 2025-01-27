@@ -1,10 +1,10 @@
 package auth_entry_point_composer
 
 import (
-	authRepository "getfund-api-v2/internal/domain/auth/adapter/auth_repository"
 	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
 	"getfund-api-v2/internal/domain/auth/adapter/middleware/auth_middleware"
 	"getfund-api-v2/internal/domain/auth/adapter/proxy/user_repository_proxy"
+	authRepository "getfund-api-v2/internal/domain/auth/adapter/repository"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/auth_service"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/session_service"
 	mapper "getfund-api-v2/internal/domain/auth/core/domain_service/signin_mapper"
