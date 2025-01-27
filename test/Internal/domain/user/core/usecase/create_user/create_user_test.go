@@ -225,3 +225,13 @@ func Test_GivenCreateUserExecute_WhenInputValid_ThenEnsureCallGetUserByUsernameW
 	// Assert
 	verify.Should(t, spies.RepoSpy.Params["GetUserByUsername:username"]).Be(validInput.Email)
 }
+func Test_GivenCreateUserExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.CallsCount["GetUserByUsername"]).Be(1)
+}
