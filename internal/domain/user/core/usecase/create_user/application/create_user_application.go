@@ -22,7 +22,10 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
-	c.repository.GetUserByUsername(input.Email)
+	_, err := c.repository.GetUserByUsername(input.Email)
+	if err != nil {
+		return nil, result_app.New(result_app.NOT_FOUND_CODE, err)
+	}
 
 	return nil, nil
 }
