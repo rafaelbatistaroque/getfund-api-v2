@@ -235,3 +235,16 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnc
 	// Assert
 	verify.Should(t, spies.RepoSpy.CallsCount["GetUserByUsername"]).Be(1)
 }
+
+func Test_GivenCreateUserExecute_WhenGetUserByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetUserByUsernameError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetUserByUsername"])
+}
