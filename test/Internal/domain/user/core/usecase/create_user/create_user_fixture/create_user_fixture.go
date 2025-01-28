@@ -3,6 +3,7 @@ package create_user_fixture
 import (
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	create_user_application "getfund-api-v2/internal/domain/user/core/usecase/create_user/application"
+	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
 )
@@ -14,16 +15,19 @@ const (
 type CreateUserFixture struct {
 	RepoSpy   *user_repository_spy.UserRepositorySpy
 	HasherSpy *security_spy.HasherSpy
+	CacheSpy  *cache_spy.RedisCacheSpy
 }
 
 func NewSut() (create_user.UseCase, *CreateUserFixture) {
 	userRepoSpy := user_repository_spy.New()
 	hasherSpy := security_spy.New()
+	cacheSpy := cache_spy.New()
 
-	return create_user_application.New(userRepoSpy, hasherSpy),
+	return create_user_application.New(userRepoSpy, hasherSpy, cacheSpy),
 		&CreateUserFixture{
 			RepoSpy:   userRepoSpy,
 			HasherSpy: hasherSpy,
+			CacheSpy:  cacheSpy,
 		}
 }
 

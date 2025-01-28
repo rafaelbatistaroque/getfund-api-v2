@@ -5,6 +5,7 @@ import (
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/create_user/create_user_fixture"
 	"testing"
+	"time"
 
 	"github.com/rafaelbatistaroque/validation"
 	"github.com/rafaelbatistaroque/verify"
@@ -259,7 +260,7 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDupl
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.DUPLICATED_ENTRY_CODE)
-	verify.Should(t, err.Message.Error()).Be("User already exists")
+	verify.Should(t, err.Message.Error()).Be("user already exists")
 }
 
 func Test_GivenCreateUserExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallGetRandomCodeWithCorrectParameter(t *testing.T) {
@@ -296,4 +297,20 @@ func Test_GivenCreateUserExecute_WhenGetRandomCodeError_ThenEnsureReturnInternal
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("error to save user")
+}
+
+func Test_GivenCreateUserExecute_WhenGetRandomCodeSuccess_ThenEnsureCallSetCacheWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineGetRandomCodeSuccess()
+	expectedKeyCache := "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
+	validInput := fixture.GetInput()
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.Params["Set:key"]).Be(expectedKeyCache)
+	verify.Should(t, spies.CacheSpy.Params["Set:value"]).Be(validInput)
+	verify.Should(t, spies.CacheSpy.Params["Set:time"]).Be(24 * time.Hour)
 }
