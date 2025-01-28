@@ -277,11 +277,23 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallGet
 func Test_GivenCreateUserExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetUserByUsernameSuccessNotFound()
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["GetRandomCode"]).Be(1)
+}
+
+func Test_GivenCreateUserExecute_WhenGetRandomCodeError_ThenEnsureReturnInternalServerErrorWithAppropriateMessage(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineGetRandomCodeError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message.Error()).Be("error to save user")
 }
