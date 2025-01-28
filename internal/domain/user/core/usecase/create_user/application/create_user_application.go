@@ -48,7 +48,9 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
 	}
 
-	c.cache.Set(keyCache, input, 24*time.Hour)
+	if err := c.cache.Set(keyCache, input, 24*time.Hour); err != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to save user"))
+	}
 
 	return nil, nil
 }
