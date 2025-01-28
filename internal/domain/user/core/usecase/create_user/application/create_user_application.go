@@ -6,17 +6,25 @@ import (
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
+	"getfund-api-v2/internal/shared/service/cache_service"
+	"time"
+)
+
+const (
+	key_cache_prefix = "user_activation_"
 )
 
 type createUserApplication struct {
 	repository user_contract.Repository
 	hasher     security.Hasher
+	cache      cache_service.Cache
 }
 
-func New(repository user_contract.Repository, hasher security.Hasher) create_user.UseCase {
+func New(repository user_contract.Repository, hasher security.Hasher, cache cache_service.Cache) create_user.UseCase {
 	return &createUserApplication{
 		repository: repository,
 		hasher:     hasher,
+		cache:      cache,
 	}
 }
 
@@ -35,10 +43,17 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
-	_, errCode := c.hasher.GetRandomCode(20)
+	randomCode, errCode := c.hasher.GetRandomCode(20)
 	if errCode != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to save user"))
 	}
 
+	keyCache := buildKeyCache(randomCode)
+	c.cache.Set(keyCache, input, 24*time.Hour)
+
 	return nil, nil
+}
+
+func buildKeyCache(randomCode string) string {
+	return key_cache_prefix + randomCode
 }
