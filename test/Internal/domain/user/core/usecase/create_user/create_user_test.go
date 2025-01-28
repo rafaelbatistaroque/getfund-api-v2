@@ -314,3 +314,14 @@ func Test_GivenCreateUserExecute_WhenGetRandomCodeSuccess_ThenEnsureCallSetCache
 	verify.Should(t, spies.CacheSpy.Params["Set:value"]).Be(validInput)
 	verify.Should(t, spies.CacheSpy.Params["Set:time"]).Be(24 * time.Hour)
 }
+
+func Test_GivenCreateUserExecute_WhenCacheSetInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.CallsCount["Set"]).Be(1)
+}
