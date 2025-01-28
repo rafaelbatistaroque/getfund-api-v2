@@ -5,15 +5,18 @@ import (
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/internal/shared/security"
 )
 
 type createUserApplication struct {
 	repository user_contract.Repository
+	hasher     security.Hasher
 }
 
-func New(repository user_contract.Repository) create_user.UseCase {
+func New(repository user_contract.Repository, hasher security.Hasher) create_user.UseCase {
 	return &createUserApplication{
 		repository: repository,
+		hasher:     hasher,
 	}
 }
 
@@ -31,6 +34,8 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 	if userDuplicated != nil {
 		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("User already exists"))
 	}
+
+	c.hasher.GetRandomCode(8)
 
 	return nil, nil
 }
