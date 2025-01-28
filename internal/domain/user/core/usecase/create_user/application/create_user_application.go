@@ -43,17 +43,21 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
-	randomCode, errCode := c.hasher.GetRandomCode(20)
+	keyCache, errCode := buildActivationCode(c.hasher)
 	if errCode != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to save user"))
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
 	}
 
-	keyCache := buildKeyCache(randomCode)
 	c.cache.Set(keyCache, input, 24*time.Hour)
 
 	return nil, nil
 }
 
-func buildKeyCache(randomCode string) string {
-	return key_cache_prefix + randomCode
+func buildActivationCode(hasher security.Hasher) (string, error) {
+	activationCode, errCode := hasher.GetRandomCode(20)
+	if errCode != nil {
+		return "", errors.New("error to save user")
+	}
+
+	return key_cache_prefix + activationCode, nil
 }
