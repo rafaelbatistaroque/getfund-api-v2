@@ -4,6 +4,7 @@ import (
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	create_user_application "getfund-api-v2/internal/domain/user/core/usecase/create_user/application"
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
+	"getfund-api-v2/test/helper/security_spy"
 )
 
 const (
@@ -11,15 +12,18 @@ const (
 )
 
 type CreateUserFixture struct {
-	RepoSpy *user_repository_spy.UserRepositorySpy
+	RepoSpy   *user_repository_spy.UserRepositorySpy
+	HasherSpy *security_spy.HasherSpy
 }
 
 func NewSut() (create_user.UseCase, *CreateUserFixture) {
 	userRepoSpy := user_repository_spy.New()
+	hasherSpy := security_spy.New()
 
-	return create_user_application.New(userRepoSpy),
+	return create_user_application.New(userRepoSpy, hasherSpy),
 		&CreateUserFixture{
-			RepoSpy: userRepoSpy,
+			RepoSpy:   userRepoSpy,
+			HasherSpy: hasherSpy,
 		}
 }
 

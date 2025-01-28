@@ -261,3 +261,15 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDupl
 	verify.Should(t, err.Code).Be(result_app.DUPLICATED_ENTRY_CODE)
 	verify.Should(t, err.Message.Error()).Be("User already exists")
 }
+
+func Test_GivenCreateUserExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallsGetRandomCodeWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetUserByUsernameSuccessNotFound()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.Params["GetRandomCode:length"]).Be(8)
+}

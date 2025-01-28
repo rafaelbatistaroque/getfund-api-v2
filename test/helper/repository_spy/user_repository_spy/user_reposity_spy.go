@@ -24,10 +24,10 @@ func (r *UserRepositorySpy) GetUserByUsername(username string) (*user_dto.UserDt
 
 	sucess := r.SuccessResult["GetUserByUsername"]
 	if sucess != nil {
-		return sucess.(*user_dto.UserDto), r.ErrorResult["GetUserByUsername"]
+		return sucess.(*user_dto.UserDto), nil
 	}
-	r.DefineGetUserByUsernameSuccess()
-	return r.SuccessResult["GetUserByUsername"].(*user_dto.UserDto), r.ErrorResult["GetUserByUsername"]
+
+	return nil, r.ErrorResult["GetUserByUsername"]
 }
 
 func (r *UserRepositorySpy) DefineGetUserByUsernameError() {
@@ -36,4 +36,8 @@ func (r *UserRepositorySpy) DefineGetUserByUsernameError() {
 
 func (r *UserRepositorySpy) DefineGetUserByUsernameSuccess() {
 	r.SuccessResult["GetUserByUsername"] = &user_dto.UserDto{Id: "fake-id"}
+}
+
+func (r *UserRepositorySpy) DefineGetUserByUsernameSuccessNotFound() {
+	r.SuccessResult["GetUserByUsername"] = nil
 }
