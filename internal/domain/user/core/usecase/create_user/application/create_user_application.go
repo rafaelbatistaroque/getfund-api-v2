@@ -32,10 +32,13 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 	}
 
 	if userDuplicated != nil {
-		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("User already exists"))
+		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
-	c.hasher.GetRandomCode(20)
+	_, errCode := c.hasher.GetRandomCode(20)
+	if errCode != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to save user"))
+	}
 
 	return nil, nil
 }
