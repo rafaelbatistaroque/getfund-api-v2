@@ -325,3 +325,16 @@ func Test_GivenCreateUserExecute_WhenCacheSetInvoked_ThenEnsureCallsOnce(t *test
 	// Assert
 	verify.Should(t, spies.CacheSpy.CallsCount["Set"]).Be(1)
 }
+
+func Test_GivenCreateUserExecute_WhenCacheSetError_ThenEnsureReturnErrorWithAppropriateMessage(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheSetError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message.Error()).Be("error to save user")
+}
