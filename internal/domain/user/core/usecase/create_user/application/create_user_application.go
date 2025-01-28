@@ -35,7 +35,7 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("User already exists"))
 	}
 
-	c.hasher.GetRandomCode(8)
+	c.hasher.GetRandomCode(20)
 
 	return nil, nil
 }

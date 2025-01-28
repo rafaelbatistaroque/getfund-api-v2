@@ -271,7 +271,7 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallGet
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.HasherSpy.Params["GetRandomCode:length"]).Be(8)
+	verify.Should(t, spies.HasherSpy.Params["GetRandomCode:length"]).Be(20)
 }
 
 func Test_GivenCreateUserExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
