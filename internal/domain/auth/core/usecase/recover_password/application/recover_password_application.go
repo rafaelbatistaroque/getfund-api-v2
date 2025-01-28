@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var (
+const (
 	key_cache_prefix = "recovery_password_"
 )
 
