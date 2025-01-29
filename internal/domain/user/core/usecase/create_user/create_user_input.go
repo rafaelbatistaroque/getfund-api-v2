@@ -48,10 +48,12 @@ func (i *createUserInput) Validate() validation.Validatable {
 		).
 		ApplyRules(i.RegisteredUrl, "RegisteredUrl",
 			&validation.RequiredRule{},
-		).
-		ApplyRules(i.CouponCode, "CouponCode",
-			&validation.LengthRule{Exactly: 8},
 		)
+
+	if i.CouponCode != "" {
+		i.rules.ApplyRules(i.CouponCode, "CouponCode",
+			&validation.LengthRule{Exactly: 8})
+	}
 
 	return i.rules.GetResult()
 }
