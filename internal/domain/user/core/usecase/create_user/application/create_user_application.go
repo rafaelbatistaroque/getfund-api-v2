@@ -61,7 +61,7 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		emitUserCriationWithCouponCodeStartedEvent(c.bus, input, keyCache)
 	}
 
-	return nil, nil
+	return &create_user.Output{Message: "user creation started"}, nil
 }
 
 func validateDuplicatedUser(input *create_user.Input, repository user_contract.Repository) *result_app.ApplicationError {
