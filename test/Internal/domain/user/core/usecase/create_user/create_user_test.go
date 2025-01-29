@@ -248,7 +248,7 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameError_ThenEnsureReturnNotF
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetUserByUsername"])
 }
 

@@ -39,13 +39,8 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
-	userDuplicated, err := c.repository.GetUserByUsername(input.Email)
-	if err != nil {
-		return nil, result_app.New(result_app.NOT_FOUND_CODE, err)
-	}
-
-	if userDuplicated != nil {
-		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
+	if invalidUser := validateDuplicatedUser(input, c.repository); invalidUser != nil {
+		return nil, invalidUser
 	}
 
 	keyCache, errCode := buildActivationCode(c.hasher)
@@ -60,6 +55,19 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 	emitUserCriationStartedEvent(c.bus, input, keyCache)
 
 	return nil, nil
+}
+
+func validateDuplicatedUser(input *create_user.Input, repository user_contract.Repository) *result_app.ApplicationError {
+	userDuplicated, err := repository.GetUserByUsername(input.Email)
+	if err != nil {
+		return result_app.New(result_app.SERVER_ERROR_CODE, err)
+	}
+
+	if userDuplicated != nil {
+		return result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
+	}
+
+	return nil
 }
 
 func buildActivationCode(hasher security.Hasher) (string, error) {
