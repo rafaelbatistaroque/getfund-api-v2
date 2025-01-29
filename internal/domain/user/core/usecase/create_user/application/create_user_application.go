@@ -54,6 +54,10 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 
 	emitUserCriationStartedEvent(c.bus, input, keyCache)
 
+	if input.CouponCode != "" {
+		emitUserCriationWithCouponCodeStartedEvent(c.bus, input, keyCache)
+	}
+
 	return nil, nil
 }
 
@@ -87,4 +91,13 @@ func emitUserCriationStartedEvent(bus bus.EventBus, input *create_user.Input, ac
 	}
 
 	bus.EmitWithPayload(&event.UserCriationStartedEvent{}, userCriationStarted)
+}
+
+func emitUserCriationWithCouponCodeStartedEvent(bus bus.EventBus, input *create_user.Input, activationCode string) {
+	payload := &user_dto.UserCriationWithCouponStardedDto{
+		CouponCode:     input.CouponCode,
+		ActivationCode: activationCode,
+	}
+
+	bus.EmitWithPayload(&event.UserCriationWithCouponCodeStartedEvent{}, payload)
 }
