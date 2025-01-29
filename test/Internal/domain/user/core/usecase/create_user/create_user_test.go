@@ -388,3 +388,14 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserCriationWithCouponCodeStartedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"]).Be(payload)
 }
+
+func Test_GivenCreateUserExecute_WhenHasCouponCodeAndEmitWithPayloadInvoked_ThenEnsureCallsTwice(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(2)
+}
