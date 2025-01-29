@@ -7,6 +7,7 @@ import (
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
+	"getfund-api-v2/test/helper/settings_spy"
 )
 
 const (
@@ -14,10 +15,11 @@ const (
 )
 
 type CreateUserFixture struct {
-	RepoSpy   *user_repository_spy.UserRepositorySpy
-	HasherSpy *security_spy.HasherSpy
-	CacheSpy  *cache_spy.RedisCacheSpy
-	BusSpy    *eventbus_spy.EventBusSpy
+	RepoSpy     *user_repository_spy.UserRepositorySpy
+	HasherSpy   *security_spy.HasherSpy
+	CacheSpy    *cache_spy.RedisCacheSpy
+	BusSpy      *eventbus_spy.EventBusSpy
+	SettingsSpy *settings_spy.ApplicationSettingsSpy
 }
 
 func NewSut() (create_user.UseCase, *CreateUserFixture) {
@@ -25,13 +27,15 @@ func NewSut() (create_user.UseCase, *CreateUserFixture) {
 	hasherSpy := security_spy.New()
 	cacheSpy := cache_spy.New()
 	busSpy := eventbus_spy.New()
+	settingsSpy := settings_spy.New()
 
-	return create_user_application.New(userRepoSpy, hasherSpy, cacheSpy, busSpy),
+	return create_user_application.New(userRepoSpy, hasherSpy, cacheSpy, busSpy, settingsSpy),
 		&CreateUserFixture{
-			RepoSpy:   userRepoSpy,
-			HasherSpy: hasherSpy,
-			CacheSpy:  cacheSpy,
-			BusSpy:    busSpy,
+			RepoSpy:     userRepoSpy,
+			HasherSpy:   hasherSpy,
+			CacheSpy:    cacheSpy,
+			BusSpy:      busSpy,
+			SettingsSpy: settingsSpy,
 		}
 }
 

@@ -5,6 +5,7 @@ import (
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
+	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
@@ -22,14 +23,16 @@ type createUserApplication struct {
 	hasher     security.Hasher
 	cache      cache_service.Cache
 	bus        bus.EventBus
+	settings   settings.ApplicationSettings
 }
 
-func New(repository user_contract.Repository, hasher security.Hasher, cache cache_service.Cache, bus bus.EventBus) create_user.UseCase {
+func New(repository user_contract.Repository, hasher security.Hasher, cache cache_service.Cache, bus bus.EventBus, settings settings.ApplicationSettings) create_user.UseCase {
 	return &createUserApplication{
 		repository: repository,
 		hasher:     hasher,
 		cache:      cache,
 		bus:        bus,
+		settings:   settings,
 	}
 }
 
@@ -52,7 +55,7 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to save user"))
 	}
 
-	emitUserCriationStartedEvent(c.bus, input, keyCache)
+	emitUserCriationStartedEvent(c.bus, c.settings, keyCache)
 
 	if input.CouponCode != "" {
 		emitUserCriationWithCouponCodeStartedEvent(c.bus, input, keyCache)
@@ -83,11 +86,10 @@ func buildActivationCode(hasher security.Hasher) (string, error) {
 	return key_cache_prefix + activationCode, nil
 }
 
-func emitUserCriationStartedEvent(bus bus.EventBus, input *create_user.Input, activationCode string) {
+func emitUserCriationStartedEvent(bus bus.EventBus, settings settings.ApplicationSettings, activationCode string) {
 	userCriationStarted := &user_dto.UserCriationStartedDto{
 		ActivationCode: activationCode,
-		FirstName:      input.FirstName,
-		Email:          input.Email,
+		ActivationLink: settings.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
 
 	bus.EmitWithPayload(&event.UserCriationStartedEvent{}, userCriationStarted)
