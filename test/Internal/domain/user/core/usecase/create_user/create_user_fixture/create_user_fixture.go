@@ -135,3 +135,9 @@ func WithInvalidCouponCode(value string) Option {
 		params.CouponCode = value
 	}
 }
+
+func WithEmptyCouponCode() Option {
+	return func(params *create_user.Input) {
+		params.CouponCode = ""
+	}
+}

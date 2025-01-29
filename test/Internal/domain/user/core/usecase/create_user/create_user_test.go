@@ -344,7 +344,7 @@ func Test_GivenCreateUserExecute_WhenCacheSetError_ThenEnsureReturnErrorWithAppr
 func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	validInput := fixture.GetInput()
+	validInput := fixture.GetInput(fixture.WithEmptyCouponCode())
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	payload := &user_dto.UserCriationStartedDto{
 		ActivationCode: "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
@@ -365,8 +365,26 @@ func Test_GivenCreateUserExecute_WhenEmitWithPayloadInvoked_ThenEnsureCallsOnce(
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.Execute(fixture.GetInput())
+	sut.Execute(fixture.GetInput(fixture.WithEmptyCouponCode()))
 
 	// Assert
 	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(1)
+}
+
+func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayloadWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	validInput := fixture.GetInput()
+	spies.HasherSpy.DefineGetRandomCodeSuccess()
+	payload := &user_dto.UserCriationWithCouponStardedDto{
+		CouponCode:     validInput.CouponCode,
+		ActivationCode: "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
+	}
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserCriationWithCouponCodeStartedEvent{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"]).Be(payload)
 }
