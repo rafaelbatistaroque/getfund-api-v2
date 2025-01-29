@@ -399,3 +399,14 @@ func Test_GivenCreateUserExecute_WhenHasCouponCodeAndEmitWithPayloadInvoked_Then
 	// Assert
 	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(2)
 }
+
+func Test_GivenCreateUserExecute_WhenSuccess_ThenEnsureReturnSuccessWithAppropiateMessage(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+
+	// Act
+	result, _ := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, result.Message).Be("user creation started")
+}
