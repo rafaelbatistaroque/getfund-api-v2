@@ -2,7 +2,7 @@ package result_app
 
 import "fmt"
 
-var (
+const (
 	SUCCESS_CODE             = 0
 	UNAUTHORIZED_CODE        = 1
 	DUPLICATED_ENTRY_CODE    = 2
