@@ -2,7 +2,9 @@ package create_user_test
 
 import (
 	"fmt"
+	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/pkg/bus/event"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/create_user/create_user_fixture"
 	"testing"
 	"time"
@@ -337,4 +339,23 @@ func Test_GivenCreateUserExecute_WhenCacheSetError_ThenEnsureReturnErrorWithAppr
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("error to save user")
+}
+
+func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	validInput := fixture.GetInput()
+	spies.HasherSpy.DefineGetRandomCodeSuccess()
+	payload := &user_dto.UserCriationStartedDto{
+		ActivationCode: "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
+		FirstName:      validInput.FirstName,
+		Email:          validInput.Email,
+	}
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserCriationStartedEvent{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"]).Be(payload)
 }

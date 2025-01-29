@@ -172,8 +172,8 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallPublishW
 	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.EventBusSpy.Params["PublishWithPayload:event"]).Be(&event.RecoverPasswordStarted{})
-	verify.Should(t, spies.EventBusSpy.Params["PublishWithPayload:payload"]).Be(expectedPaylod)
+	verify.Should(t, spies.EventBusSpy.Params["EmitWithPayload:event"]).Be(&event.RecoverPasswordStarted{})
+	verify.Should(t, spies.EventBusSpy.Params["EmitWithPayload:payload"]).Be(expectedPaylod)
 }
 
 func Test_GivenRecoverPasswordExecute_WhenPublishWithPayload_ThenEnsureReturnOutput(t *testing.T) {

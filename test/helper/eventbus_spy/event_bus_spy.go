@@ -26,8 +26,8 @@ func (eb *EventBusSpy) Emit(event bus.Event) {
 }
 
 func (eb *EventBusSpy) EmitWithPayload(event bus.Event, payload any) {
-	eb.Params["PublishWithPayload:event"] = event
-	eb.Params["PublishWithPayload:payload"] = payload
+	eb.Params["EmitWithPayload:event"] = event
+	eb.Params["EmitWithPayload:payload"] = payload
 
-	eb.CallsCount["PublishWithPayload"]++
+	eb.CallsCount["EmitWithPayload"]++
 }
