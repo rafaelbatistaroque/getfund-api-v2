@@ -347,7 +347,7 @@ func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadW
 	validInput := fixture.GetInput(fixture.WithEmptyCouponCode())
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	activationCode := "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
-	payload := &user_dto.UserCriationStartedDto{
+	payload := &user_dto.UserCriationDto{
 		ActivationCode: activationCode,
 		ActivationLink: spies.SettingsSpy.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
@@ -376,7 +376,7 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput()
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
-	payload := &user_dto.UserCriationWithCouponStardedDto{
+	payload := &user_dto.UserCriationWithCouponDto{
 		CouponCode:     validInput.CouponCode,
 		ActivationCode: "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
 	}
