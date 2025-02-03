@@ -1,7 +1,10 @@
 package auth_entry_point_composer
 
 import (
-	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	"getfund-api-v2/internal/domain/auth/adapter/gateway/recover_password_gateway"
+	"getfund-api-v2/internal/domain/auth/adapter/gateway/reset_password_gateway"
+	signin_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signin_auth_gateway"
+	signout_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signout_auth_gateway"
 	"getfund-api-v2/internal/domain/auth/adapter/middleware/auth_middleware"
 	"getfund-api-v2/internal/domain/auth/adapter/proxy/user_repository_proxy"
 	authRepository "getfund-api-v2/internal/domain/auth/adapter/repository"
@@ -52,17 +55,20 @@ func Get(
 	recoverPassword := recover_password_application.New(hasher, settings, authRepositoryProxy, cache, eventBus)
 	resetPassword := reset_password_application.New(cache, authRepositoryProxy)
 
-	//gateway
-	auth_gateways := auth_gateway.New(signin, signout, recoverPassword, resetPassword)
+	//gateways
+	signinGateway := signin_gateway.New(signin)
+	signoutGateway := signout_gateway.New(signout)
+	resetPasswordGateway := reset_password_gateway.New(resetPassword)
+	recoverPasswordGateway := recover_password_gateway.New(recoverPassword)
 
 	//Middlewares
 	auth_middleware := auth_middleware.New(sessionService)
 
 	return AuthEntryPointComposer{
-		Signin:                     response_proxy.New(auth_gateways.Signin),
-		Signout:                    response_proxy.New(auth_gateways.Signout),
-		RecoverPassword:            response_proxy.New(auth_gateways.RecoverPassword),
-		ResetPassword:              response_proxy.New(auth_gateways.ResetPassword),
+		Signin:                     response_proxy.New(signinGateway.Signin),
+		Signout:                    response_proxy.New(signoutGateway.Signout),
+		RecoverPassword:            response_proxy.New(recoverPasswordGateway.RecoverPassword),
+		ResetPassword:              response_proxy.New(resetPasswordGateway.ResetPassword),
 		MiddlewareAutenticate:      auth_middleware.Authenticate,
 		MiddlewareAutenticateAdmin: auth_middleware.AuthenticateAdmin,
 	}

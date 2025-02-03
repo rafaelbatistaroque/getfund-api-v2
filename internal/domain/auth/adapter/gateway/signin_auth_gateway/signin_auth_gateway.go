@@ -1,4 +1,4 @@
-package auth_gateway
+package signin_gateway
 
 import (
 	"encoding/json"
@@ -7,7 +7,21 @@ import (
 	"net/http"
 )
 
-func (h *authGateway) Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+type SigninGateway interface {
+	Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
+}
+
+type signinGateway struct {
+	signin signin.UseCase
+}
+
+func New(signin signin.UseCase) SigninGateway {
+	return &signinGateway{
+		signin: signin,
+	}
+}
+
+func (h *signinGateway) Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var input signin.Input
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {

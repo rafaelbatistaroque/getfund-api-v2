@@ -1,4 +1,4 @@
-package auth_gateway
+package signout_gateway
 
 import (
 	"errors"
@@ -8,7 +8,21 @@ import (
 	"net/http"
 )
 
-func (h *authGateway) Signout(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+type SignoutGateway interface {
+	Signout(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
+}
+
+type signoutGateway struct {
+	signout signout.UseCase
+}
+
+func New(signout signout.UseCase) SignoutGateway {
+	return &signoutGateway{
+		signout: signout,
+	}
+}
+
+func (h *signoutGateway) Signout(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	token := r.Context().Value(auth_contract.TokenKey{})
 	if token == nil || token == "" {
 		return nil, result_app.UNAUTHORIZED_CODE, errors.New("token not found")

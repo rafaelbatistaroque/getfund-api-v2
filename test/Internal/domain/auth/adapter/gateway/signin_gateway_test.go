@@ -24,47 +24,47 @@ func Test_GivenSignin_WhenDecodeError_ThenEnsureReturnBadRequestWithError(t *tes
 
 func Test_GivenSignin_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
 	// Arrange
+	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetSigninInput()
-	sut, signinSpy := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	sut.Signin(res, req)
 
 	// Assert
-	verify.Should(t, signinSpy.Params["Execute:input"]).Be(expectedInput)
+	verify.Should(t, spies.SigninUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
 
 func Test_GivenSignin_WhenDecodeSuccess_ThenEnsureCallOnce(t *testing.T) {
 	// Arrange
-	sut, signinSpy := fixture.NewSut()
+	sut, spies := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	sut.Signin(res, req)
 
 	// Assert
-	verify.Should(t, signinSpy.CallsCount["Execute"]).Be(1)
+	verify.Should(t, spies.SigninUsecaseSpy.CallsCount["Execute"]).Be(1)
 }
 
 func Test_GivenSignin_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *testing.T) {
 	// Arrange
-	sut, signinSpy := fixture.NewSut()
-	signinSpy.DefineError()
+	sut, spies := fixture.NewSut()
+	spies.SigninUsecaseSpy.DefineError()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	_, code, err := sut.Signin(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(signinSpy.ErrorResult["Execute"].Code)
-	verify.Should(t, err).Be(signinSpy.ErrorResult["Execute"].Message)
+	verify.Should(t, code).Be(spies.SigninUsecaseSpy.ErrorResult["Execute"].Code)
+	verify.Should(t, err).Be(spies.SigninUsecaseSpy.ErrorResult["Execute"].Message)
 }
 
 func Test_GivenSignin_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t *testing.T) {
 	// Arrange
-	sut, signinSpy := fixture.NewSut()
-	signinSpy.DefineSuccess()
+	sut, spies := fixture.NewSut()
+	spies.SigninUsecaseSpy.DefineSuccess()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
@@ -73,8 +73,8 @@ func Test_GivenSignin_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t
 	// Assert
 	success := signed.(*signin.Output)
 	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
-	verify.Should(t, success.Token).Be(signinSpy.SuccessResult["Execute"].Token)
-	verify.Should(t, success.Session.ID).Be(signinSpy.SuccessResult["Execute"].Session.ID)
-	verify.Should(t, success.Session.FirstName).Be(signinSpy.SuccessResult["Execute"].Session.FirstName)
-	verify.Should(t, success.Session.IsAdmin).Be(signinSpy.SuccessResult["Execute"].Session.IsAdmin)
+	verify.Should(t, success.Token).Be(spies.SigninUsecaseSpy.SuccessResult["Execute"].Token)
+	verify.Should(t, success.Session.ID).Be(spies.SigninUsecaseSpy.SuccessResult["Execute"].Session.ID)
+	verify.Should(t, success.Session.FirstName).Be(spies.SigninUsecaseSpy.SuccessResult["Execute"].Session.FirstName)
+	verify.Should(t, success.Session.IsAdmin).Be(spies.SigninUsecaseSpy.SuccessResult["Execute"].Session.IsAdmin)
 }

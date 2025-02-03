@@ -3,13 +3,17 @@ package signout_gateway_fixture
 import (
 	"context"
 	"errors"
-	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	signout_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signout_auth_gateway"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signout"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
 	"net/http/httptest"
 )
+
+type SignoutGatewayFixture struct {
+	SignoutUsecaseSpy *signoutUsecaseSpy
+}
 
 type signoutUsecaseSpy struct {
 	Params        map[string]*signout.Input
@@ -18,10 +22,13 @@ type signoutUsecaseSpy struct {
 	SuccessResult map[string]*signout.Output
 }
 
-func NewSut() (auth_gateway.AuthGateway, *signoutUsecaseSpy) {
+func NewSut() (signout_gateway.SignoutGateway, *SignoutGatewayFixture) {
 	signoutSpy := &signoutUsecaseSpy{Params: make(map[string]*signout.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*result_app.ApplicationError), SuccessResult: make(map[string]*signout.Output)}
 
-	return auth_gateway.New(nil, signoutSpy, nil, nil), signoutSpy
+	return signout_gateway.New(signoutSpy),
+		&SignoutGatewayFixture{
+			SignoutUsecaseSpy: signoutSpy,
+		}
 }
 
 func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *result_app.ApplicationError) {

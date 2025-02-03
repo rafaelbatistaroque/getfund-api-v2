@@ -3,12 +3,18 @@ package reset_password_gateway_fixture
 import (
 	"bytes"
 	"errors"
-	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	"getfund-api-v2/internal/domain/auth/adapter/gateway/reset_password_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/test/helper/cache_spy"
 	"net/http"
 	"net/http/httptest"
 )
+
+type ResetPasswordGatewayFixture struct {
+	ResetPasswordUsecaseSpy *resetPasswordUsecaseSpy
+	CacheSpy                *cache_spy.RedisCacheSpy
+}
 
 type resetPasswordUsecaseSpy struct {
 	Params        map[string]*reset_password.Input
@@ -17,14 +23,19 @@ type resetPasswordUsecaseSpy struct {
 	SuccessResult map[string]*reset_password.Output
 }
 
-func NewSut() (auth_gateway.AuthGateway, *resetPasswordUsecaseSpy) {
+func NewSut() (reset_password_gateway.ResetPasswordGateway, *ResetPasswordGatewayFixture) {
 	resetPasswordSpy := &resetPasswordUsecaseSpy{
 		Params:        make(map[string]*reset_password.Input),
 		CallsCount:    make(map[string]int),
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*reset_password.Output)}
 
-	return auth_gateway.New(nil, nil, nil, resetPasswordSpy), resetPasswordSpy
+	cacheSpy := cache_spy.New()
+
+	return reset_password_gateway.New(resetPasswordSpy),
+		&ResetPasswordGatewayFixture{
+			ResetPasswordUsecaseSpy: resetPasswordSpy,
+			CacheSpy:                cacheSpy}
 }
 
 func (s *resetPasswordUsecaseSpy) Execute(input *reset_password.Input) (*reset_password.Output, *result_app.ApplicationError) {

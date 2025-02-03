@@ -22,9 +22,9 @@ func Test_GivenResetPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestWit
 	verify.Should(t, err).NotNil()
 }
 
-func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
+func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallCacheGetWithCorrectParameter(t *testing.T) {
 	// Arrange
-	sut, resetPasswordUsecaseSpy := fixture.NewSut()
+	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetResetPasswordInput()
 	res, req := fixture.GetHttpRequestResponse("")
 
@@ -32,39 +32,52 @@ func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectP
 	sut.ResetPassword(res, req)
 
 	// Assert
-	verify.Should(t, resetPasswordUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
+	verify.Should(t, spies.ResetPasswordUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
 
-func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallUsecaseOnce(t *testing.T) {
+func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
 	// Arrange
-	sut, resetPasswordUsecaseSpy := fixture.NewSut()
+	sut, spies := fixture.NewSut()
+	expectedInput := fixture.GetResetPasswordInput()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	sut.ResetPassword(res, req)
 
 	// Assert
-	verify.Should(t, resetPasswordUsecaseSpy.CallsCount["Execute"]).Be(1)
+	verify.Should(t, spies.ResetPasswordUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
+}
+
+func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallUsecaseOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	res, req := fixture.GetHttpRequestResponse("")
+
+	// Act
+	sut.ResetPassword(res, req)
+
+	// Assert
+	verify.Should(t, spies.ResetPasswordUsecaseSpy.CallsCount["Execute"]).Be(1)
 }
 
 func Test_GivenResetPassword_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *testing.T) {
 	// Arrange
-	sut, resetPasswordUsecaseSpy := fixture.NewSut()
-	resetPasswordUsecaseSpy.DefineError()
+	sut, spies := fixture.NewSut()
+	spies.ResetPasswordUsecaseSpy.DefineError()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	_, code, err := sut.ResetPassword(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(resetPasswordUsecaseSpy.ErrorResult["Execute"].Code)
-	verify.Should(t, err).Be(resetPasswordUsecaseSpy.ErrorResult["Execute"].Message)
+	verify.Should(t, code).Be(spies.ResetPasswordUsecaseSpy.ErrorResult["Execute"].Code)
+	verify.Should(t, err).Be(spies.ResetPasswordUsecaseSpy.ErrorResult["Execute"].Message)
 }
 
 func Test_GivenResetPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t *testing.T) {
 	// Arrange
-	sut, resetPasswordUsecaseSpy := fixture.NewSut()
-	resetPasswordUsecaseSpy.DefineSuccess()
+	sut, spies := fixture.NewSut()
+	spies.ResetPasswordUsecaseSpy.DefineSuccess()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
@@ -73,5 +86,5 @@ func Test_GivenResetPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSucces
 	// Assert
 	success := result.(*reset_password.Output)
 	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
-	verify.Should(t, success.Message).Be(resetPasswordUsecaseSpy.SuccessResult["Execute"].Message)
+	verify.Should(t, success.Message).Be(spies.ResetPasswordUsecaseSpy.SuccessResult["Execute"].Message)
 }

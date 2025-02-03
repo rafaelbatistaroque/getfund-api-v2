@@ -24,35 +24,35 @@ func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnServerErrorWithError(
 
 func Test_GivenSignout_WhenTokenFound_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
 	// Arrange
+	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetSignoutInput()
-	sut, signoutSpy := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	sut.Signout(res, req)
 
 	// Assert
-	verify.Should(t, signoutSpy.Params["Execute:input"]).Be(expectedInput)
+	verify.Should(t, spies.SignoutUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
 
 func Test_GivenSignout_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *testing.T) {
 	// Arrange
-	sut, signoutSpy := fixture.NewSut()
-	signoutSpy.DefineError()
+	sut, spies := fixture.NewSut()
+	spies.SignoutUsecaseSpy.DefineError()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	_, code, err := sut.Signout(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(signoutSpy.ErrorResult["Execute"].Code)
-	verify.Should(t, err).Be(signoutSpy.ErrorResult["Execute"].Message)
+	verify.Should(t, code).Be(spies.SignoutUsecaseSpy.ErrorResult["Execute"].Code)
+	verify.Should(t, err).Be(spies.SignoutUsecaseSpy.ErrorResult["Execute"].Message)
 }
 
 func Test_GivenSignout_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t *testing.T) {
 	// Arrange
-	sut, signoutSpy := fixture.NewSut()
-	signoutSpy.DefineSuccess()
+	sut, spies := fixture.NewSut()
+	spies.SignoutUsecaseSpy.DefineSuccess()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
@@ -61,5 +61,5 @@ func Test_GivenSignout_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(
 	// Assert
 	success := result.(*signout.Output)
 	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
-	verify.Should(t, success.Message).Be(signoutSpy.SuccessResult["Execute"].Message)
+	verify.Should(t, success.Message).Be(spies.SignoutUsecaseSpy.SuccessResult["Execute"].Message)
 }

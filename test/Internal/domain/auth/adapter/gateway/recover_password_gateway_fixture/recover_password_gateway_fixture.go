@@ -3,12 +3,16 @@ package recover_password_gateway_fixture
 import (
 	"bytes"
 	"errors"
-	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	"getfund-api-v2/internal/domain/auth/adapter/gateway/recover_password_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
 	"net/http/httptest"
 )
+
+type RecoverPasswordGatewayFixture struct {
+	RecoverPasswordUsecaseSpy *recoverPasswordUsecaseSpy
+}
 
 type recoverPasswordUsecaseSpy struct {
 	Params        map[string]*recover_password.Input
@@ -17,14 +21,17 @@ type recoverPasswordUsecaseSpy struct {
 	SuccessResult map[string]*recover_password.Output
 }
 
-func NewSut() (auth_gateway.AuthGateway, *recoverPasswordUsecaseSpy) {
+func NewSut() (recover_password_gateway.RecoverPasswordGateway, *RecoverPasswordGatewayFixture) {
 	recoverPasswordSpy := &recoverPasswordUsecaseSpy{
 		Params:        make(map[string]*recover_password.Input),
 		CallsCount:    make(map[string]int),
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*recover_password.Output)}
 
-	return auth_gateway.New(nil, nil, recoverPasswordSpy, nil), recoverPasswordSpy
+	return recover_password_gateway.New(recoverPasswordSpy),
+		&RecoverPasswordGatewayFixture{
+			RecoverPasswordUsecaseSpy: recoverPasswordSpy,
+		}
 }
 
 func (s *recoverPasswordUsecaseSpy) Execute(input *recover_password.Input) (*recover_password.Output, *result_app.ApplicationError) {

@@ -24,7 +24,7 @@ func Test_GivenRecoverPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestW
 
 func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParameter(t *testing.T) {
 	// Arrange
-	sut, recoverPasswordSpy := fixture.NewSut()
+	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetRecoverPasswordInput()
 	res, req := fixture.GetHttpRequestResponse("")
 
@@ -32,39 +32,39 @@ func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrec
 	sut.RecoverPassword(res, req)
 
 	// Assert
-	verify.Should(t, recoverPasswordSpy.Params["Execute:input"]).Be(expectedInput)
+	verify.Should(t, spies.RecoverPasswordUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
 
 func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallOnce(t *testing.T) {
 	// Arrange
-	sut, recoverPasswordSpy := fixture.NewSut()
+	sut, spies := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	sut.RecoverPassword(res, req)
 
 	// Assert
-	verify.Should(t, recoverPasswordSpy.CallsCount["Execute"]).Be(1)
+	verify.Should(t, spies.RecoverPasswordUsecaseSpy.CallsCount["Execute"]).Be(1)
 }
 
 func Test_GivenRecoverPassword_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *testing.T) {
 	// Arrange
-	sut, recoverPasswordSpy := fixture.NewSut()
-	recoverPasswordSpy.DefineError()
+	sut, spies := fixture.NewSut()
+	spies.RecoverPasswordUsecaseSpy.DefineError()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
 	_, code, err := sut.RecoverPassword(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(recoverPasswordSpy.ErrorResult["Execute"].Code)
-	verify.Should(t, err).Be(recoverPasswordSpy.ErrorResult["Execute"].Message)
+	verify.Should(t, code).Be(spies.RecoverPasswordUsecaseSpy.ErrorResult["Execute"].Code)
+	verify.Should(t, err).Be(spies.RecoverPasswordUsecaseSpy.ErrorResult["Execute"].Message)
 }
 
 func Test_GivenRecoverPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t *testing.T) {
 	// Arrange
-	sut, recoverPasswordSpy := fixture.NewSut()
-	recoverPasswordSpy.DefineSuccess()
+	sut, spies := fixture.NewSut()
+	spies.RecoverPasswordUsecaseSpy.DefineSuccess()
 	res, req := fixture.GetHttpRequestResponse("")
 
 	// Act
@@ -73,5 +73,5 @@ func Test_GivenRecoverPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSucc
 	// Assert
 	success := result.(*recover_password.Output)
 	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
-	verify.Should(t, success.Message).Be(recoverPasswordSpy.SuccessResult["Execute"].Message)
+	verify.Should(t, success.Message).Be(spies.RecoverPasswordUsecaseSpy.SuccessResult["Execute"].Message)
 }

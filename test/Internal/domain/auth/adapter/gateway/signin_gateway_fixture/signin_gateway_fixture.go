@@ -3,12 +3,16 @@ package signin_gateway_fixture
 import (
 	"bytes"
 	"errors"
-	auth_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway"
+	signin_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signin_auth_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
 	"net/http/httptest"
 )
+
+type SigninGatewayFixture struct {
+	SigninUsecaseSpy *signinUsecaseSpy
+}
 
 type signinUsecaseSpy struct {
 	Params        map[string]*signin.Input
@@ -17,14 +21,17 @@ type signinUsecaseSpy struct {
 	SuccessResult map[string]*signin.Output
 }
 
-func NewSut() (auth_gateway.AuthGateway, *signinUsecaseSpy) {
+func NewSut() (signin_gateway.SigninGateway, *SigninGatewayFixture) {
 	signinSpy := &signinUsecaseSpy{
 		Params:        make(map[string]*signin.Input),
 		CallsCount:    make(map[string]int),
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*signin.Output)}
 
-	return auth_gateway.New(signinSpy, nil, nil, nil), signinSpy
+	return signin_gateway.New(signinSpy),
+		&SigninGatewayFixture{
+			SigninUsecaseSpy: signinSpy,
+		}
 }
 
 func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *result_app.ApplicationError) {
