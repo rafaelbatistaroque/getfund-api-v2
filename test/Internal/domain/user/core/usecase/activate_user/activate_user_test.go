@@ -59,3 +59,16 @@ func Test_GivenExecute_WhenCacheGetInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Assert
 	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(1)
 }
+
+func Test_GivenExecute_WhenCacheGetError_ThenEnsureReturnNotFoundErrorWIthApropriateMessage(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Message.Error()).Be("activation code not found")
+}
