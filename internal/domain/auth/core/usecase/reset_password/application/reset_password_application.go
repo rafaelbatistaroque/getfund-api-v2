@@ -42,7 +42,7 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 	forgetPasswordDto := &auth_dto.ForgetPasswordDto{}
 	errUnmarshal := json.Unmarshal([]byte(cacheData), forgetPasswordDto)
 	if errUnmarshal != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to unmarshal data"))
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get recovery password data"))
 	}
 
 	authenticatedUser, errGetUser := r.authRepository.GetAuthenticatedUserByUsername(forgetPasswordDto.Username)

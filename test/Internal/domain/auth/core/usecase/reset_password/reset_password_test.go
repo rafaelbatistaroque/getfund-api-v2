@@ -176,7 +176,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message.Error()).Be("error to unmarshal data")
+	verify.Should(t, err.Message.Error()).Be("error on get recovery password data")
 }
 
 func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {

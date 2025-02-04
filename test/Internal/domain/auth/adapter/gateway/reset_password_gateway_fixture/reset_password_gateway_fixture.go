@@ -6,14 +6,12 @@ import (
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/reset_password_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/test/helper/cache_spy"
 	"net/http"
 	"net/http/httptest"
 )
 
 type ResetPasswordGatewayFixture struct {
 	ResetPasswordUsecaseSpy *resetPasswordUsecaseSpy
-	CacheSpy                *cache_spy.RedisCacheSpy
 }
 
 type resetPasswordUsecaseSpy struct {
@@ -30,12 +28,9 @@ func NewSut() (reset_password_gateway.ResetPasswordGateway, *ResetPasswordGatewa
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*reset_password.Output)}
 
-	cacheSpy := cache_spy.New()
-
 	return reset_password_gateway.New(resetPasswordSpy),
 		&ResetPasswordGatewayFixture{
-			ResetPasswordUsecaseSpy: resetPasswordSpy,
-			CacheSpy:                cacheSpy}
+			ResetPasswordUsecaseSpy: resetPasswordSpy}
 }
 
 func (s *resetPasswordUsecaseSpy) Execute(input *reset_password.Input) (*reset_password.Output, *result_app.ApplicationError) {
