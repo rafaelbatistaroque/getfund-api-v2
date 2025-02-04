@@ -22,3 +22,16 @@ func Test_GivenExecute_WhenActivationCodeEmpty_ThenEnsureReturnError(t *testing.
 	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ActivationCode"))
 }
+
+func Test_GivenExecute_WhenActivationCodeInvalid_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	inputWithActivationCodeInvalid := fixture.GetInput(fixture.WithInvalidActivationCodeLength())
+
+	// Act
+	_, err := sut.Execute(inputWithActivationCodeInvalid)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "ActivationCode", 20))
+}
