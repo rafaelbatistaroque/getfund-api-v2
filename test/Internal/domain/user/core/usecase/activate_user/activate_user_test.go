@@ -35,3 +35,16 @@ func Test_GivenExecute_WhenActivationCodeInvalid_ThenEnsureReturnError(t *testin
 	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "ActivationCode", 20))
 }
+
+func Test_GivenExecute_WhenInputValid_ThenEnsureCallCacheGetWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	validInput := fixture.GetInput()
+	expectedParam := "user_activation_" + validInput.ActivationCode
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(expectedParam)
+}

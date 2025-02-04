@@ -3,15 +3,20 @@ package activate_user_fixture
 import (
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
+	"getfund-api-v2/test/helper/cache_spy"
 )
 
 type ActivateUserFixture struct {
+	CacheSpy *cache_spy.RedisCacheSpy
 }
 
 func NewSut() (activate_user.UseCase, *ActivateUserFixture) {
+	cacheSpy := cache_spy.New()
 
-	return activate_user_application.New(),
-		&ActivateUserFixture{}
+	return activate_user_application.New(cacheSpy),
+		&ActivateUserFixture{
+			CacheSpy: cacheSpy,
+		}
 }
 
 type Option func(*activate_user.Input)
