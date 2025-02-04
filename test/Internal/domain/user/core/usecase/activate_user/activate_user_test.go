@@ -48,3 +48,14 @@ func Test_GivenExecute_WhenInputValid_ThenEnsureCallCacheGetWithCorrectParameter
 	// Assert
 	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(expectedParam)
 }
+
+func Test_GivenExecute_WhenCacheGetInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(1)
+}
