@@ -35,7 +35,10 @@ func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request)
 
 	input := activate_user.Input{ActivationCode: activationCode}
 
-	u.activateUser.Execute(&input)
+	_, err := u.activateUser.Execute(&input)
+	if err != nil {
+		return nil, err.Code, err.Message
+	}
 
 	return nil, 0, nil
 }
