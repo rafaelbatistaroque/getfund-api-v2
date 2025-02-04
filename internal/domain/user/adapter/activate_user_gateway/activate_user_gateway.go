@@ -8,6 +8,10 @@ import (
 	"strings"
 )
 
+const (
+	_PATH_ACTIVATE_USER = "/user/activate/"
+)
+
 type ActiveUserGateway interface {
 	ActivateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
 }
@@ -23,11 +27,15 @@ func New(activateUser activate_user.UseCase) ActiveUserGateway {
 }
 
 func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	activationCode := strings.TrimPrefix(r.URL.Path, "/user/activate/")
+	activationCode := strings.TrimPrefix(r.URL.Path, _PATH_ACTIVATE_USER)
 
 	if activationCode == "" {
 		return nil, result_app.BAD_REQUEST_CODE, errors.New("activation code is required")
 	}
+
+	input := activate_user.Input{ActivationCode: activationCode}
+
+	u.activateUser.Execute(&input)
 
 	return nil, 0, nil
 }

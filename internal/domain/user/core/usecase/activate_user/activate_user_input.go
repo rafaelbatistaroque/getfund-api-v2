@@ -7,6 +7,8 @@ import (
 type Input = activateUserInput
 
 type activateUserInput struct {
+	ActivationCode string `json:"activation_code"`
+
 	rules validation.Rule
 }
 
