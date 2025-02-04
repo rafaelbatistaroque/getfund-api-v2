@@ -45,3 +45,17 @@ func Test_GivenActivateUser_WhenAUsecaseInvoked_ThenEnsureCallsOnce(t *testing.T
 	// Assert
 	verify.Should(t, usecase.ActivateUserUsecaseSpy.CallsCount["Execute"]).Be(1)
 }
+
+func Test_GivenActivateUser_WhenUsecaseError_ThenEnsureReturnCodeAndMessageFrom(t *testing.T) {
+	// Arrange
+	sut, usecase := fixture.NewSut()
+	usecase.ActivateUserUsecaseSpy.DefineError()
+	res, req := fixture.GetHttpRequestResponse("valid-param")
+
+	// Act
+	_, code, err := sut.ActivateUser(res, req)
+
+	// Assert
+	verify.Should(t, code).Be(usecase.ActivateUserUsecaseSpy.ErrorResult["Execute"].Code)
+	verify.Should(t, err).Be(usecase.ActivateUserUsecaseSpy.ErrorResult["Execute"].Message)
+}
