@@ -1,6 +1,7 @@
 package activate_user_application
 
 import (
+	"errors"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
@@ -27,7 +28,10 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	}
 
 	keyCache := _KEY_USER_ACTIVATION_PREFIX + input.ActivationCode
-	a.cache.Get(keyCache)
+	_, errCache := a.cache.Get(keyCache)
+	if errCache != nil {
+		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("activation code not found"))
+	}
 
 	return nil, nil
 }
