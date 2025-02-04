@@ -3,7 +3,7 @@ package create_user_gateway_fixture
 import (
 	"bytes"
 	"errors"
-	"getfund-api-v2/internal/domain/user/adapter/create_user_gateway"
+	"getfund-api-v2/internal/domain/user/adapter/gateway/create_user_gateway"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"

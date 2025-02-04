@@ -3,7 +3,7 @@ package activate_user_gateway_fixture
 import (
 	"errors"
 	"fmt"
-	"getfund-api-v2/internal/domain/user/adapter/activate_user_gateway"
+	"getfund-api-v2/internal/domain/user/adapter/gateway/activate_user_gateway"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
