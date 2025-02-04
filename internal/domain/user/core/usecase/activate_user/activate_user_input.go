@@ -16,6 +16,7 @@ func (i *activateUserInput) Validate() validation.Validatable {
 	i.rules.
 		ApplyRules(i.ActivationCode, "ActivationCode",
 			&validation.RequiredRule{},
+			&validation.LengthRule{Exactly: 20},
 		)
 
 	return i.rules.GetResult()
