@@ -1,0 +1,33 @@
+package activate_user_gateway
+
+import (
+	"errors"
+	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
+	"getfund-api-v2/internal/shared/result_app"
+	"net/http"
+	"strings"
+)
+
+type ActiveUserGateway interface {
+	ActivateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
+}
+
+type activeUserGateway struct {
+	activateUser activate_user.UseCase
+}
+
+func New(activateUser activate_user.UseCase) ActiveUserGateway {
+	return &activeUserGateway{
+		activateUser: activateUser,
+	}
+}
+
+func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+	activationCode := strings.TrimPrefix(r.URL.Path, "/user/activate/")
+
+	if activationCode == "" {
+		return nil, result_app.BAD_REQUEST_CODE, errors.New("activation code is required")
+	}
+
+	return nil, 0, nil
+}
