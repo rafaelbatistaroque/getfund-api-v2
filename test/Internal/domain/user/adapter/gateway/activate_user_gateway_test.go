@@ -8,7 +8,7 @@ import (
 	"github.com/rafaelbatistaroque/verify"
 )
 
-func Test_GivenActivateUser_WhenDecodeError_ThenEnsureReturnBadRequestWithError(t *testing.T) {
+func Test_GivenActivateUser_WhenActivationCodeUrlParamNotFound_ThenEnsureReturnBadRequestWithError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("")
@@ -19,4 +19,17 @@ func Test_GivenActivateUser_WhenDecodeError_ThenEnsureReturnBadRequestWithError(
 	// Assert
 	verify.Should(t, code).Be(result_app.BAD_REQUEST_CODE)
 	verify.Should(t, err.Error()).Be("activation code is required")
+}
+
+func Test_GivenActivateUser_WhenActivationCodeUrlParamFound_ThenEnsureCallUseCAseWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, usecase := fixture.NewSut()
+	expectedInput := fixture.GetActivateUserInput()
+	res, req := fixture.GetHttpRequestResponse(expectedInput.ActivationCode)
+
+	// Act
+	sut.ActivateUser(res, req)
+
+	// Assert
+	verify.Should(t, usecase.ActivateUserUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
