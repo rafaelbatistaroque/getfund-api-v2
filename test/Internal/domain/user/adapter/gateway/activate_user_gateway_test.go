@@ -59,3 +59,17 @@ func Test_GivenActivateUser_WhenUsecaseError_ThenEnsureReturnCodeAndMessageFrom(
 	verify.Should(t, code).Be(usecase.ActivateUserUsecaseSpy.ErrorResult["Execute"].Code)
 	verify.Should(t, err).Be(usecase.ActivateUserUsecaseSpy.ErrorResult["Execute"].Message)
 }
+
+func Test_GivenActivateUser_WhenUsecaseSuccess_ThenEnsureReturnOutputWithSuccessCode(t *testing.T) {
+	// Arrange
+	sut, usecase := fixture.NewSut()
+	usecase.ActivateUserUsecaseSpy.DefineSuccess()
+	res, req := fixture.GetHttpRequestResponse("valid-param")
+
+	// Act
+	output, code, _ := sut.ActivateUser(res, req)
+
+	// Assert
+	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
+	verify.Should(t, output).Be(usecase.ActivateUserUsecaseSpy.SuccessResult["Execute"])
+}
