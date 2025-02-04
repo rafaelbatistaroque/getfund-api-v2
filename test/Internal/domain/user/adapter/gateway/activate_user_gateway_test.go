@@ -33,3 +33,15 @@ func Test_GivenActivateUser_WhenActivationCodeUrlParamFound_ThenEnsureCallUseCAs
 	// Assert
 	verify.Should(t, usecase.ActivateUserUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
+
+func Test_GivenActivateUser_WhenAUsecaseInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, usecase := fixture.NewSut()
+	res, req := fixture.GetHttpRequestResponse("fake-activation-code")
+
+	// Act
+	sut.ActivateUser(res, req)
+
+	// Assert
+	verify.Should(t, usecase.ActivateUserUsecaseSpy.CallsCount["Execute"]).Be(1)
+}

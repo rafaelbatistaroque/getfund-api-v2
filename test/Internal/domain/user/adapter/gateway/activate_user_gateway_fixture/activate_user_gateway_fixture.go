@@ -42,7 +42,6 @@ func (s *activateUserUsecaseSpy) Execute(input *activate_user.Input) (*activate_
 }
 
 func GetHttpRequestResponse(activationCode string) (w http.ResponseWriter, r *http.Request) {
-
 	url := fmt.Sprintf("/user/activate/%s", activationCode)
 	req := httptest.NewRequest("FAKE", url, nil)
 	res := httptest.NewRecorder()
