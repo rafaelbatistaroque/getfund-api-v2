@@ -3,7 +3,7 @@ package create_user_gateway_fixture
 import (
 	"bytes"
 	"errors"
-	user_gateway "getfund-api-v2/internal/domain/user/adapter/gateway"
+	"getfund-api-v2/internal/domain/user/adapter/create_user_gateway"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"net/http"
@@ -17,14 +17,14 @@ type createUserUsecaseSpy struct {
 	SuccessResult map[string]*create_user.Output
 }
 
-func NewSut() (user_gateway.UserGateway, *createUserUsecaseSpy) {
+func NewSut() (create_user_gateway.CreateUserGateway, *createUserUsecaseSpy) {
 	createUserSpy := &createUserUsecaseSpy{
 		Params:        make(map[string]*create_user.Input),
 		CallsCount:    make(map[string]int),
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*create_user.Output)}
 
-	return user_gateway.New(createUserSpy), createUserSpy
+	return create_user_gateway.New(createUserSpy), createUserSpy
 }
 
 func (s *createUserUsecaseSpy) Execute(input *create_user.Input) (*create_user.Output, *result_app.ApplicationError) {

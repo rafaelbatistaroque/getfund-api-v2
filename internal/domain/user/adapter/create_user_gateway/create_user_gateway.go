@@ -1,4 +1,4 @@
-package user_gateway
+package create_user_gateway
 
 import (
 	"encoding/json"
@@ -7,7 +7,21 @@ import (
 	"net/http"
 )
 
-func (u *userGateway) CreateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+type CreateUserGateway interface {
+	CreateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
+}
+
+type createUserGateway struct {
+	createUser create_user.UseCase
+}
+
+func New(createUser create_user.UseCase) CreateUserGateway {
+	return &createUserGateway{
+		createUser: createUser,
+	}
+}
+
+func (u *createUserGateway) CreateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
 	var input create_user.Input
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
