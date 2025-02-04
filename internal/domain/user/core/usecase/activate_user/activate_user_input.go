@@ -13,5 +13,10 @@ type activateUserInput struct {
 }
 
 func (i *activateUserInput) Validate() validation.Validatable {
-	return nil
+	i.rules.
+		ApplyRules(i.ActivationCode, "ActivationCode",
+			&validation.RequiredRule{},
+		)
+
+	return i.rules.GetResult()
 }
