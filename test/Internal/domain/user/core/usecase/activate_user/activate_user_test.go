@@ -72,3 +72,18 @@ func Test_GivenExecute_WhenCacheGetError_ThenEnsureReturnNotFoundErrorWIthApropr
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
 	verify.Should(t, err.Message.Error()).Be("activation code not found")
 }
+
+func Test_GivenExecute_WhenExecuteFinished_ThenEnsureDeleteCacheInOrderWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	validInput := fixture.GetInput()
+	expectedCacheParameter := "user_activation_" + validInput.ActivationCode
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.Params["Delete:key"]).Be(expectedCacheParameter)
+	verify.Should(t, spies.CacheSpy.InvokeOrder[0]).Be("Get")
+	verify.Should(t, spies.CacheSpy.InvokeOrder[1]).Be("Delete")
+}
