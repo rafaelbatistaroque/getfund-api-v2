@@ -28,6 +28,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	}
 
 	keyCache := _KEY_USER_ACTIVATION_PREFIX + input.ActivationCode
+	defer a.cache.Delete(keyCache)
 	_, errCache := a.cache.Get(keyCache)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("activation code not found"))
