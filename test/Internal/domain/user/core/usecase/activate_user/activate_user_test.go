@@ -1,7 +1,9 @@
 package activate_user_test
 
 import (
+	"encoding/json"
 	"fmt"
+	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/activate_user/activate_user_fixture"
 	"testing"
@@ -99,4 +101,18 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("error on get user data")
+}
+
+func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallGetUserByUsernameWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(`{"email": "fake-valid@mail.com"}`)
+	var expectedParam = user_dto.ActivationUserDto{}
+	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.Params["GetUserByUsername:username"]).Be(expectedParam.Email)
 }
