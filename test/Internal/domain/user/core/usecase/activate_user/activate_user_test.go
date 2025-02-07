@@ -87,3 +87,16 @@ func Test_GivenExecute_WhenExecuteFinished_ThenEnsureDeleteCacheInOrderWithCorre
 	verify.Should(t, spies.CacheSpy.InvokeOrder[0]).Be("Get")
 	verify.Should(t, spies.CacheSpy.InvokeOrder[1]).Be("Delete")
 }
+
+func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(`{error-data}`)
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message.Error()).Be("error on get user data")
+}

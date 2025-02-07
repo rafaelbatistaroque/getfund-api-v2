@@ -4,18 +4,22 @@ import (
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
 	"getfund-api-v2/test/helper/cache_spy"
+	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
 )
 
 type ActivateUserFixture struct {
 	CacheSpy *cache_spy.RedisCacheSpy
+	RepoSpy  *user_repository_spy.UserRepositorySpy
 }
 
 func NewSut() (activate_user.UseCase, *ActivateUserFixture) {
 	cacheSpy := cache_spy.New()
+	repoSpy := user_repository_spy.New()
 
-	return activate_user_application.New(cacheSpy),
+	return activate_user_application.New(cacheSpy, repoSpy),
 		&ActivateUserFixture{
 			CacheSpy: cacheSpy,
+			RepoSpy:  repoSpy,
 		}
 }
 
