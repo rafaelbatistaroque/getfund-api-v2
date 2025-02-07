@@ -92,7 +92,7 @@ func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallGetUserByUsernameWithC
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(`{"email": "fake-valid@mail.com"}`)
-	var expectedParam = user_dto.ActivationUserDto{}
+	var expectedParam = user_dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
 	// Act
@@ -141,4 +141,18 @@ func Test_GivenExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDuplicateEntry
 	verify.Should(t, err.Code).Be(result_app.DUPLICATED_ENTRY_CODE)
 	verify.Should(t, err.Message.Error()).Be("user already exists")
 	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
+}
+
+func Test_GivenExecute_WhenGetUserByUsernameNotFound_ThenEnsureMapperCallToEntityWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
+	var expectedParam = user_dto.ActivationUserData{}
+	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.MapperSpy.Params["ToEntity:data"]).Be(&expectedParam)
 }

@@ -4,22 +4,26 @@ import (
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
 	"getfund-api-v2/test/helper/cache_spy"
+	"getfund-api-v2/test/helper/mapper_spy/activate_user_mapper_spy"
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
 )
 
 type ActivateUserFixture struct {
-	CacheSpy *cache_spy.RedisCacheSpy
-	RepoSpy  *user_repository_spy.UserRepositorySpy
+	CacheSpy  *cache_spy.RedisCacheSpy
+	RepoSpy   *user_repository_spy.UserRepositorySpy
+	MapperSpy *activate_user_mapper_spy.ActivateUserMapperSpy
 }
 
 func NewSut() (activate_user.UseCase, *ActivateUserFixture) {
 	cacheSpy := cache_spy.New()
 	repoSpy := user_repository_spy.New()
+	mapperSpy := activate_user_mapper_spy.New()
 
-	return activate_user_application.New(cacheSpy, repoSpy),
+	return activate_user_application.New(cacheSpy, repoSpy, mapperSpy),
 		&ActivateUserFixture{
-			CacheSpy: cacheSpy,
-			RepoSpy:  repoSpy,
+			CacheSpy:  cacheSpy,
+			RepoSpy:   repoSpy,
+			MapperSpy: mapperSpy,
 		}
 }
 
@@ -47,4 +51,8 @@ func WithInvalidActivationCodeLength() Option {
 	return func(params *activate_user.Input) {
 		params.ActivationCode = "invalid"
 	}
+}
+
+func GetUserDataWithCouponSerialized() string {
+	return `{"first_name":"fake-first-name","last_name":"fake-last-name","email":"fake@email.com","gender":"male","password":"fakaStrongPass123","country_id":1,"user_category_id":1,"main_social_network":"@FakeSocial","registered_url":"https://social.com","cupon_code":"COUPONCD"}`
 }
