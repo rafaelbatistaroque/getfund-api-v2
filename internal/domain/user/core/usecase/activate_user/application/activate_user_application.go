@@ -44,5 +44,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get user data"))
 	}
 
+	a.repository.GetUserByUsername(activationUserDto.Email)
+
 	return nil, nil
 }
