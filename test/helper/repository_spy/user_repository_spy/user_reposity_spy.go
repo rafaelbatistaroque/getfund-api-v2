@@ -6,15 +6,15 @@ import (
 )
 
 type UserRepositorySpy struct {
-	Params        map[string]string
+	Params        map[string]any
 	CallsCount    map[string]int
 	ErrorResult   map[string]error
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 }
 
 func New() *UserRepositorySpy {
 
-	return &UserRepositorySpy{Params: make(map[string]string, 1), ErrorResult: make(map[string]error), SuccessResult: make(map[string]interface{}, 1), CallsCount: make(map[string]int, 1)}
+	return &UserRepositorySpy{Params: make(map[string]any, 1), ErrorResult: make(map[string]error), SuccessResult: make(map[string]any, 1), CallsCount: make(map[string]int, 1)}
 }
 
 func (r *UserRepositorySpy) GetUserByUsername(username string) (*user_dto.UserDto, error) {
@@ -28,6 +28,14 @@ func (r *UserRepositorySpy) GetUserByUsername(username string) (*user_dto.UserDt
 	}
 
 	return nil, r.ErrorResult["GetUserByUsername"]
+}
+
+func (r *UserRepositorySpy) SaveUser(user *user_dto.ActivationUserDto) error {
+	r.Params["SaveUser:user"] = user
+
+	r.CallsCount["SaveUser"]++
+
+	return r.ErrorResult["SaveUser"]
 }
 
 func (r *UserRepositorySpy) DefineGetUserByUsernameError() {

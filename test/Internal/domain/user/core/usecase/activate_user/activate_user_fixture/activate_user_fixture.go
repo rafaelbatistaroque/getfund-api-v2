@@ -1,6 +1,7 @@
 package activate_user_fixture
 
 import (
+	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
 	"getfund-api-v2/test/helper/cache_spy"
@@ -51,6 +52,19 @@ func WithInvalidActivationCodeLength() Option {
 	return func(params *activate_user.Input) {
 		params.ActivationCode = "invalid"
 	}
+}
+
+func GetActivateUserEntity() *activate_user_entity.ActivationUser {
+	return activate_user_entity.New(
+		"fake-first-name",
+		"fake-last-name",
+		"fake@email.com",
+		"m",
+		"fakaStrongPass123",
+		"@FakeSocial",
+		"https://social.com",
+		1,
+		1)
 }
 
 func GetUserDataWithCouponSerialized() string {

@@ -181,3 +181,16 @@ func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Assert
 	verify.Should(t, spies.MapperSpy.CallsCount["ToDto"]).Be(1)
 }
+
+func Test_GivenExecute_WhenToDtoSuccess_ThenEnsureCallSaveUserWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
+	spies.MapperSpy.DefineToDtoSuccess(fixture.GetActivateUserEntity())
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.Params["SaveUser:user"]).Be(spies.MapperSpy.SuccessResult["ToDto"])
+}

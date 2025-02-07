@@ -33,7 +33,7 @@ func (m *ActivateUserMapperSpy) ToDto(entity *activate_user_entity.ActivationUse
 }
 
 func (m *ActivateUserMapperSpy) DefineToDtoSuccess(entity *activate_user_entity.ActivationUser) {
-	m.SuccessResult["ToDto"] = user_dto.ActivationUserDto{
+	m.SuccessResult["ToDto"] = &user_dto.ActivationUserDto{
 		FirstName:         entity.GetFirstName(),
 		LastName:          entity.GetLastName(),
 		Email:             entity.GetEmail(),
