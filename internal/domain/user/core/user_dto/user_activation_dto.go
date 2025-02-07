@@ -10,5 +10,7 @@ type ActivationUserDto struct {
 	UserCategoryId    int    `json:"user_category_id"`
 	MainSocialNetwork string `json:"main_social_network"`
 	RegisteredUrl     string `json:"registered_url"`
-	CouponCode        string `json:"cupon_code"`
+	RegisteredAt      int64  `json:"registered_at"`
+	IsAdmin           int    `json:"is_admin"`
+	IsActive          int    `json:"is_active"`
 }

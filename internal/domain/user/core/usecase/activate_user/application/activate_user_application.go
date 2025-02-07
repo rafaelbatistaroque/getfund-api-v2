@@ -5,6 +5,7 @@ import (
 	"errors"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/domain_service/activate_user_mapper"
+	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
@@ -56,7 +57,18 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
-	a.mapper.ToEntity(&userData)
+	user := activate_user_entity.New(
+		userData.FirstName,
+		userData.LastName,
+		userData.Email,
+		userData.Gender,
+		userData.Password,
+		userData.MainSocialNetwork,
+		userData.RegisteredUrl,
+		userData.CountryId,
+		userData.UserCategoryId)
+
+	a.mapper.ToDto(user)
 
 	return nil, nil
 }
