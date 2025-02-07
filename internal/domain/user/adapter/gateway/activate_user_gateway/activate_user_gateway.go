@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	_PATH_ACTIVATE_USER = "/user/activate/"
+	_PATH_ACTIVATE_USER         = "/user/activate/"
+	_KEY_USER_ACTIVATION_PREFIX = "user_activation_"
 )
 
 type ActiveUserGateway interface {
@@ -33,7 +34,9 @@ func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request)
 		return nil, result_app.BAD_REQUEST_CODE, errors.New("activation code is required")
 	}
 
-	input := activate_user.Input{ActivationCode: activationCode}
+	input := activate_user.Input{
+		ActivationCode: activationCode,
+		ActivationKey:  _KEY_USER_ACTIVATION_PREFIX + activationCode}
 
 	output, err := u.activateUser.Execute(&input)
 	if err != nil {

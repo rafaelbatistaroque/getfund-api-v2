@@ -31,8 +31,10 @@ func NewSut() (activate_user.UseCase, *ActivateUserFixture) {
 type Option func(*activate_user.Input)
 
 func GetInput(options ...Option) *activate_user.Input {
+	fakeValidActivationCode := "fakeActivationCodeVl"
 	input := &activate_user.Input{
-		ActivationCode: "fakeActivationCodeVl",
+		ActivationCode: fakeValidActivationCode,
+		ActivationKey:  "user_activation_" + fakeValidActivationCode,
 	}
 
 	for _, opt := range options {
@@ -51,6 +53,18 @@ func WithEmptyActivationCode() Option {
 func WithInvalidActivationCodeLength() Option {
 	return func(params *activate_user.Input) {
 		params.ActivationCode = "invalid"
+	}
+}
+
+func WithEmptyActivationKey() Option {
+	return func(params *activate_user.Input) {
+		params.ActivationKey = ""
+	}
+}
+
+func WithInvalidActivationKey() Option {
+	return func(params *activate_user.Input) {
+		params.ActivationKey = "invalid-activation-key"
 	}
 }
 

@@ -50,7 +50,10 @@ func GetHttpRequestResponse(activationCode string) (w http.ResponseWriter, r *ht
 }
 
 func GetActivateUserInput() *activate_user.Input {
-	return &activate_user.Input{ActivationCode: "fake-activation-code"}
+	fakeActivationCode := "fake-activation-code"
+	return &activate_user.Input{
+		ActivationCode: fakeActivationCode,
+		ActivationKey:  "user_activation_" + fakeActivationCode}
 }
 
 func (s *activateUserUsecaseSpy) DefineError() {

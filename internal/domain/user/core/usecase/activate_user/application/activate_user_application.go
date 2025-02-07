@@ -12,10 +12,6 @@ import (
 	"getfund-api-v2/internal/shared/service/cache_service"
 )
 
-const (
-	_KEY_USER_ACTIVATION_PREFIX = "user_activation_"
-)
-
 type activateUserApplication struct {
 	cache      cache_service.Cache
 	repository user_contract.Repository
@@ -36,8 +32,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.UNAUTHORIZED_CODE, validatable.GetErrors())
 	}
 
-	keyCache := _KEY_USER_ACTIVATION_PREFIX + input.ActivationCode
-	userSerialized, errCache := a.cache.Get(keyCache)
+	userSerialized, errCache := a.cache.Get(input.ActivationKey)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("activation code not found"))
 	}
@@ -53,7 +48,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	}
 
 	if userDuplicated != nil {
-		defer a.cache.Delete(keyCache)
+		defer a.cache.Delete(input.ActivationKey)
 		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
@@ -74,7 +69,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}
 
-	defer a.cache.Delete(keyCache)
+	defer a.cache.Delete(input.ActivationKey)
 
 	return nil, nil
 }

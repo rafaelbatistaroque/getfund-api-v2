@@ -8,6 +8,7 @@ type Input = activateUserInput
 
 type activateUserInput struct {
 	ActivationCode string `json:"activation_code"`
+	ActivationKey  string
 
 	rules validation.Rule
 }
@@ -17,6 +18,10 @@ func (i *activateUserInput) Validate() validation.Validatable {
 		ApplyRules(i.ActivationCode, "ActivationCode",
 			&validation.RequiredRule{},
 			&validation.LengthRule{Exactly: 20},
+		).
+		ApplyRules(i.ActivationKey, "ActivationKey",
+			&validation.RequiredRule{},
+			&validation.EqualRule{Equal: "user_activation_" + i.ActivationCode},
 		)
 
 	return i.rules.GetResult()

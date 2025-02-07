@@ -21,7 +21,7 @@ func Test_GivenActivateUser_WhenActivationCodeUrlParamNotFound_ThenEnsureReturnB
 	verify.Should(t, err.Error()).Be("activation code is required")
 }
 
-func Test_GivenActivateUser_WhenActivationCodeUrlParamFound_ThenEnsureCallUseCAseWithCorrectParameter(t *testing.T) {
+func Test_GivenActivateUser_WhenActivationCodeUrlParamFound_ThenEnsureCallUsecaseWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, usecase := fixture.NewSut()
 	expectedInput := fixture.GetActivateUserInput()
@@ -34,7 +34,7 @@ func Test_GivenActivateUser_WhenActivationCodeUrlParamFound_ThenEnsureCallUseCAs
 	verify.Should(t, usecase.ActivateUserUsecaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
 
-func Test_GivenActivateUser_WhenAUsecaseInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenActivateUser_WhenUsecaseInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, usecase := fixture.NewSut()
 	res, req := fixture.GetHttpRequestResponse("fake-activation-code")
