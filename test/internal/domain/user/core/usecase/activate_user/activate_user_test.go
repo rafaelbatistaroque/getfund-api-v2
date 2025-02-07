@@ -156,3 +156,15 @@ func Test_GivenExecute_WhenGetUserByUsernameNotFound_ThenEnsureMapperCallToEntit
 	// Assert
 	verify.Should(t, spies.MapperSpy.Params["ToEntity:data"]).Be(&expectedParam)
 }
+
+func Test_GivenExecute_WhenToEntityInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.MapperSpy.CallsCount["ToEntity"]).Be(1)
+}
