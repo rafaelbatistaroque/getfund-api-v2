@@ -102,6 +102,18 @@ func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallGetUserByUsernameWithC
 	verify.Should(t, spies.RepoSpy.Params["GetUserByUsername:username"]).Be(expectedParam.Email)
 }
 
+func Test_GivenExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess("")
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.CallsCount["GetUserByUsername"]).Be(1)
+}
+
 func Test_GivenExecute_WhenGetUserByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
