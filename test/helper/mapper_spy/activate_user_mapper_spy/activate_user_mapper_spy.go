@@ -22,6 +22,8 @@ func New() *ActivateUserMapperSpy {
 func (m *ActivateUserMapperSpy) ToDto(entity *activate_user_entity.ActivationUser) *user_dto.ActivationUserDto {
 	m.Params["ToDto:entity"] = entity
 
+	m.CallsCount["ToDto"]++
+
 	success := m.SuccessResult["ToDto"]
 	if success != nil {
 		return m.SuccessResult["ToDto"].(*user_dto.ActivationUserDto)

@@ -92,7 +92,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallGetUserByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(`{"email": "fake-valid@mail.com"}`)
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	var expectedParam = user_dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
@@ -106,7 +106,7 @@ func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallGetUserByUsernameWithC
 func Test_GivenExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -144,32 +144,6 @@ func Test_GivenExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDuplicateEntry
 	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
 }
 
-func Test_GivenExecute_WhenGetUserByUsernameNotFound_ThenEnsureMapperCallToEntityWithCorrectParameter(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	var expectedParam = user_dto.ActivationUserData{}
-	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
-
-	// Act
-	sut.Execute(fixture.GetInput())
-
-	// Assert
-	verify.Should(t, spies.MapperSpy.Params["ToEntity:data"]).Be(&expectedParam)
-}
-
-func Test_GivenExecute_WhenToEntityInvoked_ThenEnsureCallsOnce(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess("")
-
-	// Act
-	sut.Execute(fixture.GetInput())
-
-	// Assert
-	verify.Should(t, spies.MapperSpy.CallsCount["ToEntity"]).Be(1)
-}
-
 func Test_GivenExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallMapperToDtoWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
@@ -194,4 +168,16 @@ func Test_GivenExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallMapperToDtoWi
 	verify.Should(t, entityParam.GetIsActive()).Be(1)
 	verify.Should(t, entityParam.GetIsAdmin()).Be(0)
 	verify.Should(t, entityParam.GetRegisteredAt()).NotNil()
+}
+
+func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.MapperSpy.CallsCount["ToDto"]).Be(1)
 }
