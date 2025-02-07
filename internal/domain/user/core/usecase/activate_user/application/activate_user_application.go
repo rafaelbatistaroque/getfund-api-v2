@@ -74,5 +74,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}
 
+	defer a.cache.Delete(keyCache)
+
 	return nil, nil
 }
