@@ -69,7 +69,10 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		userData.UserCategoryId)
 
 	userDto := a.mapper.ToDto(user)
-	a.repository.SaveUser(userDto)
+
+	if err := a.repository.SaveUser(userDto); err != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
+	}
 
 	return nil, nil
 }
