@@ -10,10 +10,6 @@ import (
 	"getfund-api-v2/internal/shared/service/cache_service"
 )
 
-const (
-	_KEY_CACHE_PREFIX = "recovery_password_"
-)
-
 type resetPasswordApplication struct {
 	cacheService   cache_service.Cache
 	authRepository auth_contract.AuthRepository
@@ -32,9 +28,7 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validatable.GetErrors())
 	}
 
-	keyRecoveryCode := _KEY_CACHE_PREFIX + input.RecoveryCode
-	defer r.cacheService.Delete(keyRecoveryCode)
-	cacheData, errCache := r.cacheService.Get(keyRecoveryCode)
+	cacheData, errCache := r.cacheService.Get(input.RecoveryKey)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("recovery code not found"))
 	}
@@ -53,6 +47,8 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 	if errUpdate := r.authRepository.UpdatePassword(authenticatedUser.Id, input.Password); errUpdate != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errUpdate)
 	}
+
+	defer r.cacheService.Delete(input.RecoveryKey)
 
 	return &reset_password.Output{Message: "password updated"}, nil
 }

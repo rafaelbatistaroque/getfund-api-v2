@@ -7,6 +7,10 @@ import (
 	"net/http"
 )
 
+const (
+	_KEY_CACHE_PREFIX = "recovery_password_"
+)
+
 type ResetPasswordGateway interface {
 	ResetPassword(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
 }
@@ -28,6 +32,7 @@ func (h *resetPasswordGateway) ResetPassword(w http.ResponseWriter, r *http.Requ
 		return nil, result_app.BAD_REQUEST_CODE, err
 	}
 
+	input.RecoveryKey = _KEY_CACHE_PREFIX + input.RecoveryCode
 	result, err := h.resetPassword.Execute(&input)
 	if err != nil {
 		return nil, err.Code, err.Message

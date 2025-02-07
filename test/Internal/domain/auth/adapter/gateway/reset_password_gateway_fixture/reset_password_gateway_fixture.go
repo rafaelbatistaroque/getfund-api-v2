@@ -57,7 +57,11 @@ func GetResetPasswordInputSerialized() string {
 }
 
 func GetResetPasswordInput() *reset_password.Input {
-	return &reset_password.Input{RecoveryCode: "fake-recovery-code", Password: "fake-password"}
+	return &reset_password.Input{
+		RecoveryCode: "fake-recovery-code",
+		Password:     "fake-password",
+		RecoveryKey:  "recovery_password_fake-recovery-code",
+	}
 }
 
 func (s *resetPasswordUsecaseSpy) DefineError() {

@@ -34,7 +34,12 @@ func GetForgetPasswordFromGetSuccessCache(cacheSpy *cache_spy.RedisCacheSpy) *au
 type Option func(*reset_password.Input)
 
 func GetInput(options ...Option) *reset_password.Input {
-	input := &reset_password.Input{RecoveryCode: "fake-al44iyayjdL7fpW93wEXnkfXotDrx2krPjoREOhIgO7QD4j5MIEtWe5bSxO", Password: "strongPassword123"}
+	fakeCode := "fake-al44iyayjdL7fpW93wEXnkfXotDrx2krPjoREOhIgO7QD4j5MIEtWe5bSxO"
+	input := &reset_password.Input{
+		RecoveryCode: fakeCode,
+		Password:     "strongPassword123",
+		RecoveryKey:  "recovery_password_" + fakeCode,
+	}
 
 	for _, opt := range options {
 		opt(input)
@@ -82,5 +87,17 @@ func WithInvalidLowerPassword() Option {
 func WithInvalidDigitPassword() Option {
 	return func(params *reset_password.Input) {
 		params.Password = "ABCDefgh"
+	}
+}
+
+func WithRecoveryKeyEmpty() Option {
+	return func(params *reset_password.Input) {
+		params.RecoveryKey = ""
+	}
+}
+
+func WithRecoveryKeyInvalid() Option {
+	return func(params *reset_password.Input) {
+		params.RecoveryKey = "invalid-recovery-key"
 	}
 }
