@@ -68,7 +68,8 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		userData.CountryId,
 		userData.UserCategoryId)
 
-	a.mapper.ToDto(user)
+	userDto := a.mapper.ToDto(user)
+	a.repository.SaveUser(userDto)
 
 	return nil, nil
 }
