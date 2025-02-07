@@ -33,7 +33,6 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	}
 
 	keyCache := _KEY_USER_ACTIVATION_PREFIX + input.ActivationCode
-	defer a.cache.Delete(keyCache)
 	userData, errCache := a.cache.Get(keyCache)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("activation code not found"))
@@ -44,9 +43,14 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get user data"))
 	}
 
-	_, errRepo := a.repository.GetUserByUsername(activationUserDto.Email)
+	userDuplicated, errRepo := a.repository.GetUserByUsername(activationUserDto.Email)
 	if errRepo != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errRepo)
+	}
+
+	if userDuplicated != nil {
+		defer a.cache.Delete(keyCache)
+		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
 	return nil, nil
