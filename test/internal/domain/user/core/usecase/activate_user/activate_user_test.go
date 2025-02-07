@@ -134,13 +134,16 @@ func Test_GivenExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDuplicateEntry
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
 	spies.RepoSpy.DefineGetUserByUsernameSuccess()
+	validInput := fixture.GetInput()
+	expectedParam := "user_activation_" + validInput.ActivationCode
 
 	// Act
-	_, err := sut.Execute(fixture.GetInput())
+	_, err := sut.Execute(validInput)
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.DUPLICATED_ENTRY_CODE)
 	verify.Should(t, err.Message.Error()).Be("user already exists")
+	verify.Should(t, spies.CacheSpy.Params["Delete:key"]).Be(expectedParam)
 	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
 }
 
@@ -219,4 +222,19 @@ func Test_GivenExecute_WhenSaveUserError_ThenEnsureReturnError(t *testing.T) {
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["SaveUser"])
+}
+
+func Test_GivenExecute_WhenSaveUserSuccess_ThenEnsureCallCacheDeleteWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
+	validInput := fixture.GetInput()
+	expectedParam := "user_activation_" + validInput.ActivationCode
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.CacheSpy.Params["Delete:key"]).Be(expectedParam)
+	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
 }
