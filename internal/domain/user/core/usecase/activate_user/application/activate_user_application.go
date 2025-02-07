@@ -1,8 +1,11 @@
 package activate_user_application
 
 import (
+	"encoding/json"
 	"errors"
+	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
+	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
 )
@@ -12,12 +15,14 @@ const (
 )
 
 type activateUserApplication struct {
-	cache cache_service.Cache
+	cache      cache_service.Cache
+	repository user_contract.Repository
 }
 
-func New(cache cache_service.Cache) activate_user.UseCase {
+func New(cache cache_service.Cache, repository user_contract.Repository) activate_user.UseCase {
 	return &activateUserApplication{
-		cache: cache,
+		cache:      cache,
+		repository: repository,
 	}
 }
 
@@ -29,9 +34,14 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 
 	keyCache := _KEY_USER_ACTIVATION_PREFIX + input.ActivationCode
 	defer a.cache.Delete(keyCache)
-	_, errCache := a.cache.Get(keyCache)
+	userData, errCache := a.cache.Get(keyCache)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("activation code not found"))
+	}
+
+	var activationUserDto = user_dto.ActivationUserDto{}
+	if err := json.Unmarshal([]byte(userData), &activationUserDto); err != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get user data"))
 	}
 
 	return nil, nil
