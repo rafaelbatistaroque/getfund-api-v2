@@ -194,3 +194,17 @@ func Test_GivenExecute_WhenToDtoSuccess_ThenEnsureCallSaveUserWithCorrectParamet
 	// Assert
 	verify.Should(t, spies.RepoSpy.Params["SaveUser:user"]).Be(spies.MapperSpy.SuccessResult["ToDto"])
 }
+
+func Test_GivenExecute_WhenSaveUserError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
+	spies.RepoSpy.DefineSaveUserError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["SaveUser"])
+}

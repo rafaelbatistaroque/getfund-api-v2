@@ -49,3 +49,7 @@ func (r *UserRepositorySpy) DefineGetUserByUsernameSuccess() {
 func (r *UserRepositorySpy) DefineGetUserByUsernameSuccessNotFound() {
 	r.SuccessResult["GetUserByUsername"] = nil
 }
+
+func (r *UserRepositorySpy) DefineSaveUserError() {
+	r.ErrorResult["SaveUser"] = errors.New("fake-error")
+}
