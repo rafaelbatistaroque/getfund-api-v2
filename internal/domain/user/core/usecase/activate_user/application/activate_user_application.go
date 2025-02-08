@@ -32,7 +32,26 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.UNAUTHORIZED_CODE, validatable.GetErrors())
 	}
 
-	userSerialized, errCache := a.cache.Get(input.ActivationKey)
+	userData, errData := getUserData(input, a.cache)
+	if errData != nil {
+		return nil, errData
+	}
+
+	if err := checkForDuplicateUser(input, userData, a.cache, a.repository); err != nil {
+		return nil, err
+	}
+
+	if err := saveUser(userData, a.mapper, a.repository); err != nil {
+		return nil, err
+	}
+
+	defer a.cache.Delete(input.ActivationKey)
+
+	return nil, nil
+}
+
+func getUserData(input *activate_user.Input, cache cache_service.Cache) (*user_dto.ActivationUserData, *result_app.ApplicationError) {
+	userSerialized, errCache := cache.Get(input.ActivationKey)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("activation code not found"))
 	}
@@ -42,16 +61,24 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get user data"))
 	}
 
-	userDuplicated, errRepo := a.repository.GetUserByUsername(userData.Email)
+	return &userData, nil
+}
+
+func checkForDuplicateUser(input *activate_user.Input, userData *user_dto.ActivationUserData, cache cache_service.Cache, repository user_contract.Repository) *result_app.ApplicationError {
+	userDuplicated, errRepo := repository.GetUserByUsername(userData.Email)
 	if errRepo != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errRepo)
+		return result_app.New(result_app.SERVER_ERROR_CODE, errRepo)
 	}
 
 	if userDuplicated != nil {
-		defer a.cache.Delete(input.ActivationKey)
-		return nil, result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
+		defer cache.Delete(input.ActivationKey)
+		return result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
+	return nil
+}
+
+func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper.Mapper, repository user_contract.Repository) *result_app.ApplicationError {
 	user := activate_user_entity.New(
 		userData.FirstName,
 		userData.LastName,
@@ -63,13 +90,11 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		userData.CountryId,
 		userData.UserCategoryId)
 
-	userDto := a.mapper.ToDto(user)
+	userDto := mapper.ToDto(user)
 
-	if err := a.repository.SaveUser(userDto); err != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
+	if err := repository.SaveUser(userDto); err != nil {
+		return result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}
 
-	defer a.cache.Delete(input.ActivationKey)
-
-	return nil, nil
+	return nil
 }
