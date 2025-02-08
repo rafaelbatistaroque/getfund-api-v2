@@ -30,12 +30,17 @@ func (r *UserRepositorySpy) GetUserByUsername(username string) (*user_dto.UserDt
 	return nil, r.ErrorResult["GetUserByUsername"]
 }
 
-func (r *UserRepositorySpy) SaveUser(user *user_dto.ActivationUserDto) error {
+func (r *UserRepositorySpy) SaveUser(user *user_dto.ActivationUserDto) (*user_dto.UserDto, error) {
 	r.Params["SaveUser:user"] = user
 
 	r.CallsCount["SaveUser"]++
 
-	return r.ErrorResult["SaveUser"]
+	sucess := r.SuccessResult["SaveUser"]
+	if sucess != nil {
+		return sucess.(*user_dto.UserDto), nil
+	}
+
+	return nil, r.ErrorResult["SaveUser"]
 }
 
 func (r *UserRepositorySpy) DefineGetUserByUsernameError() {
@@ -52,4 +57,8 @@ func (r *UserRepositorySpy) DefineGetUserByUsernameSuccessNotFound() {
 
 func (r *UserRepositorySpy) DefineSaveUserError() {
 	r.ErrorResult["SaveUser"] = errors.New("fake-error")
+}
+
+func (r *UserRepositorySpy) DefineSaveUserSuccess() {
+	r.SuccessResult["SaveUser"] = &user_dto.UserDto{Id: "fake-id"}
 }

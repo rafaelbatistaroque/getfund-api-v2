@@ -356,7 +356,7 @@ func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadW
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserCriationStarted{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserActivationWithCouponConfirmed{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"]).Be(payload)
 }
 

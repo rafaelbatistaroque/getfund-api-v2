@@ -5,6 +5,7 @@ import (
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
 	"getfund-api-v2/test/helper/cache_spy"
+	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/mapper_spy/activate_user_mapper_spy"
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
 )
@@ -13,18 +14,21 @@ type ActivateUserFixture struct {
 	CacheSpy  *cache_spy.RedisCacheSpy
 	RepoSpy   *user_repository_spy.UserRepositorySpy
 	MapperSpy *activate_user_mapper_spy.ActivateUserMapperSpy
+	BusSpy    *eventbus_spy.EventBusSpy
 }
 
 func NewSut() (activate_user.UseCase, *ActivateUserFixture) {
 	cacheSpy := cache_spy.New()
 	repoSpy := user_repository_spy.New()
 	mapperSpy := activate_user_mapper_spy.New()
+	busSpy := eventbus_spy.New()
 
-	return activate_user_application.New(cacheSpy, repoSpy, mapperSpy),
+	return activate_user_application.New(cacheSpy, repoSpy, mapperSpy, busSpy),
 		&ActivateUserFixture{
 			CacheSpy:  cacheSpy,
 			RepoSpy:   repoSpy,
 			MapperSpy: mapperSpy,
+			BusSpy:    busSpy,
 		}
 }
 
