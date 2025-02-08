@@ -10,19 +10,23 @@ import (
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
+	"getfund-api-v2/pkg/bus"
+	"getfund-api-v2/pkg/bus/event"
 )
 
 type activateUserApplication struct {
 	cache      cache_service.Cache
 	repository user_contract.Repository
 	mapper     activate_user_mapper.Mapper
+	bus        bus.EventBus
 }
 
-func New(cache cache_service.Cache, repository user_contract.Repository, mapper activate_user_mapper.Mapper) activate_user.UseCase {
+func New(cache cache_service.Cache, repository user_contract.Repository, mapper activate_user_mapper.Mapper, bus bus.EventBus) activate_user.UseCase {
 	return &activateUserApplication{
 		cache:      cache,
 		repository: repository,
 		mapper:     mapper,
+		bus:        bus,
 	}
 }
 
@@ -41,11 +45,20 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, err
 	}
 
-	if err := saveUser(userData, a.mapper, a.repository); err != nil {
+	userSaved, err := saveUser(userData, a.mapper, a.repository)
+	if err != nil {
 		return nil, err
 	}
 
 	defer a.cache.Delete(input.ActivationKey)
+
+	if userData.CouponCode != "" {
+		payload := user_dto.UserActivationWithCouponDto{
+			ActivationCode: input.ActivationCode,
+			UserId:         userSaved.Id,
+		}
+		a.bus.EmitWithPayload(&event.UserActivationWithCouponConfirmed{}, payload)
+	}
 
 	return nil, nil
 }
@@ -78,7 +91,7 @@ func checkForDuplicateUser(input *activate_user.Input, userData *user_dto.Activa
 	return nil
 }
 
-func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper.Mapper, repository user_contract.Repository) *result_app.ApplicationError {
+func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper.Mapper, repository user_contract.Repository) (*user_dto.UserDto, *result_app.ApplicationError) {
 	user := activate_user_entity.New(
 		userData.FirstName,
 		userData.LastName,
@@ -92,9 +105,10 @@ func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper
 
 	userDto := mapper.ToDto(user)
 
-	if err := repository.SaveUser(userDto); err != nil {
-		return result_app.New(result_app.SERVER_ERROR_CODE, err)
+	userSaved, err := repository.SaveUser(userDto)
+	if err != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}
 
-	return nil
+	return userSaved, nil
 }
