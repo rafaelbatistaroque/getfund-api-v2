@@ -1,17 +1,17 @@
 package event
 
-type UserCriationWithCouponCodeStartedEvent struct {
+type UserCriationWithCouponCodeStarted struct {
 	payload []byte
 }
 
-func (e *UserCriationWithCouponCodeStartedEvent) GetName() string {
-	return "UserCriationStartedEvent"
+func (e *UserCriationWithCouponCodeStarted) GetName() string {
+	return "UserCriationWithCouponCodeStarted"
 }
 
-func (e *UserCriationWithCouponCodeStartedEvent) GetPayload() []byte {
+func (e *UserCriationWithCouponCodeStarted) GetPayload() []byte {
 	return e.payload
 }
 
-func (e *UserCriationWithCouponCodeStartedEvent) SetPayload(payload []byte) {
+func (e *UserCriationWithCouponCodeStarted) SetPayload(payload []byte) {
 	e.payload = payload
 }

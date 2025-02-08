@@ -1,17 +1,17 @@
 package event
 
-type UserCriationStartedEvent struct {
+type UserCriationStarted struct {
 	payload []byte
 }
 
-func (e *UserCriationStartedEvent) GetName() string {
-	return "UserCriationStartedEvent"
+func (e *UserCriationStarted) GetName() string {
+	return "UserCriationStarted"
 }
 
-func (e *UserCriationStartedEvent) GetPayload() []byte {
+func (e *UserCriationStarted) GetPayload() []byte {
 	return e.payload
 }
 
-func (e *UserCriationStartedEvent) SetPayload(payload []byte) {
+func (e *UserCriationStarted) SetPayload(payload []byte) {
 	e.payload = payload
 }
