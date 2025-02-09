@@ -78,7 +78,10 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response null]"))
 		}
 
-		return nil, nil
+		return &activate_user.Output{
+			Token:   response.Token,
+			Session: activate_user.SessionOutput(response.Session),
+		}, nil
 	case <-time.After(time.Duration(a.settings.GetTimeoutResponseEvent()) * time.Second):
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [timeout]"))
 	}
