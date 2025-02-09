@@ -73,10 +73,14 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	a.bus.EmitWithPayload(&event.UserCreated{}, payloadConfirmed)
 
 	select {
-	case <-channelResponse:
+	case response := <-channelResponse:
+		if response == nil {
+			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response null]"))
+		}
+
 		return nil, nil
 	case <-time.After(time.Duration(a.settings.GetTimeoutResponseEvent()) * time.Second):
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session"))
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [timeout]"))
 	}
 
 }
