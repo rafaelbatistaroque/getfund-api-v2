@@ -60,6 +60,14 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		a.bus.EmitWithPayload(&event.UserActivationWithCouponConfirmed{}, payloadCoupon)
 	}
 
+	channelResponse := make(chan *user_dto.SessionResponseDto, 1)
+	payloadConfirmed := &user_dto.UserCreatedPayloadDto{
+		Id:              userSaved.Id,
+		SuccessResponse: channelResponse,
+	}
+
+	a.bus.EmitWithPayload(&event.UserCreated{}, payloadConfirmed)
+
 	return nil, nil
 }
 
