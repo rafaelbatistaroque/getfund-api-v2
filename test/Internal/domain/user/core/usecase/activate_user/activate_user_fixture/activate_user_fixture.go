@@ -88,3 +88,7 @@ func GetActivateUserEntity() *activate_user_entity.ActivationUser {
 func GetUserDataWithCouponSerialized() string {
 	return `{"first_name":"fake-first-name","last_name":"fake-last-name","email":"fake@email.com","gender":"m","password":"fakaStrongPass123","country_id":1,"user_category_id":1,"main_social_network":"@FakeSocial","registered_url":"https://social.com","cupon_code":"COUPONCD"}`
 }
+
+func GetUserDataWithoutCouponSerialized() string {
+	return `{"first_name":"fake-first-name","last_name":"fake-last-name","email":"fake@email.com","gender":"m","password":"fakaStrongPass123","country_id":1,"user_category_id":1,"main_social_network":"@FakeSocial","registered_url":"https://social.com","cupon_code":""}`
+}
