@@ -291,6 +291,19 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][0]).Be(expectedPaylod)
 }
 
+func Test_GivenExecute_WhenEmitWithPayloadWithUserActivationWithCouponConfirmedEventInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
+	spies.RepoSpy.DefineSaveUserSuccess()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(2)
+}
+
 func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
@@ -307,6 +320,19 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	payloadReceived := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*user_dto.UserCreatedPayloadDto)
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserCreated{})
 	verify.Should(t, payloadReceived.Id).Be(expectedPayload.Id)
+}
+
+func Test_GivenExecute_WhenEmitWithPayloadWithUserCreatedEventInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
+	spies.RepoSpy.DefineSaveUserSuccess()
+
+	// Act
+	sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(1)
 }
 
 func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturn(t *testing.T) {
