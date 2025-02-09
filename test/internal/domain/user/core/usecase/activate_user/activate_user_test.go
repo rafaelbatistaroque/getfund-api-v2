@@ -9,6 +9,7 @@ import (
 	"getfund-api-v2/pkg/bus/event"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/activate_user/activate_user_fixture"
 	"testing"
+	"time"
 
 	"github.com/rafaelbatistaroque/validation"
 	"github.com/rafaelbatistaroque/verify"
@@ -335,7 +336,7 @@ func Test_GivenExecute_WhenEmitWithPayloadWithUserCreatedEventInvoked_ThenEnsure
 	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(1)
 }
 
-func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturn(t *testing.T) {
+func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturnServerErrorWithAppropriateMessage(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
@@ -345,7 +346,29 @@ func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturn(t 
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserCreated{})
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message.Error()).Be("error on get session")
+	verify.Should(t, err.Message.Error()).Be("error on get session [timeout]")
+}
+
+func Test_GivenExecute_WhenEmitWithPayloadResponseNulo_ThenEnsureReturnServerErrorWithAppropriateMessage(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
+	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errChannel := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	go func() {
+		_, err := sut.Execute(fixture.GetInput())
+		errChannel <- err
+	}()
+	time.Sleep(1 * time.Second)
+	payload := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*user_dto.UserCreatedPayloadDto)
+	payload.SuccessResponse <- nil
+
+	// Assert
+	errUnwrapped := <-errChannel
+	verify.Should(t, errUnwrapped.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response null]")
 }
