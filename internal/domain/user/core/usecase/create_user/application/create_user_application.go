@@ -87,7 +87,7 @@ func buildActivationCode(hasher security.Hasher) (string, error) {
 }
 
 func emitUserCriationStartedEvent(bus bus.EventBus, settings settings.ApplicationSettings, activationCode string) {
-	payload := &user_dto.UserCriationDto{
+	payload := &user_dto.UserCriationPayloadDto{
 		ActivationCode: activationCode,
 		ActivationLink: settings.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
@@ -96,7 +96,7 @@ func emitUserCriationStartedEvent(bus bus.EventBus, settings settings.Applicatio
 }
 
 func emitUserCriationWithCouponCodeStarted(bus bus.EventBus, input *create_user.Input, activationCode string) {
-	payload := &user_dto.UserCriationWithCouponDto{
+	payload := &user_dto.UserCriationWithCouponPayloadDto{
 		CouponCode:     input.CouponCode,
 		ActivationCode: activationCode,
 	}

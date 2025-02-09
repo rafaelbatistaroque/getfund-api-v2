@@ -5,14 +5,14 @@ import (
 )
 
 type EventBusSpy struct {
-	Params        map[string]interface{}
+	Params        map[string][]any
 	CallsCount    map[string]int
 	ErrorResult   map[string]error
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 }
 
 func New() *EventBusSpy {
-	return &EventBusSpy{Params: make(map[string]interface{}), CallsCount: make(map[string]int), ErrorResult: make(map[string]error), SuccessResult: make(map[string]interface{})}
+	return &EventBusSpy{Params: make(map[string][]any), CallsCount: make(map[string]int), ErrorResult: make(map[string]error), SuccessResult: make(map[string]any)}
 }
 
 func (eb *EventBusSpy) Subscribe(eventName string, handler bus.Handler) {
@@ -20,14 +20,14 @@ func (eb *EventBusSpy) Subscribe(eventName string, handler bus.Handler) {
 }
 
 func (eb *EventBusSpy) Emit(event bus.Event) {
-	eb.Params["Publish:event"] = event
+	eb.Params["Publish:event"] = append(eb.Params["Publish:event"], event)
 
 	eb.CallsCount["Publish"]++
 }
 
 func (eb *EventBusSpy) EmitWithPayload(event bus.Event, payload any) {
-	eb.Params["EmitWithPayload:event"] = event
-	eb.Params["EmitWithPayload:payload"] = payload
+	eb.Params["EmitWithPayload:event"] = append(eb.Params["EmitWithPayload:event"], event)
+	eb.Params["EmitWithPayload:payload"] = append(eb.Params["EmitWithPayload:payload"], payload)
 
 	eb.CallsCount["EmitWithPayload"]++
 }

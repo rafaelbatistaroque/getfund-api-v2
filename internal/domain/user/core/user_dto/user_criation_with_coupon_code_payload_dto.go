@@ -1,6 +1,6 @@
 package user_dto
 
-type UserCriationWithCouponDto struct {
+type UserCriationWithCouponPayloadDto struct {
 	CouponCode     string `json:"coupon_code"`
 	ActivationCode string `json:"activation_code"`
 }

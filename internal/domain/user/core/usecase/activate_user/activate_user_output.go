@@ -1,6 +1,14 @@
 package activate_user
 
-type Output = activateUserOutput
+type Output = ActivateUserOutput
 
-type activateUserOutput struct {
+type ActivateUserOutput struct {
+	Token   string        `json:"token"`
+	Session SessionOutput `json:"session"`
+}
+
+type SessionOutput struct {
+	ID        string `json:"id"`
+	FirstName string `json:"first_name"`
+	IsAdmin   bool   `json:"is_admin"`
 }

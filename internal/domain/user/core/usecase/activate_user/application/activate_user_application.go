@@ -53,11 +53,11 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	defer a.cache.Delete(input.ActivationKey)
 
 	if userData.CouponCode != "" {
-		payload := user_dto.UserActivationWithCouponDto{
+		payloadCoupon := &user_dto.UserActivationWithCouponPayloadDto{
 			ActivationCode: input.ActivationCode,
 			UserId:         userSaved.Id,
 		}
-		a.bus.EmitWithPayload(&event.UserActivationWithCouponConfirmed{}, payload)
+		a.bus.EmitWithPayload(&event.UserActivationWithCouponConfirmed{}, payloadCoupon)
 	}
 
 	return nil, nil

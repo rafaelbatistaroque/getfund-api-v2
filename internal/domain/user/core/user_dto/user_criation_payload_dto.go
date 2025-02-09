@@ -1,6 +1,6 @@
 package user_dto
 
-type UserCriationDto struct {
+type UserCriationPayloadDto struct {
 	ActivationCode string `json:"activation_code"`
 	ActivationLink string `json:"activation_link"`
 }

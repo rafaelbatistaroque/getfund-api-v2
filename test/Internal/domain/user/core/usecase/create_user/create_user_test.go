@@ -347,7 +347,7 @@ func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadW
 	validInput := fixture.GetInput(fixture.WithEmptyCouponCode())
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	activationCode := "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
-	payload := &user_dto.UserCriationDto{
+	payload := &user_dto.UserCriationPayloadDto{
 		ActivationCode: activationCode,
 		ActivationLink: spies.SettingsSpy.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
@@ -356,8 +356,8 @@ func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadW
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserActivationWithCouponConfirmed{})
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"]).Be(payload)
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserCriationStarted{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][0]).Be(payload)
 }
 
 func Test_GivenCreateUserExecute_WhenEmitWithPayloadInvoked_ThenEnsureCallsOnce(t *testing.T) {
@@ -376,7 +376,7 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput()
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
-	payload := &user_dto.UserCriationWithCouponDto{
+	payload := &user_dto.UserCriationWithCouponPayloadDto{
 		CouponCode:     validInput.CouponCode,
 		ActivationCode: "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
 	}
@@ -385,8 +385,8 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserCriationWithCouponCodeStarted{})
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"]).Be(payload)
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][1]).Be(&event.UserCriationWithCouponCodeStarted{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][1]).Be(payload)
 }
 
 func Test_GivenCreateUserExecute_WhenHasCouponCodeAndEmitWithPayloadInvoked_ThenEnsureCallsTwice(t *testing.T) {

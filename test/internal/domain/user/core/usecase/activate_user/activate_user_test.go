@@ -278,7 +278,7 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.RepoSpy.DefineSaveUserSuccess()
 	inputValid := fixture.GetInput()
-	expectedPaylod := user_dto.UserActivationWithCouponDto{
+	expectedPaylod := &user_dto.UserActivationWithCouponPayloadDto{
 		ActivationCode: inputValid.ActivationCode,
 		UserId:         spies.RepoSpy.SuccessResult["SaveUser"].(*user_dto.UserDto).Id,
 	}
@@ -287,6 +287,6 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	sut.Execute(inputValid)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"]).Be(&event.UserActivationWithCouponConfirmed{})
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"]).Be(expectedPaylod)
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserActivationWithCouponConfirmed{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][0]).Be(expectedPaylod)
 }
