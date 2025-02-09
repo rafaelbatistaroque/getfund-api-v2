@@ -308,3 +308,18 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserCreated{})
 	verify.Should(t, payloadReceived.Id).Be(expectedPayload.Id)
 }
+
+func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturn(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
+	spies.RepoSpy.DefineSaveUserSuccess()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserCreated{})
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message.Error()).Be("error on get session")
+}

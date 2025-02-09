@@ -8,13 +8,15 @@ import (
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/mapper_spy/activate_user_mapper_spy"
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
+	"getfund-api-v2/test/helper/settings_spy"
 )
 
 type ActivateUserFixture struct {
-	CacheSpy  *cache_spy.RedisCacheSpy
-	RepoSpy   *user_repository_spy.UserRepositorySpy
-	MapperSpy *activate_user_mapper_spy.ActivateUserMapperSpy
-	BusSpy    *eventbus_spy.EventBusSpy
+	CacheSpy    *cache_spy.RedisCacheSpy
+	RepoSpy     *user_repository_spy.UserRepositorySpy
+	MapperSpy   *activate_user_mapper_spy.ActivateUserMapperSpy
+	BusSpy      *eventbus_spy.EventBusSpy
+	SettingsSpy *settings_spy.ApplicationSettingsSpy
 }
 
 func NewSut() (activate_user.UseCase, *ActivateUserFixture) {
@@ -22,13 +24,15 @@ func NewSut() (activate_user.UseCase, *ActivateUserFixture) {
 	repoSpy := user_repository_spy.New()
 	mapperSpy := activate_user_mapper_spy.New()
 	busSpy := eventbus_spy.New()
+	settingsSpy := settings_spy.New()
 
-	return activate_user_application.New(cacheSpy, repoSpy, mapperSpy, busSpy),
+	return activate_user_application.New(cacheSpy, repoSpy, mapperSpy, busSpy, settingsSpy),
 		&ActivateUserFixture{
-			CacheSpy:  cacheSpy,
-			RepoSpy:   repoSpy,
-			MapperSpy: mapperSpy,
-			BusSpy:    busSpy,
+			CacheSpy:    cacheSpy,
+			RepoSpy:     repoSpy,
+			MapperSpy:   mapperSpy,
+			BusSpy:      busSpy,
+			SettingsSpy: settingsSpy,
 		}
 }
 
