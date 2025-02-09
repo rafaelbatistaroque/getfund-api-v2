@@ -22,19 +22,21 @@ type ApplicationSettings interface {
 	GetSMTPUsername() string
 	GetSMTPFrom() string
 	GetTemplateDir() string
+	GetTimeoutResponseEvent() int
 }
 
 type applicationSettings struct {
-	port            string
-	baseUrl         string
-	apiUrl          string
-	addrRedis       string
-	secretKey       []byte
-	serverSalt      []byte
-	stripeSecretKey string
-	masterToken     string
-	smtp            *smtpData
-	templateDir     string
+	port                 string
+	baseUrl              string
+	apiUrl               string
+	addrRedis            string
+	secretKey            []byte
+	serverSalt           []byte
+	stripeSecretKey      string
+	masterToken          string
+	smtp                 *smtpData
+	templateDir          string
+	timeoutResposenEvent int
 }
 
 type smtpData struct {
@@ -45,18 +47,19 @@ type smtpData struct {
 	passsword string
 }
 
-func (s *applicationSettings) GetPort() string         { return s.port }
-func (s *applicationSettings) GetApiUrl() string       { return s.apiUrl }
-func (s *applicationSettings) GetBaseUrl() string      { return s.baseUrl }
-func (s *applicationSettings) GetServerSalt() []byte   { return s.serverSalt }
-func (s *applicationSettings) GetSecretKey() []byte    { return s.secretKey }
-func (s *applicationSettings) GetAddrRedis() string    { return s.addrRedis }
-func (s *applicationSettings) GetSMTPHost() string     { return s.smtp.host }
-func (s *applicationSettings) GetSMTPPort() int        { return s.smtp.port }
-func (s *applicationSettings) GetSMTPPassword() string { return s.smtp.passsword }
-func (s *applicationSettings) GetSMTPUsername() string { return s.smtp.userName }
-func (s *applicationSettings) GetSMTPFrom() string     { return s.smtp.from }
-func (s *applicationSettings) GetTemplateDir() string  { return s.templateDir }
+func (s *applicationSettings) GetPort() string              { return s.port }
+func (s *applicationSettings) GetApiUrl() string            { return s.apiUrl }
+func (s *applicationSettings) GetBaseUrl() string           { return s.baseUrl }
+func (s *applicationSettings) GetServerSalt() []byte        { return s.serverSalt }
+func (s *applicationSettings) GetSecretKey() []byte         { return s.secretKey }
+func (s *applicationSettings) GetAddrRedis() string         { return s.addrRedis }
+func (s *applicationSettings) GetSMTPHost() string          { return s.smtp.host }
+func (s *applicationSettings) GetSMTPPort() int             { return s.smtp.port }
+func (s *applicationSettings) GetSMTPPassword() string      { return s.smtp.passsword }
+func (s *applicationSettings) GetSMTPUsername() string      { return s.smtp.userName }
+func (s *applicationSettings) GetSMTPFrom() string          { return s.smtp.from }
+func (s *applicationSettings) GetTemplateDir() string       { return s.templateDir }
+func (s *applicationSettings) GetTimeoutResponseEvent() int { return s.timeoutResposenEvent }
 
 func Load() ApplicationSettings {
 	logger := logger.New("Settings")
@@ -95,7 +98,8 @@ func Load() ApplicationSettings {
 			userName:  getEnv("SMTP_USERNAME", ""),
 			from:      getEnv("SMTP_FROM", ""),
 		},
-		templateDir: "internal/domain/notification/adapter/template",
+		templateDir:          "internal/domain/notification/adapter/template",
+		timeoutResposenEvent: getIntEnv("TIME_OUT_RESPONSE_EVENT", ""),
 	}
 }
 

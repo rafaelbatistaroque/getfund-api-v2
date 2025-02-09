@@ -8,10 +8,12 @@ import (
 	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
+	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
 	"getfund-api-v2/pkg/bus/event"
+	"time"
 )
 
 type activateUserApplication struct {
@@ -19,14 +21,16 @@ type activateUserApplication struct {
 	repository user_contract.Repository
 	mapper     activate_user_mapper.Mapper
 	bus        bus.EventBus
+	settings   settings.ApplicationSettings
 }
 
-func New(cache cache_service.Cache, repository user_contract.Repository, mapper activate_user_mapper.Mapper, bus bus.EventBus) activate_user.UseCase {
+func New(cache cache_service.Cache, repository user_contract.Repository, mapper activate_user_mapper.Mapper, bus bus.EventBus, settings settings.ApplicationSettings) activate_user.UseCase {
 	return &activateUserApplication{
 		cache:      cache,
 		repository: repository,
 		mapper:     mapper,
 		bus:        bus,
+		settings:   settings,
 	}
 }
 
@@ -68,7 +72,13 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 
 	a.bus.EmitWithPayload(&event.UserCreated{}, payloadConfirmed)
 
-	return nil, nil
+	select {
+	case <-channelResponse:
+		return nil, nil
+	case <-time.After(time.Duration(a.settings.GetTimeoutResponseEvent()) * time.Second):
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session"))
+	}
+
 }
 
 func getUserData(input *activate_user.Input, cache cache_service.Cache) (*user_dto.ActivationUserData, *result_app.ApplicationError) {
