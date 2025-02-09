@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
+	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus/event"
@@ -371,4 +372,30 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseNulo_ThenEnsureReturnServerErr
 	errUnwrapped := <-errChannel
 	verify.Should(t, errUnwrapped.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response null]")
+}
+
+func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSession(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
+	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	resultChannel := make(chan *activate_user.Output, 1)
+	expectedResult := fixture.GetResponseSession()
+
+	// Act
+	go func() {
+		result, _ := sut.Execute(fixture.GetInput())
+		resultChannel <- result
+	}()
+	time.Sleep(1 * time.Second)
+	payload := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*user_dto.UserCreatedPayloadDto)
+	payload.SuccessResponse <- expectedResult
+
+	// Assert
+	resultUnwrapped := <-resultChannel
+	verify.Should(t, resultUnwrapped.Token).Be(expectedResult.Token)
+	verify.Should(t, resultUnwrapped.Session.ID).Be(expectedResult.Session.ID)
+	verify.Should(t, resultUnwrapped.Session.FirstName).Be(expectedResult.Session.FirstName)
+	verify.Should(t, resultUnwrapped.Session.IsAdmin).Be(expectedResult.Session.IsAdmin)
 }
