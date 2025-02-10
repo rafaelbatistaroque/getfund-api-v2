@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	_PATH_ACTIVATE_USER         = "/user/activate/"
 	_KEY_USER_ACTIVATION_PREFIX = "user_activation_"
 )
 
@@ -28,7 +27,7 @@ func New(activateUser activate_user.UseCase) ActiveUserGateway {
 }
 
 func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
-	activationCode := strings.TrimPrefix(r.URL.Path, _PATH_ACTIVATE_USER)
+	activationCode := getActivationCodeParam(r)
 
 	if activationCode == "" {
 		return nil, result_app.BAD_REQUEST_CODE, errors.New("activation code is required")
@@ -44,4 +43,10 @@ func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request)
 	}
 
 	return output, result_app.SUCCESS_CODE, nil
+}
+
+func getActivationCodeParam(r *http.Request) string {
+	urlParts := strings.Split(r.URL.Path, "/")
+
+	return urlParts[len(urlParts)-1]
 }
