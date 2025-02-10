@@ -351,7 +351,7 @@ func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturnSer
 	verify.Should(t, err.Message.Error()).Be("error on get session [timeout]")
 }
 
-func Test_GivenExecute_WhenEmitWithPayloadResponseNulo_ThenEnsureReturnServerErrorWithAppropriateMessage(t *testing.T) {
+func Test_GivenExecute_WhenEmitWithPayloadResponseEmpty_ThenEnsureReturnServerErrorWithAppropriateMessage(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
@@ -373,6 +373,30 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseNulo_ThenEnsureReturnServerErr
 	errUnwrapped := <-errChannel
 	verify.Should(t, errUnwrapped.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response empty]")
+}
+
+func Test_GivenExecute_WhenEmitWithPayloadResponseInvalid_ThenEnsureReturnServerErrorWithAppropriateMessage(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
+	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errChannel := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	go func() {
+		_, err := sut.Execute(fixture.GetInput())
+		errChannel <- err
+	}()
+	time.Sleep(1 * time.Second)
+	responseChannel := spies.BusSpy.Params["EmitWithPayload:responseChannel"][0].(chan []byte)
+	responseChannel <- []byte("{invalid-response}")
+	close(responseChannel)
+
+	// Assert
+	errUnwrapped := <-errChannel
+	verify.Should(t, errUnwrapped.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response invalid]")
 }
 
 func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSession(t *testing.T) {
