@@ -1,10 +1,10 @@
 package activate_user_fixture
 
 import (
+	"encoding/json"
 	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/mapper_spy/activate_user_mapper_spy"
@@ -98,13 +98,18 @@ func GetUserDataWithoutCouponSerialized() string {
 	return `{"first_name":"fake-first-name","last_name":"fake-last-name","email":"fake@email.com","gender":"m","password":"fakaStrongPass123","country_id":1,"user_category_id":1,"main_social_network":"@FakeSocial","registered_url":"https://social.com","cupon_code":""}`
 }
 
-func GetResponseSession() *user_dto.SessionResponseDto {
-	return &user_dto.SessionResponseDto{
+func GetResponseSession() ([]byte, *activate_user.Output) {
+	response := &activate_user.Output{
 		Token: "fake-token",
-		Session: user_dto.SessionDto{
+		Session: activate_user.SessionOutput{
 			ID:        "fake-id",
-			FirstName: "Fake User",
-			IsAdmin:   false,
+			FirstName: "fake-first-name",
+			IsAdmin:   true,
 		},
 	}
+	responseSerialized, err := json.Marshal(response)
+	if err != nil {
+		return nil, nil
+	}
+	return responseSerialized, response
 }

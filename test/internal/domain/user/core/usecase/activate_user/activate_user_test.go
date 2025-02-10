@@ -365,13 +365,14 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseNulo_ThenEnsureReturnServerErr
 		errChannel <- err
 	}()
 	time.Sleep(1 * time.Second)
-	payload := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*user_dto.UserCreatedPayloadDto)
-	payload.SuccessResponse <- nil
+	responseChannel := spies.BusSpy.Params["EmitWithPayload:responseChannel"][0].(chan []byte)
+	responseChannel <- []byte("")
+	close(responseChannel)
 
 	// Assert
 	errUnwrapped := <-errChannel
 	verify.Should(t, errUnwrapped.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response null]")
+	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response empty]")
 }
 
 func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSession(t *testing.T) {
@@ -381,7 +382,7 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSessio
 	spies.RepoSpy.DefineSaveUserSuccess()
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
 	resultChannel := make(chan *activate_user.Output, 1)
-	expectedResult := fixture.GetResponseSession()
+	responseEvent, expectedOutput := fixture.GetResponseSession()
 
 	// Act
 	go func() {
@@ -389,13 +390,15 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSessio
 		resultChannel <- result
 	}()
 	time.Sleep(1 * time.Second)
-	payload := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*user_dto.UserCreatedPayloadDto)
-	payload.SuccessResponse <- expectedResult
+	responseChannel := spies.BusSpy.Params["EmitWithPayload:responseChannel"][0].(chan []byte)
+	responseChannel <- responseEvent
+	close(responseChannel)
 
 	// Assert
 	resultUnwrapped := <-resultChannel
-	verify.Should(t, resultUnwrapped.Token).Be(expectedResult.Token)
-	verify.Should(t, resultUnwrapped.Session.ID).Be(expectedResult.Session.ID)
-	verify.Should(t, resultUnwrapped.Session.FirstName).Be(expectedResult.Session.FirstName)
-	verify.Should(t, resultUnwrapped.Session.IsAdmin).Be(expectedResult.Session.IsAdmin)
+	verify.Should(t, resultUnwrapped).NotNil()
+	verify.Should(t, resultUnwrapped.Token).Be(expectedOutput.Token)
+	verify.Should(t, resultUnwrapped.Session.ID).Be(expectedOutput.Session.ID)
+	verify.Should(t, resultUnwrapped.Session.FirstName).Be(expectedOutput.Session.FirstName)
+	verify.Should(t, resultUnwrapped.Session.IsAdmin).Be(expectedOutput.Session.IsAdmin)
 }

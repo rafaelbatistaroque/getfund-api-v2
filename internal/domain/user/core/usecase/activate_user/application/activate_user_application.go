@@ -64,28 +64,26 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		a.bus.EmitWithPayload(&event.UserActivationWithCouponConfirmed{}, payloadCoupon)
 	}
 
-	channelResponse := make(chan *user_dto.SessionResponseDto, 1)
+	channelResponse := make(chan []byte, 1)
 	payloadConfirmed := &user_dto.UserCreatedPayloadDto{
-		Id:              userSaved.Id,
-		SuccessResponse: channelResponse,
+		Id: userSaved.Id,
 	}
 
-	a.bus.EmitWithPayload(&event.UserCreated{}, payloadConfirmed)
+	a.bus.EmitWithPayloadAndResponse(&event.UserCreated{}, payloadConfirmed, channelResponse)
 
 	select {
 	case response := <-channelResponse:
-		if response == nil {
-			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response null]"))
+		if len(response) == 0 {
+			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response empty]"))
 		}
 
-		return &activate_user.Output{
-			Token:   response.Token,
-			Session: activate_user.SessionOutput(response.Session),
-		}, nil
+		var output = &activate_user.Output{}
+		json.Unmarshal(response, output)
+
+		return output, nil
 	case <-time.After(time.Duration(a.settings.GetTimeoutResponseEvent()) * time.Second):
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [timeout]"))
 	}
-
 }
 
 func getUserData(input *activate_user.Input, cache cache_service.Cache) (*user_dto.ActivationUserData, *result_app.ApplicationError) {
