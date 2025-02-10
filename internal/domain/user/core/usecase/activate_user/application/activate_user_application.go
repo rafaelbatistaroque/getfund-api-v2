@@ -71,21 +71,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 
 	a.bus.EmitWithPayloadAndResponse(&event.UserCreated{}, payloadConfirmed, channelResponse)
 
-	select {
-	case response := <-channelResponse:
-		if len(response) == 0 {
-			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response empty]"))
-		}
-
-		var output = &activate_user.Output{}
-		if err := json.Unmarshal(response, output); err != nil {
-			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response invalid]"))
-		}
-
-		return output, nil
-	case <-time.After(time.Duration(a.settings.GetTimeoutResponseEvent()) * time.Second):
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [timeout]"))
-	}
+	return getOutputFromHandleEventResponse(channelResponse, a.settings)
 }
 
 func getUserData(input *activate_user.Input, cache cache_service.Cache) (*user_dto.ActivationUserData, *result_app.ApplicationError) {
@@ -136,4 +122,22 @@ func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper
 	}
 
 	return userSaved, nil
+}
+
+func getOutputFromHandleEventResponse(channelResponse <-chan []byte, settings settings.ApplicationSettings) (*activate_user.Output, *result_app.ApplicationError) {
+	select {
+	case response := <-channelResponse:
+		if len(response) == 0 {
+			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response empty]"))
+		}
+
+		var output = &activate_user.Output{}
+		if err := json.Unmarshal(response, output); err != nil {
+			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response invalid]"))
+		}
+
+		return output, nil
+	case <-time.After(time.Duration(settings.GetTimeoutResponseEvent()) * time.Second):
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [timeout]"))
+	}
 }
