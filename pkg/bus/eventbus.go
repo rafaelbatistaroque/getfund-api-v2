@@ -11,6 +11,9 @@ type Event interface {
 	GetName() string
 	GetPayload() []byte
 	SetPayload(payload []byte)
+
+	SetChannel(channel chan []byte)
+	DefineResponse(response []byte)
 }
 
 type Handler interface {
@@ -21,6 +24,7 @@ type EventBus interface {
 	Subscribe(eventName string, handler Handler)
 	Emit(event Event)
 	EmitWithPayload(event Event, payload any)
+	EmitWithPayloadAndResponse(event Event, payload any, responseChannel chan []byte)
 }
 
 type eventBus struct {
@@ -76,4 +80,9 @@ func (eb *eventBus) EmitWithPayload(event Event, payload any) {
 	event.SetPayload(data)
 
 	eb.Emit(event)
+}
+
+func (eb *eventBus) EmitWithPayloadAndResponse(event Event, payload any, responseChannel chan []byte) {
+	event.SetChannel(responseChannel)
+	eb.EmitWithPayload(event, payload)
 }

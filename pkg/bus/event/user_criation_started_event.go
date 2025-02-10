@@ -2,6 +2,7 @@ package event
 
 type UserCriationStarted struct {
 	payload []byte
+	channel chan []byte
 }
 
 func (e *UserCriationStarted) GetName() string {
@@ -14,4 +15,12 @@ func (e *UserCriationStarted) GetPayload() []byte {
 
 func (e *UserCriationStarted) SetPayload(payload []byte) {
 	e.payload = payload
+}
+
+func (e *UserCriationStarted) SetChannel(channel chan []byte) {
+	e.channel = channel
+}
+
+func (e *UserCriationStarted) DefineResponse(response []byte) {
+	e.channel <- response
 }
