@@ -29,3 +29,14 @@ func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallValidadeCouponWithC
 	//Assert
 	verify.Should(t, spies.UseCaseSpy.Params["Execute:input"]).Be(expectedInput)
 }
+
+func Test_GivenHandler_WhenValidadeCouponInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Handle(fixture.GetValidUserCriationWithCouponStarted())
+
+	//Assert
+	verify.Should(t, spies.UseCaseSpy.CallsCount["Execute"]).Be(1)
+}
