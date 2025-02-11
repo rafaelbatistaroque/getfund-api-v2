@@ -1,26 +1,26 @@
 package event
 
-type UserCriationWithCouponCodeStarted struct {
+type UserCriationWithCouponStarted struct {
 	payload []byte
 	channel chan []byte
 }
 
-func (e *UserCriationWithCouponCodeStarted) GetName() string {
+func (e *UserCriationWithCouponStarted) GetName() string {
 	return "UserCriationWithCouponCodeStarted"
 }
 
-func (e *UserCriationWithCouponCodeStarted) GetPayload() []byte {
+func (e *UserCriationWithCouponStarted) GetPayload() []byte {
 	return e.payload
 }
 
-func (e *UserCriationWithCouponCodeStarted) SetPayload(payload []byte) {
+func (e *UserCriationWithCouponStarted) SetPayload(payload []byte) {
 	e.payload = payload
 }
 
-func (e *UserCriationWithCouponCodeStarted) SetChannel(channel chan []byte) {
+func (e *UserCriationWithCouponStarted) SetChannel(channel chan []byte) {
 	e.channel = channel
 }
 
-func (e *UserCriationWithCouponCodeStarted) DefineResponse(response []byte) {
+func (e *UserCriationWithCouponStarted) DefineResponse(response []byte) {
 	e.channel <- response
 }

@@ -385,7 +385,7 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][1]).Be(&event.UserCriationWithCouponCodeStarted{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][1]).Be(&event.UserCriationWithCouponStarted{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][1]).Be(payload)
 }
 

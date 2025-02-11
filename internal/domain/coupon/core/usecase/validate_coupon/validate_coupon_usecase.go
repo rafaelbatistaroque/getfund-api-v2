@@ -1,9 +1,9 @@
-package validate_coupon_code
+package validate_coupon
 
 import "getfund-api-v2/internal/shared/result_app"
 
-type UseCase = validateCouponCode
+type UseCase = validateCoupon
 
-type validateCouponCode interface {
+type validateCoupon interface {
 	Execute(input *Input) (*Output, *result_app.ApplicationError)
 }

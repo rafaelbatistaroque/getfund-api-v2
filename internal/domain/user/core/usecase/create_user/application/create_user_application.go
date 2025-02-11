@@ -101,5 +101,5 @@ func emitUserCriationWithCouponCodeStarted(bus bus.EventBus, input *create_user.
 		ActivationCode: activationCode,
 	}
 
-	bus.EmitWithPayload(&event.UserCriationWithCouponCodeStarted{}, payload)
+	bus.EmitWithPayload(&event.UserCriationWithCouponStarted{}, payload)
 }
