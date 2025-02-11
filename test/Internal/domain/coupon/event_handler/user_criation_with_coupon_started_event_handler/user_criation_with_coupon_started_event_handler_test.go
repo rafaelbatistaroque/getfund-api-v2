@@ -7,7 +7,7 @@ import (
 	"github.com/rafaelbatistaroque/verify"
 )
 
-func Test_GivenHandler_WhenPayloadParseError_ThenEnsureNeverCallValidadeCouponCodeUsecase(t *testing.T) {
+func Test_GivenHandler_WhenPayloadParseError_ThenEnsureNeverCallValidadeCoupon(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
@@ -16,4 +16,16 @@ func Test_GivenHandler_WhenPayloadParseError_ThenEnsureNeverCallValidadeCouponCo
 
 	//Assert
 	verify.Should(t, spies.UseCaseSpy.CallsCount["Execute"]).Be(0)
+}
+
+func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallValidadeCouponWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	expectedInput := fixture.GetValidateCouponInput()
+
+	// Act
+	sut.Handle(fixture.GetValidUserCriationWithCouponStarted())
+
+	//Assert
+	verify.Should(t, spies.UseCaseSpy.Params["Execute:input"]).Be(expectedInput)
 }

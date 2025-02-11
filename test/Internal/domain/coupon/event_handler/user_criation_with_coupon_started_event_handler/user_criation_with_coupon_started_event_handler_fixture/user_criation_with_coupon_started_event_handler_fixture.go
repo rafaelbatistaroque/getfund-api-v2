@@ -1,6 +1,7 @@
 package user_criation_with_coupon_started_event_handler_fixture
 
 import (
+	"encoding/json"
 	"getfund-api-v2/internal/domain/coupon/adapter/event_handler/user_criation_with_coupon_started_event_handler"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/shared/result_app"
@@ -46,4 +47,21 @@ func (uc *ValidateCouponApplicationSpy) Execute(input *validate_coupon.Input) (*
 
 func GetInvalidUserCriationWithCouponStarted() *event.UserCriationWithCouponStarted {
 	return &event.UserCriationWithCouponStarted{}
+}
+
+func GetValidateCouponInput() *validate_coupon.Input {
+	return &validate_coupon.Input{
+		CouponCode: "fake-coupon-code",
+	}
+}
+
+func GetValidUserCriationWithCouponStarted() *event.UserCriationWithCouponStarted {
+	payload, _ := json.Marshal(map[string]string{
+		"coupon_code": "fake-coupon-code",
+	})
+
+	event := &event.UserCriationWithCouponStarted{}
+	event.SetPayload(payload)
+
+	return event
 }
