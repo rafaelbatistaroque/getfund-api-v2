@@ -7,6 +7,8 @@ import (
 type Input = validateCouponInput
 
 type validateCouponInput struct {
+	CouponCode string `json:"coupon_code"`
+
 	rules validation.Rule
 }
 

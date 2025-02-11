@@ -11,6 +11,7 @@ import (
 type UserCriationWithCouponPayloadDto struct {
 	CouponCode     string `json:"coupon_code"`
 	ActivationCode string `json:"activation_code"`
+	Status         string `json:"status"`
 }
 
 type userCriationWithCouponStartedEventHandler struct {
@@ -34,6 +35,7 @@ func (h *userCriationWithCouponStartedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	var input = validate_coupon.Input{}
-	h.usecase.Execute(&input)
+	h.usecase.Execute(&validate_coupon.Input{
+		CouponCode: payload.CouponCode,
+	})
 }
