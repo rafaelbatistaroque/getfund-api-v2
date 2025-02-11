@@ -2,7 +2,9 @@ package user_criation_with_coupon_started_event_handler_fixture
 
 import (
 	"encoding/json"
+	"errors"
 	"getfund-api-v2/internal/domain/coupon/adapter/event_handler/user_criation_with_coupon_started_event_handler"
+	"getfund-api-v2/internal/domain/coupon/core/coupon_dto"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus"
@@ -45,6 +47,14 @@ func (uc *ValidateCouponApplicationSpy) Execute(input *validate_coupon.Input) (*
 	return uc.SuccessResult["Execute"], uc.ErrorResult["Execute"]
 }
 
+func (uc *ValidateCouponApplicationSpy) DefineValidateCouponUsecaseError(withMessage string) {
+	uc.ErrorResult["Execute"] = &result_app.ApplicationError{Message: errors.New(withMessage)}
+}
+
+func (uc *ValidateCouponApplicationSpy) DefineValidateCouponUsecaseSuccess() {
+	uc.SuccessResult["Execute"] = &validate_coupon.Output{}
+}
+
 func GetInvalidUserCriationWithCouponStarted() *event.UserCriationWithCouponStarted {
 	return &event.UserCriationWithCouponStarted{}
 }
@@ -55,9 +65,18 @@ func GetValidateCouponInput() *validate_coupon.Input {
 	}
 }
 
+func GetUserCriationWithCouponPayloadDto(errorStatus string) *coupon_dto.UserCriationWithCouponPayloadDto {
+	return &coupon_dto.UserCriationWithCouponPayloadDto{
+		CouponCode:     "fake-coupon-code",
+		ActivationCode: "fake-activation-code",
+		ErrorStatus:    errorStatus,
+	}
+}
+
 func GetValidUserCriationWithCouponStarted() *event.UserCriationWithCouponStarted {
 	payload, _ := json.Marshal(map[string]string{
-		"coupon_code": "fake-coupon-code",
+		"coupon_code":     "fake-coupon-code",
+		"activation_code": "fake-activation-code",
 	})
 
 	event := &event.UserCriationWithCouponStarted{}

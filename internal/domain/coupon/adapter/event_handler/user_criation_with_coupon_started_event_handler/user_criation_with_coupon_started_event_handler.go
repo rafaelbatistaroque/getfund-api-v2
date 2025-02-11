@@ -40,5 +40,6 @@ func (h *userCriationWithCouponStartedEventHandler) Handle(event bus.Event) {
 		payload.ErrorStatus = strings.TrimPrefix(err.Message.Error(), "status:")
 	}
 
-	h.cache.Set("user_activation_"+payload.ActivationCode+"_coupon", payload, 24*time.Hour)
+	key := "user_activation_" + payload.ActivationCode + "_coupon"
+	h.cache.Set(key, payload, 24*time.Hour)
 }

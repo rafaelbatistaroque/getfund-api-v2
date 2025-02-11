@@ -7,19 +7,19 @@ import (
 
 // Redis Spy
 type RedisCacheSpy struct {
-	Params      map[string]interface{}
+	Params      map[string]any
 	CallsCount  map[string]int
 	InvokeOrder []string
 
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 	ErrorResult   map[string]error
 }
 
 func New() *RedisCacheSpy {
-	return &RedisCacheSpy{Params: make(map[string]interface{}), CallsCount: make(map[string]int), InvokeOrder: []string{}, SuccessResult: make(map[string]interface{}), ErrorResult: make(map[string]error)}
+	return &RedisCacheSpy{Params: make(map[string]any), CallsCount: make(map[string]int), InvokeOrder: []string{}, SuccessResult: make(map[string]any), ErrorResult: make(map[string]error)}
 }
 
-func (r *RedisCacheSpy) Set(key string, value interface{}, time time.Duration) error {
+func (r *RedisCacheSpy) Set(key string, value any, time time.Duration) error {
 	r.Params["Set:key"] = key
 	r.Params["Set:value"] = value
 	r.Params["Set:time"] = time
