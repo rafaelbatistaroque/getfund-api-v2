@@ -2,17 +2,14 @@ package user_criation_with_coupon_started_event_handler
 
 import (
 	"encoding/json"
+	"getfund-api-v2/internal/domain/coupon/core/coupon_dto"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
 	logger "getfund-api-v2/pkg/log"
+	"strings"
+	"time"
 )
-
-type UserCriationWithCouponPayloadDto struct {
-	CouponCode     string `json:"coupon_code"`
-	ActivationCode string `json:"activation_code"`
-	Status         string `json:"status"`
-}
 
 type userCriationWithCouponStartedEventHandler struct {
 	usecase validate_coupon.UseCase
@@ -29,13 +26,16 @@ func New(usecase validate_coupon.UseCase, cache cache_service.Cache) bus.Handler
 }
 
 func (h *userCriationWithCouponStartedEventHandler) Handle(event bus.Event) {
-	var payload = &UserCriationWithCouponPayloadDto{}
+	var payload = &coupon_dto.UserCriationWithCouponPayloadDto{}
 	if err := json.Unmarshal(event.GetPayload(), payload); err != nil {
 		h.logger.Error("IsOk: False | get payload failed")
 		return
 	}
 
-	h.usecase.Execute(&validate_coupon.Input{
+	_, err := h.usecase.Execute(&validate_coupon.Input{
 		CouponCode: payload.CouponCode,
 	})
+
+	payload.Status = strings.TrimPrefix(err.Message.Error(), "status:")
+	h.cache.Set("user_activation_"+payload.ActivationCode+"_coupon", payload, 24*time.Hour)
 }
