@@ -32,5 +32,5 @@ func (a *AuthServiceSpy) DefineNotAuthenticate(code int, message error) {
 }
 
 func (a *AuthServiceSpy) DefineAuthenticate() {
-	a.SuccessResult = &auth_dto.SessionDto{ID: "fake-id", FirstName: "fake-first-name", IsAdmin: 0}
+	a.SuccessResult = &auth_dto.SessionDto{ID: 1, FirstName: "fake-first-name", IsAdmin: false}
 }

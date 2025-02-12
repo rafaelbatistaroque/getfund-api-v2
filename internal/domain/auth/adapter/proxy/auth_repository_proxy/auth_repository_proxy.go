@@ -1,4 +1,4 @@
-package user_repository_proxy
+package auth_repository_proxy
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
@@ -40,7 +40,7 @@ func (r *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*
 	}, nil
 }
 
-func (r *authRepositoryProxy) UpdatePassword(id, value string) error {
+func (r *authRepositoryProxy) UpdatePassword(id int, value string) error {
 	passwordHashed := r.hasher.HashAndMerge(value, r.settings.GetServerSalt())
 
 	return r.authRepository.UpdatePassword(id, passwordHashed)

@@ -7,10 +7,10 @@ import (
 
 func NewSut() (signin_mapper.SigninMapper, *model.SessionDto) {
 	return signin_mapper.New(),
-		&model.SessionDto{ID: "fake-ID", FirstName: "fake-first-name", IsAdmin: 1}
+		&model.SessionDto{ID: 1, FirstName: "fake-first-name", IsAdmin: true}
 
 }
 
 func GetauthenticatedUser() *model.AuthenticatedUserDto {
-	return &model.AuthenticatedUserDto{Id: "fake-ID", FirstName: "fake-first-name", IsAdmin: 1}
+	return &model.AuthenticatedUserDto{Id: 1, FirstName: "fake-first-name", IsAdmin: true}
 }

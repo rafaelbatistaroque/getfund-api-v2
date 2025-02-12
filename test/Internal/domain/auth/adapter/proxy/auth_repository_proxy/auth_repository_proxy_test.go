@@ -1,9 +1,9 @@
-package user_repository_proxy_test
+package auth_repository_proxy_test
 
 import (
 	"bytes"
 	auth_model "getfund-api-v2/internal/domain/auth/core/auth_dto"
-	fixture "getfund-api-v2/test/internal/domain/auth/adapter/proxy/user_repository_proxy/auth_repository_proxy_fixture"
+	fixture "getfund-api-v2/test/internal/domain/auth/adapter/proxy/auth_repository_proxy/auth_repository_proxy_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"
@@ -118,7 +118,7 @@ func Test_GivenUpdatePassword_WhenInit_ThenEnsureCallHashAndMergeWithCorrectPara
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.UpdatePassword("", expectedInput)
+	sut.UpdatePassword(0, expectedInput)
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.Params["HashAndMerge:input"]).Be(expectedInput)
@@ -130,7 +130,7 @@ func Test_GivenUpdatePassword_WhenHashAndMergeInvoked_ThenEnsureCallsOnce(t *tes
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.UpdatePassword("", "")
+	sut.UpdatePassword(0, "")
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["HashAndMerge"]).Be(1)
@@ -139,7 +139,7 @@ func Test_GivenUpdatePassword_WhenHashAndMergeInvoked_ThenEnsureCallsOnce(t *tes
 func Test_GivenUpdatePassword_WhenHashAndMergeSuccess_ThenEnsureCallRepositoryUpdatePasswordWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	expectedParamId := "fake-id"
+	expectedParamId := 1
 	spies.HasherSpy.DefineHashAndMergeSuccess("fake-password-hashed")
 
 	// Act
@@ -155,7 +155,7 @@ func Test_GivenUpdatePassword_WhenUpdatePasswordInvoked_ThenEnsureCallsOnce(t *t
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.UpdatePassword("", "")
+	sut.UpdatePassword(0, "")
 
 	// Assert
 	verify.Should(t, spies.AuthRepoSpy.CallsCount["UpdatePassword"]).Be(1)
@@ -167,7 +167,7 @@ func Test_GivenUpdatePassword_WhenUpdatePasswordError_ThenEnsureErrorFrom(t *tes
 	spies.AuthRepoSpy.DefineUpdatePasswordError()
 
 	// Act
-	err := sut.UpdatePassword("", "")
+	err := sut.UpdatePassword(0, "")
 
 	// Assert
 	verify.Should(t, err).Be(spies.AuthRepoSpy.ErrorResult["UpdatePassword"])
@@ -178,7 +178,7 @@ func Test_GivenUpdatePassword_WhenUpdatePasswordSuccess_ThenEnsureNull(t *testin
 	sut, _ := fixture.NewSut()
 
 	// Act
-	result := sut.UpdatePassword("", "")
+	result := sut.UpdatePassword(0, "")
 
 	// Assert
 	verify.Should(t, result).Nil()

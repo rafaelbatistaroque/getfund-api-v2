@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-func NewMemoryDB(tables ...interface{}) *gorm.DB {
+func NewMemoryDB(tables ...any) *gorm.DB {
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 	})

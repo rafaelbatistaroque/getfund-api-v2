@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-const (
-	_YES = 1
-	_NOT = 0
-)
-
 type ActivationUser struct {
 	firstName         string
 	lastName          string
@@ -21,8 +16,8 @@ type ActivationUser struct {
 	mainSocialNetwork string
 	registeredUrl     string
 	registeredAt      time.Time
-	isActive          int
-	isAdmin           int
+	isActive          bool
+	isAdmin           bool
 }
 
 func New(firstName, lastName, email, gender, password, mainSocialNetwork, registeredUrl string, countryId, userCategoryId int) *ActivationUser {
@@ -37,8 +32,8 @@ func New(firstName, lastName, email, gender, password, mainSocialNetwork, regist
 		mainSocialNetwork: getValidValue(mainSocialNetwork),
 		registeredUrl:     getValidValue(registeredUrl),
 		registeredAt:      time.Now(),
-		isActive:          _YES,
-		isAdmin:           _NOT,
+		isActive:          true,
+		isAdmin:           false,
 	}
 }
 
@@ -98,10 +93,10 @@ func (u *ActivationUser) GetRegisteredAt() int64 {
 	return u.registeredAt.Unix()
 }
 
-func (u *ActivationUser) GetIsActive() int {
+func (u *ActivationUser) GetIsActive() bool {
 	return u.isActive
 }
 
-func (u *ActivationUser) GetIsAdmin() int {
+func (u *ActivationUser) GetIsAdmin() bool {
 	return u.isAdmin
 }

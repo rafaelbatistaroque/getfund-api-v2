@@ -199,8 +199,8 @@ func Test_GivenExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallMapperToDtoWi
 	verify.Should(t, entityParam.GetUserCategoryId()).Be(expectedParam.UserCategoryId)
 	verify.Should(t, entityParam.GetMainSocialNetwork()).Be(expectedParam.MainSocialNetwork)
 	verify.Should(t, entityParam.GetRegisteredUrl()).Be(expectedParam.RegisteredUrl)
-	verify.Should(t, entityParam.GetIsActive()).Be(1)
-	verify.Should(t, entityParam.GetIsAdmin()).Be(0)
+	verify.Should(t, entityParam.GetIsActive()).BeTrue()
+	verify.Should(t, entityParam.GetIsAdmin()).BeFalse()
 	verify.Should(t, entityParam.GetRegisteredAt()).NotNil()
 }
 

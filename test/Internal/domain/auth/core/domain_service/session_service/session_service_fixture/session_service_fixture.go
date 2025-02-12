@@ -33,7 +33,7 @@ func GetSaveSessionInputValid() *auth_dto.SessionDto {
 	return &auth_dto.SessionDto{}
 }
 func GetSaveSessionInputValidSerialized() string {
-	return "{\"id\":\"\",\"first_name\":\"\",\"is_admin\":0}"
+	return "{\"id\":0,\"first_name\":\"\",\"is_admin\":false}"
 }
 
 func GetDeleteSessionInputInvalid() string { return "" }

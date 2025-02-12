@@ -66,5 +66,5 @@ func (s *signinUsecaseSpy) DefineError() {
 }
 
 func (s *signinUsecaseSpy) DefineSuccess() {
-	s.SuccessResult["Execute"] = &signin.Output{Token: "fake-token", Session: signin.SessionOutput{ID: "fake-id", FirstName: "fake-firstname", IsAdmin: true}}
+	s.SuccessResult["Execute"] = &signin.Output{Token: "fake-token", Session: signin.SessionOutput{ID: 1, FirstName: "fake-firstname", IsAdmin: true}}
 }

@@ -6,15 +6,15 @@ import (
 )
 
 type AuthRepositoryProxySpy struct {
-	Params        map[string]string
+	Params        map[string]any
 	CallsCount    map[string]int
 	ErrorResult   map[string]error
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 }
 
 func New() *AuthRepositoryProxySpy {
 
-	return &AuthRepositoryProxySpy{Params: make(map[string]string, 1), ErrorResult: make(map[string]error), SuccessResult: make(map[string]interface{}, 1), CallsCount: make(map[string]int, 1)}
+	return &AuthRepositoryProxySpy{Params: make(map[string]any, 1), ErrorResult: make(map[string]error), SuccessResult: make(map[string]any, 1), CallsCount: make(map[string]int, 1)}
 }
 
 func (r *AuthRepositoryProxySpy) GetAuthenticatedUserByUsername(username string) (*auth_model.AuthenticatedUserDto, error) {
@@ -30,7 +30,7 @@ func (r *AuthRepositoryProxySpy) GetAuthenticatedUserByUsername(username string)
 	return r.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_model.AuthenticatedUserDto), r.ErrorResult["GetAuthenticatedUserByUsername"]
 }
 
-func (r *AuthRepositoryProxySpy) UpdatePassword(id, value string) error {
+func (r *AuthRepositoryProxySpy) UpdatePassword(id int, value string) error {
 	r.Params["UpdatePassword:id"] = id
 	r.Params["UpdatePassword:value"] = value
 
@@ -44,5 +44,5 @@ func (r *AuthRepositoryProxySpy) DefineGetAuthenticatedUserByUsernameError() {
 }
 
 func (r *AuthRepositoryProxySpy) DefineGetAuthenticatedUserByUsernameSuccess() {
-	r.SuccessResult["GetAuthenticatedUserByUsername"] = &auth_model.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: "fake-id", IsAdmin: 0}
+	r.SuccessResult["GetAuthenticatedUserByUsername"] = &auth_model.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
 }

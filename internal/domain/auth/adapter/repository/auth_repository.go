@@ -4,14 +4,9 @@ import (
 	"errors"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/pkg/db/schema"
 
 	"gorm.io/gorm"
-)
-
-var (
-	table_USER = "user"
-	active     = 1
-	first      = 1
 )
 
 type authRepository struct {
@@ -23,30 +18,39 @@ func New(db *gorm.DB) auth_contract.AuthRepository {
 }
 
 func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
-	var authenticatedUser = auth_dto.AuthenticatedUserDto{}
+	var user = schema.User{}
 	result := r.db.
-		Table(table_USER).
-		Select("id, first_name, is_admin, password, username").
-		Where("is_active=? AND username=?", active, username).
-		Limit(first).
-		Scan(&authenticatedUser)
-
-	if result.RowsAffected == 0 {
-		return nil, errors.New("user not found")
-	}
+		Select("id, first_name, is_admin, username").
+		Where("is_active = ? AND username = ?", true, username).
+		First(&user)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &authenticatedUser, nil
+	if result.RowsAffected == 0 {
+		return nil, errors.New("user not found")
+	}
+
+	return &auth_dto.AuthenticatedUserDto{
+		Id:        int(user.ID),
+		FirstName: user.FirstName,
+		Password:  user.Password,
+		IsAdmin:   user.IsAdmin,
+	}, nil
 }
 
-func (r *authRepository) UpdatePassword(id, value string) error {
-	result := r.db.Table(table_USER).Where("id=?", id).Update("password", value)
+func (r *authRepository) UpdatePassword(id int, value string) error {
+	result := r.db.
+		Model(&schema.User{}).
+		Where("id=?", id).
+		Update("password", value)
+
 	if result.Error != nil {
 		return result.Error
 	}
+
+	//RowsAffected
 
 	return nil
 }

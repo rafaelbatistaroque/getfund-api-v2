@@ -37,7 +37,7 @@ func (m *SigninMapperSpy) ToOutput(token string, session *model.SessionDto) *sig
 		Session: signin.SessionOutput{
 			ID:        session.ID,
 			FirstName: session.FirstName,
-			IsAdmin:   session.IsAdmin == 1,
+			IsAdmin:   session.IsAdmin,
 		},
 	}
 

@@ -1,6 +1,7 @@
 package auth_user_repository_test
 
 import (
+	"getfund-api-v2/pkg/db/schema"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/repository/auth_repository_fixture"
 	"testing"
 
@@ -25,9 +26,8 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenQueryError_ThenEnsureReturnErr
 func Test_GivenGetAuthenticatedUserByUsername_WhenInactivedUser_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	expectedId := uuid.NewString()
 	username := uuid.NewString()
-	db.Create(&fixture.FakeUser{ID: expectedId, Username: username, IsActive: 0})
+	db.Create(&schema.User{Username: username, IsActive: false})
 
 	// Act
 	_, err := sut.GetAuthenticatedUserByUsername(username)
@@ -39,15 +39,14 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenInactivedUser_ThenEnsureReturn
 func Test_GivenGetAuthenticatedUserByUsername_WhenQuerySuccess_ThenEnsureReturnUserFound(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	expectedId := uuid.NewString()
 	username := uuid.NewString()
-	db.Create(&fixture.FakeUser{ID: expectedId, Username: username, IsActive: 1})
+	db.Create(&schema.User{Username: username, IsActive: true})
 
 	// Act
 	authenticatedUser, _ := sut.GetAuthenticatedUserByUsername(username)
 
 	// Assert
-	verify.Should(t, authenticatedUser.Id).Be(expectedId)
+	verify.Should(t, authenticatedUser.Id).Be(1)
 }
 
 func Test_GivenUpdatePassword_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
@@ -57,7 +56,7 @@ func Test_GivenUpdatePassword_WhenQueryError_ThenEnsureReturnError(t *testing.T)
 	currentDb.Close()
 
 	// Act
-	err := sut.UpdatePassword("", "")
+	err := sut.UpdatePassword(1, "")
 
 	// Assert
 	verify.Should(t, err).NotNil()
@@ -66,16 +65,15 @@ func Test_GivenUpdatePassword_WhenQueryError_ThenEnsureReturnError(t *testing.T)
 func Test_GivenUpdatePassword_WhenSuccess_ThenEnsureNull(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	expectedId := uuid.NewString()
 	newPassword := uuid.NewString()
-	db.Create(&fixture.FakeUser{ID: expectedId, Password: uuid.NewString()})
+	db.Create(&schema.User{Password: uuid.NewString()})
 
 	// Act
-	result := sut.UpdatePassword(expectedId, newPassword)
+	result := sut.UpdatePassword(1, newPassword)
 
 	// Assert
-	user := fixture.FakeUser{}
-	db.Where("id = ?", expectedId).First(&user)
+	user := &schema.User{}
+	db.Where("id = ?", 1).First(user)
 
 	verify.Should(t, result).Nil()
 	verify.Should(t, user.Password).Be(newPassword)

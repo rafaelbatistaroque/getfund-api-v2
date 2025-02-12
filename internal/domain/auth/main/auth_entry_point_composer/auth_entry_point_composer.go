@@ -1,12 +1,13 @@
 package auth_entry_point_composer
 
 import (
+	"getfund-api-v2/internal/domain/auth/adapter/event_handler/user_created_event_handler"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/recover_password_gateway"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/reset_password_gateway"
 	signin_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signin_auth_gateway"
 	signout_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signout_auth_gateway"
 	"getfund-api-v2/internal/domain/auth/adapter/middleware/auth_middleware"
-	"getfund-api-v2/internal/domain/auth/adapter/proxy/user_repository_proxy"
+	"getfund-api-v2/internal/domain/auth/adapter/proxy/auth_repository_proxy"
 	authRepository "getfund-api-v2/internal/domain/auth/adapter/repository"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/auth_service"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/session_service"
@@ -45,7 +46,7 @@ func Get(
 	//dependencies
 	hasher := security.New()
 	mapper := mapper.New()
-	authRepositoryProxy := user_repository_proxy.New(authRepository.New(db), settings, hasher)
+	authRepositoryProxy := auth_repository_proxy.New(authRepository.New(db), settings, hasher)
 	authService := auth_service.New(authRepositoryProxy, settings, hasher, mapper)
 	sessionService := session_service.New(cache, hasher, settings)
 
@@ -63,6 +64,9 @@ func Get(
 
 	//Middlewares
 	auth_middleware := auth_middleware.New(sessionService)
+
+	//Event Handler
+	eventBus.Subscribe("UserCreated", user_created_event_handler.New(signin, cache))
 
 	return AuthEntryPointComposer{
 		Signin:                     response_proxy.New(signinGateway.Signin),

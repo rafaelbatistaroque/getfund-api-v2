@@ -8,7 +8,7 @@ type SigninOutput struct {
 }
 
 type SessionOutput struct {
-	ID        string `json:"id"`
+	ID        int    `json:"id"`
 	FirstName string `json:"first_name"`
 	IsAdmin   bool   `json:"is_admin"`
 }

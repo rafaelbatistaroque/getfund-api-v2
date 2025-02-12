@@ -20,7 +20,7 @@ func Test_GivenSigninMapper_WhenToOutput_ThenEnsureCorrectMapToSigninOutput(t *t
 	verify.Should(t, result.Token).Be(expectedToken)
 	verify.Should(t, result.Session.ID).Be(expectedResult.ID)
 	verify.Should(t, result.Session.FirstName).Be(expectedResult.FirstName)
-	verify.Should(t, result.Session.IsAdmin).Be(expectedResult.IsAdmin == 1)
+	verify.Should(t, result.Session.IsAdmin).Be(expectedResult.IsAdmin)
 }
 
 func Test_GivenSigninMapper_WhenToSessionModelMapped_ThenEnsureReturnSessionModel(t *testing.T) {

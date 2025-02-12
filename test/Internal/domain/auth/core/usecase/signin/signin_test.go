@@ -153,5 +153,5 @@ func Test_GivenSigninExecute_WhenMapperInvoke_ThenEnsureReturnOutputWithSession(
 	verify.Should(t, result.Token).Be(spies.SessionSpy.SuccessResult["SaveSession"])
 	verify.Should(t, result.Session.ID).Be(spies.AuthServiceSpy.SuccessResult.ID)
 	verify.Should(t, result.Session.FirstName).Be(spies.AuthServiceSpy.SuccessResult.FirstName)
-	verify.Should(t, result.Session.IsAdmin).Be(spies.AuthServiceSpy.SuccessResult.IsAdmin == 1)
+	verify.Should(t, result.Session.IsAdmin).Be(spies.AuthServiceSpy.SuccessResult.IsAdmin)
 }

@@ -25,7 +25,7 @@ func (m *signinMapper) ToOutput(token string, session *model.SessionDto) *signin
 		Session: signin.SessionOutput{
 			ID:        session.ID,
 			FirstName: session.FirstName,
-			IsAdmin:   session.IsAdmin == 1,
+			IsAdmin:   session.IsAdmin,
 		},
 	}
 }

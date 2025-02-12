@@ -1,7 +1,7 @@
 package auth_repository_proxy_fixture
 
 import (
-	"getfund-api-v2/internal/domain/auth/adapter/proxy/user_repository_proxy"
+	"getfund-api-v2/internal/domain/auth/adapter/proxy/auth_repository_proxy"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/test/helper/repository_spy/auth_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
@@ -19,7 +19,7 @@ func NewSut() (auth_contract.AuthRepository, *authRepositoryProxyFixture) {
 	authRepositorySpy := auth_repository_spy.New()
 	hasherSpy := security_spy.New()
 
-	return user_repository_proxy.New(authRepositorySpy, settingsSpy, hasherSpy),
+	return auth_repository_proxy.New(authRepositorySpy, settingsSpy, hasherSpy),
 		&authRepositoryProxyFixture{
 			HasherSpy:   hasherSpy,
 			SettingsSpy: settingsSpy,
