@@ -48,15 +48,44 @@ func Test_GivenUserExistsByUsername_WhenFound_ThenEnsureReturnSuccess(t *testing
 	verify.Should(t, userFound.Id).Be(1)
 }
 
-func Test_GivenSaveUser_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenCreateUser_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
 	currentDb, _ := db.DB()
 	currentDb.Close()
 
 	// Act
-	_, err := sut.SaveUser(fixture.GetEmptyActivationUserDto())
+	_, err := sut.CreateUser(fixture.GetEmptyActivationUserDto())
 
 	// Assert
 	verify.Should(t, err).NotNil()
+}
+
+func Test_GivenCreateUser_WhenUserCreatedSuccess_ThenEnsureReturnUserDtoFilled(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	expectedUserCreated := fixture.GetFilledActivationUserDto()
+
+	// Act
+	result, err := sut.CreateUser(expectedUserCreated)
+
+	// Assert
+	userSaved := &schema.User{}
+	db.Where("username = ?", expectedUserCreated.Email).First(userSaved)
+
+	verify.Should(t, err).Nil()
+	verify.Should(t, userSaved.ID).Be(uint(result.Id))
+	verify.Should(t, userSaved.FirstName).Be(expectedUserCreated.FirstName)
+	verify.Should(t, userSaved.LastName).Be(expectedUserCreated.LastName)
+	verify.Should(t, userSaved.CountryID).Be(uint(expectedUserCreated.CountryId))
+	verify.Should(t, userSaved.UserCategoryID).Be(uint(expectedUserCreated.UserCategoryId))
+	verify.Should(t, userSaved.Password).Be(expectedUserCreated.Password)
+	verify.Should(t, userSaved.Gender).Be(expectedUserCreated.Gender)
+	verify.Should(t, userSaved.IsActive).Be(expectedUserCreated.IsActive)
+	verify.Should(t, userSaved.IsAdmin).Be(expectedUserCreated.IsAdmin)
+	verify.Should(t, userSaved.MainSocialNetwork).Be(expectedUserCreated.MainSocialNetwork)
+	verify.Should(t, userSaved.RegisteredUrl).Be(expectedUserCreated.RegisteredUrl)
+	verify.Should(t, userSaved.Email).Be(expectedUserCreated.Email)
+	verify.Should(t, userSaved.Username).Be(expectedUserCreated.Email)
+	verify.Should(t, userSaved.CreatedAt).NotNil()
 }

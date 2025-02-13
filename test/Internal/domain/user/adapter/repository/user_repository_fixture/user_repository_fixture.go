@@ -19,3 +19,18 @@ func NewSUT() (user_contract.Repository, *gorm.DB) {
 func GetEmptyActivationUserDto() *user_dto.ActivationUserDto {
 	return &user_dto.ActivationUserDto{}
 }
+
+func GetFilledActivationUserDto() *user_dto.ActivationUserDto {
+	return &user_dto.ActivationUserDto{
+		FirstName:         "fake-first-name",
+		LastName:          "fake-last-name",
+		Email:             "fake@email.com",
+		Gender:            "m",
+		Password:          "fakaStrongPass123",
+		CountryId:         1,
+		UserCategoryId:    1,
+		MainSocialNetwork: "@FakeSocial",
+		RegisteredUrl:     "https://social.com",
+		IsAdmin:           false,
+	}
+}

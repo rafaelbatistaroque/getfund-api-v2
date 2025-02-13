@@ -120,7 +120,7 @@ func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallUserExistsByUsernameWi
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	var expectedParam = user_dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
@@ -135,7 +135,7 @@ func Test_GivenExecute_WhenUserExistsByUsernameInvoked_ThenEnsureCallsOnce(t *te
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -180,7 +180,7 @@ func Test_GivenExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallMapperToDt
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	var expectedParam = user_dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
@@ -206,7 +206,7 @@ func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -215,52 +215,52 @@ func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	verify.Should(t, spies.MapperSpy.CallsCount["ToDto"]).Be(1)
 }
 
-func Test_GivenExecute_WhenToDtoSuccess_ThenEnsureCallSaveUserWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenToDtoSuccess_ThenEnsureCallCreateUserWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.MapperSpy.DefineToDtoSuccess(fixture.GetActivateUserEntity())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.Params["SaveUser:user"]).Be(spies.MapperSpy.SuccessResult["ToDto"])
+	verify.Should(t, spies.RepoSpy.Params["CreateUser:user"]).Be(spies.MapperSpy.SuccessResult["ToDto"])
 }
 
-func Test_GivenExecute_WhenSaveUserInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenExecute_WhenCreateUserInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.CallsCount["SaveUser"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["CreateUser"]).Be(1)
 }
 
-func Test_GivenExecute_WhenSaveUserError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenExecute_WhenCreateUserError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserError()
+	spies.RepoSpy.DefineCreateUserError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["SaveUser"])
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["CreateUser"])
 }
 
-func Test_GivenExecute_WhenSaveUserSuccess_ThenEnsureCallCacheDeleteWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenCreateUserSuccess_ThenEnsureCallCacheDeleteWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	validInput := fixture.GetInput()
 	expectedParam := "user_activation_" + validInput.ActivationCode
 
@@ -276,11 +276,11 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	inputValid := fixture.GetInput()
 	expectedPaylod := &user_dto.UserActivationWithCouponPayloadDto{
 		ActivationCode: inputValid.ActivationCode,
-		UserId:         spies.RepoSpy.SuccessResult["SaveUser"].(*user_dto.UserDto).Id,
+		UserId:         spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
 	}
 
 	// Act
@@ -295,7 +295,7 @@ func Test_GivenExecute_WhenEmitWithPayloadWithUserActivationWithCouponConfirmedE
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -308,9 +308,9 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	expectedPayload := &user_dto.UserCreatedPayloadDto{
-		Id: spies.RepoSpy.SuccessResult["SaveUser"].(*user_dto.UserDto).Id,
+		Id: spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
 	}
 
 	// Act
@@ -326,7 +326,7 @@ func Test_GivenExecute_WhenEmitWithPayloadWithUserCreatedEventInvoked_ThenEnsure
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -339,7 +339,7 @@ func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturnSer
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
@@ -353,7 +353,7 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseEmpty_ThenEnsureReturnServerEr
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
 	errChannel := make(chan *result_app.ApplicationError, 1)
 
@@ -377,7 +377,7 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseInvalid_ThenEnsureReturnServer
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
 	errChannel := make(chan *result_app.ApplicationError, 1)
 
@@ -401,7 +401,7 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSessio
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
-	spies.RepoSpy.DefineSaveUserSuccess()
+	spies.RepoSpy.DefineCreateUserSuccess()
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
 	resultChannel := make(chan *activate_user.Output, 1)
 	responseEvent, expectedOutput := fixture.GetResponseSession()
