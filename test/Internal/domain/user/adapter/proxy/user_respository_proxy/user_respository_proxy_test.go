@@ -92,3 +92,16 @@ func Test_GivenCreateUser_WhenRepoCreateUserInvoked_ThenEnsureCallsOnce(t *testi
 	// Assert
 	verify.Should(t, spies.RepoSpy.CallsCount["CreateUser"]).Be(1)
 }
+
+func Test_GivenCreateUser_WhenRepoCreateUserError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("")
+	spies.RepoSpy.DefineCreateUserError()
+
+	// Act
+	_, err := sut.CreateUser(fixture.GetEmptyActivationUserDto())
+
+	// Assert
+	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["CreateUser"])
+}
