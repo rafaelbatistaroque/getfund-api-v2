@@ -32,7 +32,9 @@ func (u *userRepository) UserExistsByUsername(username string) (*user_dto.UserDt
 		return nil, result.Error
 	}
 
-	return nil, nil
+	return &user_dto.UserDto{
+		Id: int(user.ID),
+	}, nil
 }
 
 func (u *userRepository) SaveUser(user *user_dto.ActivationUserDto) (*user_dto.UserDto, error) {
