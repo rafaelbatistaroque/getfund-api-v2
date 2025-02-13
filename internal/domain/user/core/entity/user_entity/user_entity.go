@@ -8,6 +8,7 @@ type User struct {
 	firstName         string
 	lastName          string
 	email             string
+	username          string
 	gender            string
 	password          string
 	countryId         int
@@ -23,6 +24,7 @@ func New(firstName, lastName, email, gender, password, mainSocialNetwork, regist
 		firstName:         getValidValue(firstName),
 		lastName:          getValidValue(lastName),
 		email:             getValidValue(email),
+		username:          getValidValue(email),
 		gender:            validateGender(gender),
 		password:          getValidValue(password),
 		countryId:         countryId,
@@ -60,6 +62,10 @@ func (u *User) GetLastName() string {
 
 func (u *User) GetEmail() string {
 	return u.email
+}
+
+func (u *User) GetUsername() string {
+	return u.username
 }
 
 func (u *User) GetGender() string {

@@ -42,7 +42,7 @@ func (u *userRepository) CreateUser(dto *user_dto.ActivationUserDto) (*user_dto.
 		FirstName:         dto.FirstName,
 		LastName:          dto.LastName,
 		Email:             dto.Email,
-		Username:          dto.Email,
+		Username:          dto.Username,
 		Password:          dto.Password,
 		Gender:            dto.Gender,
 		MainSocialNetwork: dto.MainSocialNetwork,
