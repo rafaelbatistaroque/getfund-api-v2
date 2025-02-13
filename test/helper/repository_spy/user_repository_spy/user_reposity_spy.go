@@ -17,17 +17,17 @@ func New() *UserRepositorySpy {
 	return &UserRepositorySpy{Params: make(map[string]any, 1), ErrorResult: make(map[string]error), SuccessResult: make(map[string]any, 1), CallsCount: make(map[string]int, 1)}
 }
 
-func (r *UserRepositorySpy) GetUserByUsername(username string) (*user_dto.UserDto, error) {
-	r.Params["GetUserByUsername:username"] = username
+func (r *UserRepositorySpy) UserExistsByUsername(username string) (*user_dto.UserDto, error) {
+	r.Params["UserExistsByUsername:username"] = username
 
-	r.CallsCount["GetUserByUsername"]++
+	r.CallsCount["UserExistsByUsername"]++
 
-	sucess := r.SuccessResult["GetUserByUsername"]
+	sucess := r.SuccessResult["UserExistsByUsername"]
 	if sucess != nil {
 		return sucess.(*user_dto.UserDto), nil
 	}
 
-	return nil, r.ErrorResult["GetUserByUsername"]
+	return nil, r.ErrorResult["UserExistsByUsername"]
 }
 
 func (r *UserRepositorySpy) SaveUser(user *user_dto.ActivationUserDto) (*user_dto.UserDto, error) {
@@ -43,16 +43,16 @@ func (r *UserRepositorySpy) SaveUser(user *user_dto.ActivationUserDto) (*user_dt
 	return nil, r.ErrorResult["SaveUser"]
 }
 
-func (r *UserRepositorySpy) DefineGetUserByUsernameError() {
-	r.ErrorResult["GetUserByUsername"] = errors.New("fake-error")
+func (r *UserRepositorySpy) DefineUserExistsByUsernameError() {
+	r.ErrorResult["UserExistsByUsername"] = errors.New("fake-error")
 }
 
-func (r *UserRepositorySpy) DefineGetUserByUsernameSuccess() {
-	r.SuccessResult["GetUserByUsername"] = &user_dto.UserDto{Id: "fake-id"}
+func (r *UserRepositorySpy) DefineUserExistsByUsernameSuccess() {
+	r.SuccessResult["UserExistsByUsername"] = &user_dto.UserDto{Id: "fake-id"}
 }
 
-func (r *UserRepositorySpy) DefineGetUserByUsernameSuccessNotFound() {
-	r.SuccessResult["GetUserByUsername"] = nil
+func (r *UserRepositorySpy) DefineUserExistsByUsernameSuccessNotFound() {
+	r.SuccessResult["UserExistsByUsername"] = nil
 }
 
 func (r *UserRepositorySpy) DefineSaveUserError() {

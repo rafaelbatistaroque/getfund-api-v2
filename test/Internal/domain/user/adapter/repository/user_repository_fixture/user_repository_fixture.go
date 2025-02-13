@@ -1,8 +1,8 @@
-package auth_repository_fixture
+package user_repository_fixture
 
 import (
-	auth_repository "getfund-api-v2/internal/domain/auth/adapter/repository"
-	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	user_repository "getfund-api-v2/internal/domain/user/adapter/repository"
+	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/pkg/db/schema"
 	"getfund-api-v2/test/helper/db_fixture"
 	"math/rand"
@@ -11,10 +11,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func NewSUT() (auth_contract.AuthRepository, *gorm.DB) {
+func NewSUT() (user_contract.Repository, *gorm.DB) {
 	db := db_fixture.NewMemoryDB(&schema.User{})
 
-	return auth_repository.New(db), db
+	return user_repository.New(db), db
 }
 
 func AddRandomUser(db *gorm.DB, quantity int, diff bool) {

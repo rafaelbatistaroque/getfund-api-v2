@@ -116,7 +116,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 	verify.Should(t, err.Message.Error()).Be("error on get user data")
 }
 
-func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallGetUserByUsernameWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallUserExistsByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
@@ -128,10 +128,10 @@ func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallGetUserByUsernameWithC
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.Params["GetUserByUsername:username"]).Be(expectedParam.Email)
+	verify.Should(t, spies.RepoSpy.Params["UserExistsByUsername:username"]).Be(expectedParam.Email)
 }
 
-func Test_GivenExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenExecute_WhenUserExistsByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
@@ -141,28 +141,28 @@ func Test_GivenExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnce(t *testi
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.CallsCount["GetUserByUsername"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["UserExistsByUsername"]).Be(1)
 }
 
-func Test_GivenExecute_WhenGetUserByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
+func Test_GivenExecute_WhenUserExistsByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.RepoSpy.DefineGetUserByUsernameError()
+	spies.RepoSpy.DefineUserExistsByUsernameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetUserByUsername"])
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["UserExistsByUsername"])
 }
 
-func Test_GivenExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDuplicateEntryError(t *testing.T) {
+func Test_GivenExecute_WhenUserExistsByUsernameFound_ThenEnsureReturnDuplicateEntryError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.RepoSpy.DefineGetUserByUsernameSuccess()
+	spies.RepoSpy.DefineUserExistsByUsernameSuccess()
 	validInput := fixture.GetInput()
 	expectedParam := "user_activation_" + validInput.ActivationCode
 
@@ -176,7 +176,7 @@ func Test_GivenExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDuplicateEntry
 	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
 }
 
-func Test_GivenExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallMapperToDtoWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallMapperToDtoWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())

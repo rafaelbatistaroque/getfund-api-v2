@@ -64,7 +64,7 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 }
 
 func validateDuplicatedUser(input *create_user.Input, repository user_contract.Repository) *result_app.ApplicationError {
-	userDuplicated, err := repository.GetUserByUsername(input.Email)
+	userDuplicated, err := repository.UserExistsByUsername(input.Email)
 	if err != nil {
 		return result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}

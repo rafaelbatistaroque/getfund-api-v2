@@ -217,7 +217,7 @@ func Test_GivenCreateUserExecute_WhenInputCouponCodeInvalid_ThenEnsureReturnErro
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "CouponCode", 8))
 }
 
-func Test_GivenCreateUserExecute_WhenInputValid_ThenEnsureCallGetUserByUsernameWithCorrectParameter(t *testing.T) {
+func Test_GivenCreateUserExecute_WhenInputValid_ThenEnsureCallUserExistsByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput()
@@ -226,9 +226,9 @@ func Test_GivenCreateUserExecute_WhenInputValid_ThenEnsureCallGetUserByUsernameW
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.Params["GetUserByUsername:username"]).Be(validInput.Email)
+	verify.Should(t, spies.RepoSpy.Params["UserExistsByUsername:username"]).Be(validInput.Email)
 }
-func Test_GivenCreateUserExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenCreateUserExecute_WhenUserExistsByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
@@ -236,26 +236,26 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameInvoked_ThenEnsureCallsOnc
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.CallsCount["GetUserByUsername"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["UserExistsByUsername"]).Be(1)
 }
 
-func Test_GivenCreateUserExecute_WhenGetUserByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
+func Test_GivenCreateUserExecute_WhenUserExistsByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetUserByUsernameError()
+	spies.RepoSpy.DefineUserExistsByUsernameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetUserByUsername"])
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["UserExistsByUsername"])
 }
 
-func Test_GivenCreateUserExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDuplicateEntryError(t *testing.T) {
+func Test_GivenCreateUserExecute_WhenUserExistsByUsernameFound_ThenEnsureReturnDuplicateEntryError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetUserByUsernameSuccess()
+	spies.RepoSpy.DefineUserExistsByUsernameSuccess()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
@@ -265,10 +265,10 @@ func Test_GivenCreateUserExecute_WhenGetUserByUsernameFound_ThenEnsureReturnDupl
 	verify.Should(t, err.Message.Error()).Be("user already exists")
 }
 
-func Test_GivenCreateUserExecute_WhenGetUserByUsernameNotFound_ThenEnsureCallGetRandomCodeWithCorrectParameter(t *testing.T) {
+func Test_GivenCreateUserExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallGetRandomCodeWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetUserByUsernameSuccessNotFound()
+	spies.RepoSpy.DefineUserExistsByUsernameSuccessNotFound()
 
 	// Act
 	sut.Execute(fixture.GetInput())

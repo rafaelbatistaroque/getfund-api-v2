@@ -1,0 +1,21 @@
+package user_repository_test
+
+import (
+	fixture "getfund-api-v2/test/internal/domain/user/adapter/repository/user_repository_fixture"
+	"testing"
+
+	"github.com/rafaelbatistaroque/verify"
+)
+
+func Test_GivenUserExistsByUsername_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	currentDb, _ := db.DB()
+	currentDb.Close()
+
+	// Act
+	_, err := sut.UserExistsByUsername("invalid-username")
+
+	// Assert
+	verify.Should(t, err).NotNil()
+}

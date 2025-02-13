@@ -1,6 +1,7 @@
 package activate_user_application
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
@@ -9,6 +10,7 @@ import (
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/settings"
+	"getfund-api-v2/internal/shared/app_constant"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
@@ -88,7 +90,7 @@ func getUserData(input *activate_user.Input, cache cache_service.Cache) (*user_d
 }
 
 func checkForDuplicateUser(input *activate_user.Input, userData *user_dto.ActivationUserData, cache cache_service.Cache, repository user_contract.Repository) *result_app.ApplicationError {
-	userDuplicated, errRepo := repository.GetUserByUsername(userData.Email)
+	userDuplicated, errRepo := repository.UserExistsByUsername(userData.Email)
 	if errRepo != nil {
 		return result_app.New(result_app.SERVER_ERROR_CODE, errRepo)
 	}
@@ -126,7 +128,7 @@ func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper
 func getOutputFromHandleEventResponse(channelResponse <-chan []byte, settings settings.ApplicationSettings) (*activate_user.Output, *result_app.ApplicationError) {
 	select {
 	case response := <-channelResponse:
-		if len(response) == 0 {
+		if bytes.Equal(response, app_constant.EMPTYB) {
 			return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get session [response empty]"))
 		}
 
