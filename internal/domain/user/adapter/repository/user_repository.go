@@ -1,6 +1,7 @@
 package user_repository
 
 import (
+	"errors"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/pkg/db/schema"
@@ -22,6 +23,10 @@ func (u *userRepository) UserExistsByUsername(username string) (*user_dto.UserDt
 		Select("id").
 		Where("username = ?", username).
 		First(&user)
+
+	if result.Error == gorm.ErrRecordNotFound {
+		return nil, errors.New("user not found")
+	}
 
 	if result.Error != nil {
 		return nil, result.Error
