@@ -22,22 +22,29 @@ func New(repository user_contract.Repository, settings settings.ApplicationSetti
 }
 
 func (u *userRepositoryProxy) CreateUser(user *user_dto.ActivationUserDto) (*user_dto.UserDto, error) {
-	user.FirstName = u.hasher.Encrypt(user.FirstName, u.settings.GetSecretKey())
-	user.LastName = u.hasher.Encrypt(user.LastName, u.settings.GetSecretKey())
-	user.Email = u.hasher.Encrypt(user.Email, u.settings.GetSecretKey())
-	user.MainSocialNetwork = u.hasher.Encrypt(user.MainSocialNetwork, u.settings.GetSecretKey())
-	user.RegisteredUrl = u.hasher.Encrypt(user.RegisteredUrl, u.settings.GetSecretKey())
-	user.Password = u.hasher.HashAndMerge(user.Password, u.settings.GetServerSalt())
-	usernameHashed, errHash := u.hasher.HashWithSalt(user.Username, u.settings.GetServerSalt())
-	if errHash != nil {
-		return nil, errHash
+	userHashed := &user_dto.ActivationUserDto{
+		FirstName:         u.hasher.Encrypt(user.FirstName, u.settings.GetSecretKey()),
+		LastName:          u.hasher.Encrypt(user.LastName, u.settings.GetSecretKey()),
+		Email:             u.hasher.Encrypt(user.Email, u.settings.GetSecretKey()),
+		MainSocialNetwork: u.hasher.Encrypt(user.MainSocialNetwork, u.settings.GetSecretKey()),
+		RegisteredUrl:     u.hasher.Encrypt(user.RegisteredUrl, u.settings.GetSecretKey()),
+		Password:          u.hasher.HashAndMerge(user.Password, u.settings.GetServerSalt()),
+		Gender:            user.Gender,
+		CountryId:         user.CountryId,
+		UserCategoryId:    user.UserCategoryId,
+		IsAdmin:           user.IsAdmin,
+		IsActive:          user.IsActive,
 	}
 
-	user.Username = usernameHashed
+	var err error
+	userHashed.Username, err = u.hasher.HashWithSalt(user.Username, u.settings.GetServerSalt())
+	if err != nil {
+		return nil, err
+	}
 
-	userCreated, errRepo := u.repository.CreateUser(user)
-	if errRepo != nil {
-		return nil, errRepo
+	userCreated, err := u.repository.CreateUser(userHashed)
+	if err != nil {
+		return nil, err
 	}
 
 	return userCreated, nil
