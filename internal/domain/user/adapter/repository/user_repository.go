@@ -37,6 +37,14 @@ func (u *userRepository) UserExistsByUsername(username string) (*user_dto.UserDt
 	}, nil
 }
 
-func (u *userRepository) SaveUser(user *user_dto.ActivationUserDto) (*user_dto.UserDto, error) {
+func (u *userRepository) SaveUser(dto *user_dto.ActivationUserDto) (*user_dto.UserDto, error) {
+	var user = schema.User{}
+
+	result := u.db.Create(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
 	return nil, nil
 }
