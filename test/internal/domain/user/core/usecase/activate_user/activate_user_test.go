@@ -192,6 +192,7 @@ func Test_GivenExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallMapperToDt
 	verify.Should(t, entityParam.GetFirstName()).Be(expectedParam.FirstName)
 	verify.Should(t, entityParam.GetLastName()).Be(expectedParam.LastName)
 	verify.Should(t, entityParam.GetEmail()).Be(expectedParam.Email)
+	verify.Should(t, entityParam.GetUsername()).Be(expectedParam.Email)
 	verify.Should(t, entityParam.GetGender()).Be(expectedParam.Gender)
 	verify.Should(t, entityParam.GetPassword()).Be(expectedParam.Password)
 	verify.Should(t, entityParam.GetCountryId()).Be(expectedParam.CountryId)

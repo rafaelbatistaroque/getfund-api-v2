@@ -86,6 +86,6 @@ func Test_GivenCreateUser_WhenUserCreatedSuccess_ThenEnsureReturnUserDtoFilled(t
 	verify.Should(t, userSaved.MainSocialNetwork).Be(expectedUserCreated.MainSocialNetwork)
 	verify.Should(t, userSaved.RegisteredUrl).Be(expectedUserCreated.RegisteredUrl)
 	verify.Should(t, userSaved.Email).Be(expectedUserCreated.Email)
-	verify.Should(t, userSaved.Username).Be(expectedUserCreated.Email)
+	verify.Should(t, userSaved.Username).Be(expectedUserCreated.Username)
 	verify.Should(t, userSaved.CreatedAt).NotNil()
 }

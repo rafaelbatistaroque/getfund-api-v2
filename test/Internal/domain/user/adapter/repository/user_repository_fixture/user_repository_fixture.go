@@ -25,6 +25,7 @@ func GetFilledActivationUserDto() *user_dto.ActivationUserDto {
 		FirstName:         "fake-first-name",
 		LastName:          "fake-last-name",
 		Email:             "fake@email.com",
+		Username:          "fake@email.com",
 		Gender:            "m",
 		Password:          "fakaStrongPass123",
 		CountryId:         1,

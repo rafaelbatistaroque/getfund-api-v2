@@ -6,19 +6,28 @@ import (
 )
 
 type HasherSpy struct {
-	Params        map[string]interface{}
+	Params        map[string]any
+	ParamsByCall  map[string][]any
 	CallsCount    map[string]int
 	ErrorResult   map[string]error
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 }
 
 func New() *HasherSpy {
-	return &HasherSpy{Params: make(map[string]interface{}, 2), ErrorResult: make(map[string]error, 1), SuccessResult: make(map[string]interface{}, 2), CallsCount: make(map[string]int, 1)}
+	return &HasherSpy{
+		Params:        make(map[string]any, 2),
+		ParamsByCall:  map[string][]any{},
+		ErrorResult:   make(map[string]error, 1),
+		SuccessResult: make(map[string]any, 2),
+		CallsCount:    make(map[string]int, 1)}
 }
 
 func (h *HasherSpy) HashAndMerge(input string, serverSalt []byte) string {
 	h.Params["HashAndMerge:input"] = input
 	h.Params["HashAndMerge:serverSalt"] = serverSalt
+
+	h.ParamsByCall["HashAndMerge:input"] = append(h.ParamsByCall["HashAndMerge:input"], input)
+	h.ParamsByCall["HashAndMerge:serverSalt"] = append(h.ParamsByCall["HashAndMerge:serverSalt"], serverSalt)
 
 	h.CallsCount["HashAndMerge"]++
 
@@ -33,6 +42,9 @@ func (h *HasherSpy) DecryptMerged(mergedEncryptedData string, secretKey []byte) 
 	h.Params["DecryptMerged:mergedEncryptedData"] = mergedEncryptedData
 	h.Params["DecryptMerged:secretKey"] = secretKey
 
+	h.ParamsByCall["DecryptMerged:mergedEncryptedData"] = append(h.ParamsByCall["DecryptMerged:mergedEncryptedData"], mergedEncryptedData)
+	h.ParamsByCall["DecryptMerged:secretKey"] = append(h.ParamsByCall["DecryptMerged:secretKey"], secretKey)
+
 	h.CallsCount["DecryptMerged"]++
 
 	success := h.SuccessResult["DecryptMerged"]
@@ -45,6 +57,9 @@ func (h *HasherSpy) DecryptMerged(mergedEncryptedData string, secretKey []byte) 
 func (h *HasherSpy) HashWithSalt(inputText string, serverSalt []byte) (string, error) {
 	h.Params["HashWithSalt:inputText"] = inputText
 	h.Params["HashWithSalt:serverSalt"] = serverSalt
+
+	h.ParamsByCall["HashWithSalt:inputText"] = append(h.ParamsByCall["HashWithSalt:inputText"], inputText)
+	h.ParamsByCall["HashWithSalt:serverSalt"] = append(h.ParamsByCall["HashWithSalt:serverSalt"], serverSalt)
 
 	h.CallsCount["HashWithSalt"]++
 
@@ -74,6 +89,9 @@ func (h *HasherSpy) IsMatch(inputHashed, inputText string, serverSalt []byte) bo
 func (h *HasherSpy) Encrypt(input string, secretKey []byte) string {
 	h.Params["Encrypt:input"] = input
 	h.Params["Encrypt:secretKey"] = secretKey
+
+	h.ParamsByCall["Encrypt:input"] = append(h.ParamsByCall["Encrypt:input"], input)
+	h.ParamsByCall["Encrypt:secretKey"] = append(h.ParamsByCall["Encrypt:secretKey"], secretKey)
 
 	h.CallsCount["Encrypt"]++
 
