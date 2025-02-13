@@ -6,9 +6,9 @@ import (
 	"getfund-api-v2/internal/domain/coupon/adapter/event_handler/user_criation_with_coupon_started_event_handler"
 	"getfund-api-v2/internal/domain/coupon/core/coupon_dto"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
+	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus"
-	"getfund-api-v2/pkg/bus/event"
 	"getfund-api-v2/test/helper/cache_spy"
 )
 
@@ -55,8 +55,8 @@ func (uc *ValidateCouponApplicationSpy) DefineValidateCouponUsecaseSuccess() {
 	uc.SuccessResult["Execute"] = &validate_coupon.Output{}
 }
 
-func GetInvalidUserCriationWithCouponStarted() *event.UserCriationWithCouponStarted {
-	return &event.UserCriationWithCouponStarted{}
+func GetInvalidUserCriationWithCouponStarted() *create_user.UserCriationWithCouponStartedEvent {
+	return &create_user.UserCriationWithCouponStartedEvent{}
 }
 
 func GetValidateCouponInput() *validate_coupon.Input {
@@ -73,13 +73,13 @@ func GetUserCriationWithCouponPayloadDto(errorStatus string) *coupon_dto.UserCri
 	}
 }
 
-func GetValidUserCriationWithCouponStarted() *event.UserCriationWithCouponStarted {
+func GetValidUserCriationWithCouponStarted() *create_user.UserCriationWithCouponStartedEvent {
 	payload, _ := json.Marshal(map[string]string{
 		"coupon_code":     "fake-coupon-code",
 		"activation_code": "fake-activation-code",
 	})
 
-	event := &event.UserCriationWithCouponStarted{}
+	event := &create_user.UserCriationWithCouponStartedEvent{}
 	event.SetPayload(payload)
 
 	return event

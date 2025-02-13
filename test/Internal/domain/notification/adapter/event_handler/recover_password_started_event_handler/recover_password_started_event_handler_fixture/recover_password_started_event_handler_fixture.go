@@ -2,11 +2,11 @@ package recover_password_started_event_handler_fixture
 
 import (
 	"encoding/json"
+	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
 	sut "getfund-api-v2/internal/domain/notification/adapter/event_handler/recover_password_started_event_handler"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus"
-	"getfund-api-v2/pkg/bus/event"
 	"getfund-api-v2/test/helper/cache_spy"
 )
 
@@ -53,12 +53,12 @@ func (uc *SendRecoverPasswordMailUsecaseSpy) DefineSendRecoverPasswordMailUsecas
 	uc.ErrorResult["Execute"] = &result_app.ApplicationError{}
 }
 
-func GetInvalidRecoverPasswordStartedEvent() *event.RecoverPasswordStarted {
-	return &event.RecoverPasswordStarted{}
+func GetInvalidRecoverPasswordStartedEvent() *recover_password.RecoverPasswordStartedEvent {
+	return &recover_password.RecoverPasswordStartedEvent{}
 }
 
-func GetValidRecoverPasswordStartedEvent(withValue string) *event.RecoverPasswordStarted {
-	event := &event.RecoverPasswordStarted{}
+func GetValidRecoverPasswordStartedEvent(withValue string) *recover_password.RecoverPasswordStartedEvent {
+	event := &recover_password.RecoverPasswordStartedEvent{}
 	event.SetPayload([]byte(withValue))
 
 	return event

@@ -10,7 +10,6 @@ import (
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
-	"getfund-api-v2/pkg/bus/event"
 	"time"
 )
 
@@ -92,7 +91,7 @@ func emitUserCriationStartedEvent(bus bus.EventBus, settings settings.Applicatio
 		ActivationLink: settings.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
 
-	bus.EmitWithPayload(&event.UserCriationStarted{}, payload)
+	bus.EmitWithPayload(&create_user.UserCriationStartedEvent{}, payload)
 }
 
 func emitUserCriationWithCouponCodeStarted(bus bus.EventBus, input *create_user.Input, activationCode string) {
@@ -101,5 +100,5 @@ func emitUserCriationWithCouponCodeStarted(bus bus.EventBus, input *create_user.
 		ActivationCode: activationCode,
 	}
 
-	bus.EmitWithPayload(&event.UserCriationWithCouponStarted{}, payload)
+	bus.EmitWithPayload(&create_user.UserCriationWithCouponStartedEvent{}, payload)
 }

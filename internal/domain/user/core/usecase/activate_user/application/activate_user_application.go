@@ -12,7 +12,6 @@ import (
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
-	"getfund-api-v2/pkg/bus/event"
 	"time"
 )
 
@@ -61,7 +60,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 			ActivationCode: input.ActivationCode,
 			UserId:         userSaved.Id,
 		}
-		a.bus.EmitWithPayload(&event.UserActivationWithCouponConfirmed{}, payloadCoupon)
+		a.bus.EmitWithPayload(&activate_user.ActivateUserWithCouponConfirmedEvent{}, payloadCoupon)
 	}
 
 	channelResponse := make(chan []byte, 1)
@@ -69,7 +68,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		Id: userSaved.Id,
 	}
 
-	a.bus.EmitWithPayloadAndResponse(&event.UserCreated{}, payloadConfirmed, channelResponse)
+	a.bus.EmitWithPayloadAndResponse(&activate_user.ActivateUserConfirmedEvent{}, payloadConfirmed, channelResponse)
 
 	return getOutputFromHandleEventResponse(channelResponse, a.settings)
 }

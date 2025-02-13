@@ -9,7 +9,6 @@ import (
 	"getfund-api-v2/internal/shared/security"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
-	"getfund-api-v2/pkg/bus/event"
 	"time"
 )
 
@@ -74,7 +73,7 @@ func (uc *recoverPasswordApplication) Execute(input *recover_password.Input) (*r
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, cacheErr)
 	}
 
-	uc.bus.EmitWithPayload(&event.RecoverPasswordStarted{}, keyCache)
+	uc.bus.EmitWithPayload(&recover_password.RecoverPasswordStartedEvent{}, keyCache)
 
 	return &recover_password.Output{Message: "recover password started"}, nil
 }

@@ -7,7 +7,6 @@ import (
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/pkg/bus/event"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/activate_user/activate_user_fixture"
 	"testing"
 	"time"
@@ -289,7 +288,7 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	sut.Execute(inputValid)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserActivationWithCouponConfirmed{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&activate_user.ActivateUserWithCouponConfirmedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][0]).Be(expectedPaylod)
 }
 
@@ -320,7 +319,7 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 
 	// Assert
 	payloadReceived := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*user_dto.UserCreatedPayloadDto)
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserCreated{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&activate_user.ActivateUserConfirmedEvent{})
 	verify.Should(t, payloadReceived.Id).Be(expectedPayload.Id)
 }
 

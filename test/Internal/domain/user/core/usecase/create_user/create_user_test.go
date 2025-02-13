@@ -2,9 +2,9 @@ package create_user_test
 
 import (
 	"fmt"
+	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/pkg/bus/event"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/create_user/create_user_fixture"
 	"testing"
 	"time"
@@ -356,7 +356,7 @@ func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadW
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.UserCriationStarted{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&create_user.UserCriationStartedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][0]).Be(payload)
 }
 
@@ -385,7 +385,7 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][1]).Be(&event.UserCriationWithCouponStarted{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][1]).Be(&create_user.UserCriationWithCouponStartedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][1]).Be(payload)
 }
 
