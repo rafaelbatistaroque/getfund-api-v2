@@ -80,3 +80,15 @@ func Test_GivenCreateUser_WhenHasherMethodsSuccess_ThenEnsureCallCreateUserWithC
 	verify.Should(t, createUserParams.Password).Be(spies.HasherSpy.SuccessResult["HashAndMerge"])
 	verify.Should(t, createUserParams.Username).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
 }
+
+func Test_GivenCreateUser_WhenRepoCreateUserInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("")
+
+	// Act
+	sut.CreateUser(fixture.GetEmptyActivationUserDto())
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.CallsCount["CreateUser"]).Be(1)
+}
