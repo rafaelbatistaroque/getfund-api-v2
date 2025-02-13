@@ -47,3 +47,16 @@ func Test_GivenUserExistsByUsername_WhenFound_ThenEnsureReturnSuccess(t *testing
 	verify.Should(t, userFound).NotNil()
 	verify.Should(t, userFound.Id).Be(1)
 }
+
+func Test_GivenSaveUser_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	currentDb, _ := db.DB()
+	currentDb.Close()
+
+	// Act
+	_, err := sut.SaveUser(fixture.GetEmptyActivationUserDto())
+
+	// Assert
+	verify.Should(t, err).NotNil()
+}
