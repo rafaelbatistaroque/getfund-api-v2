@@ -48,7 +48,7 @@ func (r *UserRepositorySpy) DefineUserExistsByUsernameError() {
 }
 
 func (r *UserRepositorySpy) DefineUserExistsByUsernameSuccess() {
-	r.SuccessResult["UserExistsByUsername"] = &user_dto.UserDto{Id: "fake-id"}
+	r.SuccessResult["UserExistsByUsername"] = &user_dto.UserDto{Id: 1}
 }
 
 func (r *UserRepositorySpy) DefineUserExistsByUsernameSuccessNotFound() {
@@ -60,5 +60,5 @@ func (r *UserRepositorySpy) DefineSaveUserError() {
 }
 
 func (r *UserRepositorySpy) DefineSaveUserSuccess() {
-	r.SuccessResult["SaveUser"] = &user_dto.UserDto{Id: "fake-id"}
+	r.SuccessResult["SaveUser"] = &user_dto.UserDto{Id: 1}
 }

@@ -1,9 +1,11 @@
 package user_repository_test
 
 import (
+	"getfund-api-v2/pkg/db/schema"
 	fixture "getfund-api-v2/test/internal/domain/user/adapter/repository/user_repository_fixture"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/rafaelbatistaroque/verify"
 )
 
@@ -29,4 +31,19 @@ func Test_GivenUserExistsByUsername_WhenNotFound_ThenEnsureReturnApropriateError
 
 	// Assert
 	verify.Should(t, err.Error()).Be("user not found")
+}
+
+func Test_GivenUserExistsByUsername_WhenFound_ThenEnsureReturnSuccess(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	username := uuid.NewString()
+	db.Create(&schema.User{Username: username})
+
+	// Act
+	userFound, err := sut.UserExistsByUsername(username)
+
+	// Assert
+	verify.Should(t, err).Nil()
+	verify.Should(t, userFound).NotNil()
+	verify.Should(t, userFound.Id).Be(1)
 }
