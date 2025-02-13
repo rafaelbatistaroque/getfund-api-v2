@@ -22,16 +22,20 @@ func New(repository user_contract.Repository, settings settings.ApplicationSetti
 }
 
 func (u *userRepositoryProxy) CreateUser(user *user_dto.ActivationUserDto) (*user_dto.UserDto, error) {
-	u.hasher.Encrypt(user.FirstName, u.settings.GetSecretKey())
-	u.hasher.Encrypt(user.LastName, u.settings.GetSecretKey())
-	u.hasher.Encrypt(user.Email, u.settings.GetSecretKey())
-	u.hasher.Encrypt(user.MainSocialNetwork, u.settings.GetSecretKey())
-	u.hasher.Encrypt(user.RegisteredUrl, u.settings.GetSecretKey())
-	u.hasher.HashAndMerge(user.Password, u.settings.GetServerSalt())
-	_, err := u.hasher.HashWithSalt(user.Username, u.settings.GetServerSalt())
+	user.FirstName = u.hasher.Encrypt(user.FirstName, u.settings.GetSecretKey())
+	user.LastName = u.hasher.Encrypt(user.LastName, u.settings.GetSecretKey())
+	user.Email = u.hasher.Encrypt(user.Email, u.settings.GetSecretKey())
+	user.MainSocialNetwork = u.hasher.Encrypt(user.MainSocialNetwork, u.settings.GetSecretKey())
+	user.RegisteredUrl = u.hasher.Encrypt(user.RegisteredUrl, u.settings.GetSecretKey())
+	user.Password = u.hasher.HashAndMerge(user.Password, u.settings.GetServerSalt())
+	usernameHashed, err := u.hasher.HashWithSalt(user.Username, u.settings.GetServerSalt())
 	if err != nil {
 		return nil, err
 	}
+
+	user.Username = usernameHashed
+
+	u.repository.CreateUser(user)
 
 	return nil, nil
 }
