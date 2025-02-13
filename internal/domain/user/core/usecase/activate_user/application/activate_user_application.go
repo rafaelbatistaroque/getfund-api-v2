@@ -50,7 +50,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, err
 	}
 
-	userSaved, err := saveUser(userData, a.mapper, a.repository)
+	userSaved, err := createUser(userData, a.mapper, a.repository)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func checkForDuplicateUser(input *activate_user.Input, userData *user_dto.Activa
 	return nil
 }
 
-func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper.Mapper, repository user_contract.Repository) (*user_dto.UserDto, *result_app.ApplicationError) {
+func createUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper.Mapper, repository user_contract.Repository) (*user_dto.UserDto, *result_app.ApplicationError) {
 	user := user_entity.New(
 		userData.FirstName,
 		userData.LastName,
@@ -117,7 +117,7 @@ func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper
 
 	userDto := mapper.ToDto(user)
 
-	userSaved, err := repository.SaveUser(userDto)
+	userSaved, err := repository.CreateUser(userDto)
 	if err != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}
