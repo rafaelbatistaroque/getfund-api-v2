@@ -36,13 +36,24 @@ func Test_GivenCreateUser_WhenInit_ThenEnsureCallHasherMethodsWithCorrectParamet
 func Test_GivenCreateUser_WhenHasherMethodsInvoked_ThenEnsureCallsCorrectTimes(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	expectedInput := fixture.GetFilledActivationUserDto()
 
 	// Act
-	sut.CreateUser(expectedInput)
+	sut.CreateUser(fixture.GetEmptyActivationUserDto())
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["Encrypt"]).Be(5)
 	verify.Should(t, spies.HasherSpy.CallsCount["HashAndMerge"]).Be(1)
 	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
+}
+
+func Test_GivenCreateUser_WhenHashWithSaltError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltError()
+
+	// Act
+	_, err := sut.CreateUser(fixture.GetEmptyActivationUserDto())
+
+	// Assert
+	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
 }
