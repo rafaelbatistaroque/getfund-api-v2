@@ -24,12 +24,12 @@ func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*auth_
 		Where("is_active = ? AND username = ?", true, username).
 		First(&user)
 
-	if result.Error != nil {
-		return nil, result.Error
+	if result.Error == gorm.ErrRecordNotFound {
+		return nil, errors.New("user not found")
 	}
 
-	if result.RowsAffected == 0 {
-		return nil, errors.New("user not found")
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	return &auth_dto.AuthenticatedUserDto{
@@ -49,8 +49,6 @@ func (r *authRepository) UpdatePassword(id int, value string) error {
 	if result.Error != nil {
 		return result.Error
 	}
-
-	//RowsAffected
 
 	return nil
 }
