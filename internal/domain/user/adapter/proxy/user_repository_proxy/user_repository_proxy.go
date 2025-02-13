@@ -28,14 +28,17 @@ func (u *userRepositoryProxy) CreateUser(user *user_dto.ActivationUserDto) (*use
 	user.MainSocialNetwork = u.hasher.Encrypt(user.MainSocialNetwork, u.settings.GetSecretKey())
 	user.RegisteredUrl = u.hasher.Encrypt(user.RegisteredUrl, u.settings.GetSecretKey())
 	user.Password = u.hasher.HashAndMerge(user.Password, u.settings.GetServerSalt())
-	usernameHashed, err := u.hasher.HashWithSalt(user.Username, u.settings.GetServerSalt())
-	if err != nil {
-		return nil, err
+	usernameHashed, errHash := u.hasher.HashWithSalt(user.Username, u.settings.GetServerSalt())
+	if errHash != nil {
+		return nil, errHash
 	}
 
 	user.Username = usernameHashed
 
-	u.repository.CreateUser(user)
+	_, errRepo := u.repository.CreateUser(user)
+	if errRepo != nil {
+		return nil, errRepo
+	}
 
 	return nil, nil
 }
