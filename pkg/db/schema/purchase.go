@@ -1,5 +1,7 @@
 package schema
 
+import "time"
+
 type Purchase struct {
 	ID           uint   `gorm:"primaryKey;autoIncrement"`
 	CodePurchase string `gorm:"not null"`
@@ -19,4 +21,7 @@ type Purchase struct {
 	Product   Product   `gorm:"foreignKey:ProductID;constraint:OnDelete:CASCADE"`
 	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	Coupon    *Coupon   `gorm:"foreignKey:CouponID;constraint:OnDelete:SET NULL"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

@@ -1,5 +1,7 @@
 package schema
 
+import "time"
+
 type PrizeDraw struct {
 	ID                  uint   `gorm:"primaryKey;autoIncrement"`
 	Name                string `gorm:"not null"`
@@ -16,4 +18,7 @@ type PrizeDraw struct {
 
 	// Relacionamento com Entrance
 	WinnerEntrance *Entrance `gorm:"foreignKey:WinnerEntranceID;constraint:OnDelete:SET NULL"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

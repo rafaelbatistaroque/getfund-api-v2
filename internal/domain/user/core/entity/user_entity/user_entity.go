@@ -1,11 +1,10 @@
-package activate_user_entity
+package user_entity
 
 import (
 	"slices"
-	"time"
 )
 
-type ActivationUser struct {
+type User struct {
 	firstName         string
 	lastName          string
 	email             string
@@ -15,13 +14,12 @@ type ActivationUser struct {
 	userCategoryId    int
 	mainSocialNetwork string
 	registeredUrl     string
-	registeredAt      time.Time
 	isActive          bool
 	isAdmin           bool
 }
 
-func New(firstName, lastName, email, gender, password, mainSocialNetwork, registeredUrl string, countryId, userCategoryId int) *ActivationUser {
-	return &ActivationUser{
+func New(firstName, lastName, email, gender, password, mainSocialNetwork, registeredUrl string, countryId, userCategoryId int) *User {
+	return &User{
 		firstName:         getValidValue(firstName),
 		lastName:          getValidValue(lastName),
 		email:             getValidValue(email),
@@ -31,7 +29,6 @@ func New(firstName, lastName, email, gender, password, mainSocialNetwork, regist
 		userCategoryId:    userCategoryId,
 		mainSocialNetwork: getValidValue(mainSocialNetwork),
 		registeredUrl:     getValidValue(registeredUrl),
-		registeredAt:      time.Now(),
 		isActive:          true,
 		isAdmin:           false,
 	}
@@ -53,50 +50,46 @@ func validateGender(gender string) string {
 	return gender
 }
 
-func (u *ActivationUser) GetFirstName() string {
+func (u *User) GetFirstName() string {
 	return u.firstName
 }
 
-func (u *ActivationUser) GetLastName() string {
+func (u *User) GetLastName() string {
 	return u.lastName
 }
 
-func (u *ActivationUser) GetEmail() string {
+func (u *User) GetEmail() string {
 	return u.email
 }
 
-func (u *ActivationUser) GetGender() string {
+func (u *User) GetGender() string {
 	return u.gender
 }
 
-func (u *ActivationUser) GetPassword() string {
+func (u *User) GetPassword() string {
 	return u.password
 }
 
-func (u *ActivationUser) GetCountryId() int {
+func (u *User) GetCountryId() int {
 	return u.countryId
 }
 
-func (u *ActivationUser) GetUserCategoryId() int {
+func (u *User) GetUserCategoryId() int {
 	return u.userCategoryId
 }
 
-func (u *ActivationUser) GetMainSocialNetwork() string {
+func (u *User) GetMainSocialNetwork() string {
 	return u.mainSocialNetwork
 }
 
-func (u *ActivationUser) GetRegisteredUrl() string {
+func (u *User) GetRegisteredUrl() string {
 	return u.registeredUrl
 }
 
-func (u *ActivationUser) GetRegisteredAt() int64 {
-	return u.registeredAt.Unix()
-}
-
-func (u *ActivationUser) GetIsActive() bool {
+func (u *User) GetIsActive() bool {
 	return u.isActive
 }
 
-func (u *ActivationUser) GetIsAdmin() bool {
+func (u *User) GetIsAdmin() bool {
 	return u.isAdmin
 }

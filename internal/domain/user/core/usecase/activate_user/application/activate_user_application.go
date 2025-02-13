@@ -6,7 +6,7 @@ import (
 	"errors"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/domain_service/activate_user_mapper"
-	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
+	"getfund-api-v2/internal/domain/user/core/entity/user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/settings"
@@ -104,7 +104,7 @@ func checkForDuplicateUser(input *activate_user.Input, userData *user_dto.Activa
 }
 
 func saveUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper.Mapper, repository user_contract.Repository) (*user_dto.UserDto, *result_app.ApplicationError) {
-	user := activate_user_entity.New(
+	user := user_entity.New(
 		userData.FirstName,
 		userData.LastName,
 		userData.Email,

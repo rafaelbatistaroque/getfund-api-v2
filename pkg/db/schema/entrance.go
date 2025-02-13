@@ -1,5 +1,7 @@
 package schema
 
+import "time"
+
 type Entrance struct {
 	ID          uint   `gorm:"primaryKey;autoIncrement"`
 	Code        string `gorm:"not null;unique"`
@@ -14,4 +16,7 @@ type Entrance struct {
 	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	PrizeDraw PrizeDraw `gorm:"foreignKey:PrizeDrawID;constraint:OnDelete:CASCADE"`
 	Purchase  Purchase  `gorm:"foreignKey:PurchaseID;constraint:OnDelete:CASCADE"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

@@ -2,7 +2,7 @@ package activate_user_fixture
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
+	"getfund-api-v2/internal/domain/user/core/entity/user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
 	"getfund-api-v2/test/helper/cache_spy"
@@ -77,8 +77,8 @@ func WithInvalidActivationKey() Option {
 	}
 }
 
-func GetActivateUserEntity() *activate_user_entity.ActivationUser {
-	return activate_user_entity.New(
+func GetActivateUserEntity() *user_entity.User {
+	return user_entity.New(
 		"fake-first-name",
 		"fake-last-name",
 		"fake@email.com",

@@ -1,5 +1,7 @@
 package schema
 
+import "time"
+
 type FreeFundingUserEntrances struct {
 	ID          uint `gorm:"primaryKey;autoIncrement"`
 	UserID      uint `gorm:"index"`
@@ -7,4 +9,7 @@ type FreeFundingUserEntrances struct {
 
 	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	PrizeDraw PrizeDraw `gorm:"foreignKey:PrizeDrawID;constraint:OnDelete:CASCADE"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

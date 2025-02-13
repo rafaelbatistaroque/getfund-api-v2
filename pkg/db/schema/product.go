@@ -1,5 +1,7 @@
 package schema
 
+import "time"
+
 type Product struct {
 	ID            uint `gorm:"primaryKey;autoIncrement"`
 	StripePriceID *string
@@ -7,4 +9,7 @@ type Product struct {
 	EntranceQty   int    `gorm:"not null"`
 	TotalPrice    int    `gorm:"not null"`
 	IsActive      bool   `gorm:"not null;index:idx_product_active"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

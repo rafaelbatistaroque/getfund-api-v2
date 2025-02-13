@@ -1,5 +1,7 @@
 package schema
 
+import "time"
+
 type User struct {
 	ID                uint   `gorm:"primaryKey;autoIncrement"`
 	UserCategoryID    uint   `gorm:"index"`
@@ -11,7 +13,6 @@ type User struct {
 	Password          string `gorm:"not null"`
 	Gender            string `gorm:"not null"`
 	MainSocialNetwork string `gorm:"not null"`
-	RegisteredAt      int    `gorm:"not null"`
 	RegisteredUrl     string `gorm:"not null"`
 	IsAdmin           bool   `gorm:"not null"`
 	IsActive          bool   `gorm:"not null"`
@@ -19,4 +20,7 @@ type User struct {
 	// Relacionamentos
 	UserCategory UserCategory `gorm:"foreignKey:UserCategoryID;constraint:OnDelete:CASCADE"`
 	Country      Country      `gorm:"foreignKey:CountryID;constraint:OnDelete:CASCADE"`
+
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

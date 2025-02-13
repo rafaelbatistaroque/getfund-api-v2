@@ -3,7 +3,7 @@ package activate_user_test
 import (
 	"encoding/json"
 	"fmt"
-	"getfund-api-v2/internal/domain/user/core/entity/activate_user_entity"
+	"getfund-api-v2/internal/domain/user/core/entity/user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
@@ -188,7 +188,7 @@ func Test_GivenExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallMapperToDt
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	entityParam := spies.MapperSpy.Params["ToDto:entity"].(*activate_user_entity.ActivationUser)
+	entityParam := spies.MapperSpy.Params["ToDto:entity"].(*user_entity.User)
 	verify.Should(t, entityParam.GetFirstName()).Be(expectedParam.FirstName)
 	verify.Should(t, entityParam.GetLastName()).Be(expectedParam.LastName)
 	verify.Should(t, entityParam.GetEmail()).Be(expectedParam.Email)
@@ -200,7 +200,6 @@ func Test_GivenExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallMapperToDt
 	verify.Should(t, entityParam.GetRegisteredUrl()).Be(expectedParam.RegisteredUrl)
 	verify.Should(t, entityParam.GetIsActive()).BeTrue()
 	verify.Should(t, entityParam.GetIsAdmin()).BeFalse()
-	verify.Should(t, entityParam.GetRegisteredAt()).NotNil()
 }
 
 func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
