@@ -7,6 +7,8 @@ import (
 	"getfund-api-v2/test/helper/repository_spy/user_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
+
+	"github.com/google/uuid"
 )
 
 type userRepositoryProxyFixture struct {
@@ -46,4 +48,8 @@ func GetFilledActivationUserDto() *user_dto.ActivationUserDto {
 		RegisteredUrl:     "https://social.com",
 		IsAdmin:           false,
 	}
+}
+
+func GetFakeUsername() string {
+	return uuid.NewString()
 }

@@ -118,3 +118,16 @@ func Test_GivenCreateUser_WhenRepoCreateUserSuccess_ThenEnsureReturnCorrectUserD
 	// Assert
 	verify.Should(t, userReturned).Be(spies.RepoSpy.SuccessResult["CreateUser"])
 }
+
+func Test_GivenUserExistsByUsername_WhenInit_ThenEnsureCallHashWithSaltWithCorrectTimes(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	expectedInput := fixture.GetFakeUsername()
+
+	// Act
+	sut.UserExistsByUsername(expectedInput)
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.Params["HashWithSalt:inputText"]).Be(expectedInput)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+}
