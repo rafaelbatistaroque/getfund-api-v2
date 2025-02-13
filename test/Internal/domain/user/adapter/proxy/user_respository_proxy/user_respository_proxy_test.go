@@ -105,3 +105,16 @@ func Test_GivenCreateUser_WhenRepoCreateUserError_ThenEnsureReturnError(t *testi
 	// Assert
 	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["CreateUser"])
 }
+
+func Test_GivenCreateUser_WhenRepoCreateUserSuccess_ThenEnsureReturnCorrectUserDto(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("")
+	spies.RepoSpy.DefineCreateUserSuccess()
+
+	// Act
+	userReturned, _ := sut.CreateUser(fixture.GetEmptyActivationUserDto())
+
+	// Assert
+	verify.Should(t, userReturned).Be(spies.RepoSpy.SuccessResult["CreateUser"])
+}
