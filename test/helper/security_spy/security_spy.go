@@ -6,20 +6,23 @@ import (
 )
 
 type HasherSpy struct {
-	Params        map[string]any
-	ParamsByCall  map[string][]any
-	CallsCount    map[string]int
-	ErrorResult   map[string]error
-	SuccessResult map[string]any
+	Params              map[string]any
+	ParamsByCall        map[string][]any
+	CallsCount          map[string]int
+	ErrorResult         map[string]error
+	SuccessResult       map[string]any
+	SuccessResultByCall map[string][]any
 }
 
 func New() *HasherSpy {
 	return &HasherSpy{
-		Params:        make(map[string]any, 2),
-		ParamsByCall:  map[string][]any{},
-		ErrorResult:   make(map[string]error, 1),
-		SuccessResult: make(map[string]any, 2),
-		CallsCount:    make(map[string]int, 1)}
+		Params:              make(map[string]any, 2),
+		ParamsByCall:        map[string][]any{},
+		ErrorResult:         make(map[string]error, 1),
+		SuccessResult:       make(map[string]any, 2),
+		CallsCount:          make(map[string]int, 1),
+		SuccessResultByCall: map[string][]any{},
+	}
 }
 
 func (h *HasherSpy) HashAndMerge(input string, serverSalt []byte) string {
@@ -97,6 +100,7 @@ func (h *HasherSpy) Encrypt(input string, secretKey []byte) string {
 
 	success := h.SuccessResult["Encrypt"]
 	if success != nil {
+		h.SuccessResultByCall["Encrypt"] = append(h.SuccessResultByCall["Encrypt"], success.(string))
 		return success.(string)
 	}
 

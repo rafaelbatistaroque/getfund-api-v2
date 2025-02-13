@@ -2,9 +2,11 @@ package user_respository_proxy_test
 
 import (
 	"bytes"
+	"getfund-api-v2/internal/domain/user/core/user_dto"
 	fixture "getfund-api-v2/test/internal/domain/user/adapter/proxy/user_respository_proxy/user_respository_proxy_fixture"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/rafaelbatistaroque/verify"
 )
 
@@ -56,4 +58,25 @@ func Test_GivenCreateUser_WhenHashWithSaltError_ThenEnsureReturnError(t *testing
 
 	// Assert
 	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
+}
+
+func Test_GivenCreateUser_WhenHasherMethodsSuccess_ThenEnsureCallCreateUserWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineEncryptSuccess()
+	spies.HasherSpy.DefineHashAndMergeSuccess(uuid.NewString())
+	spies.HasherSpy.DefineHashWithSaltSuccess(uuid.NewString())
+
+	// Act
+	sut.CreateUser(fixture.GetEmptyActivationUserDto())
+
+	// Assert
+	createUserParams := spies.RepoSpy.Params["CreateUser:user"].(*user_dto.ActivationUserDto)
+	verify.Should(t, createUserParams.FirstName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][0])
+	verify.Should(t, createUserParams.LastName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][1])
+	verify.Should(t, createUserParams.Email).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][2])
+	verify.Should(t, createUserParams.MainSocialNetwork).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][3])
+	verify.Should(t, createUserParams.RegisteredUrl).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][4])
+	verify.Should(t, createUserParams.Password).Be(spies.HasherSpy.SuccessResult["HashAndMerge"])
+	verify.Should(t, createUserParams.Username).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
 }
