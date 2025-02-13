@@ -35,12 +35,12 @@ func (u *userRepositoryProxy) CreateUser(user *user_dto.ActivationUserDto) (*use
 
 	user.Username = usernameHashed
 
-	_, errRepo := u.repository.CreateUser(user)
+	userCreated, errRepo := u.repository.CreateUser(user)
 	if errRepo != nil {
 		return nil, errRepo
 	}
 
-	return nil, nil
+	return userCreated, nil
 }
 
 func (u *userRepositoryProxy) UserExistsByUsername(username string) (*user_dto.UserDto, error) {
