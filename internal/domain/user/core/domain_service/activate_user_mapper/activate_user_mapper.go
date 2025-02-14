@@ -18,5 +18,18 @@ func New() Mapper {
 }
 
 func (m *activateUserMapper) ToDto(entity *user_entity.User) *user_dto.ActivationUserDto {
-	return &user_dto.ActivationUserDto{}
+	return &user_dto.ActivationUserDto{
+		FirstName:         entity.GetFirstName(),
+		LastName:          entity.GetLastName(),
+		Email:             entity.GetEmail(),
+		Username:          entity.GetUsername(),
+		Gender:            entity.GetGender(),
+		Password:          entity.GetPassword(),
+		CountryId:         entity.GetCountryId(),
+		UserCategoryId:    entity.GetUserCategoryId(),
+		MainSocialNetwork: entity.GetMainSocialNetwork(),
+		RegisteredUrl:     entity.GetRegisteredUrl(),
+		IsAdmin:           entity.GetIsAdmin(),
+		IsActive:          entity.GetIsActive(),
+	}
 }
