@@ -1,7 +1,7 @@
 package signin_mapper_test
 
 import (
-	fixture "getfund-api-v2/test/internal/domain/auth/main/signin_mapper/signin_mapper_fixture"
+	fixture "getfund-api-v2/test/internal/domain/auth/core/domain_service/signin_mapper/signin_mapper_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"
