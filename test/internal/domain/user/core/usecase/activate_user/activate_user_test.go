@@ -3,9 +3,10 @@ package activate_user_test
 import (
 	"encoding/json"
 	"fmt"
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
+	payload "getfund-api-v2/internal/domain/user/core/dto/user_payload"
 	"getfund-api-v2/internal/domain/user/core/entity/user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/activate_user/activate_user_fixture"
 	"testing"
@@ -279,7 +280,7 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.RepoSpy.DefineCreateUserSuccess()
 	inputValid := fixture.GetInput()
-	expectedPaylod := &user_dto.UserActivationWithCouponPayloadDto{
+	expectedPaylod := &payload.UserActivationWithCouponPayload{
 		ActivationCode: inputValid.ActivationCode,
 		UserId:         spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
 	}
@@ -310,7 +311,7 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
 	spies.RepoSpy.DefineCreateUserSuccess()
-	expectedPayload := &user_dto.UserCreatedPayloadDto{
+	expectedPayload := &payload.UserCreatedPayload{
 		Id: spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
 	}
 
@@ -318,7 +319,7 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	payloadReceived := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*user_dto.UserCreatedPayloadDto)
+	payloadReceived := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*payload.UserCreatedPayload)
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&activate_user.ActivateUserConfirmedEvent{})
 	verify.Should(t, payloadReceived.Id).Be(expectedPayload.Id)
 }

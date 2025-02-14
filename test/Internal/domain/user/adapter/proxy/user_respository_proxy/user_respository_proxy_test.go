@@ -2,7 +2,7 @@ package user_respository_proxy_test
 
 import (
 	"bytes"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 	fixture "getfund-api-v2/test/internal/domain/user/adapter/proxy/user_respository_proxy/user_respository_proxy_fixture"
 	"testing"
 

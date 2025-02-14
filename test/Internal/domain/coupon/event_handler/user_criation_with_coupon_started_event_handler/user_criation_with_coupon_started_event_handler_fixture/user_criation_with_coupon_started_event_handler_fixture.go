@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"getfund-api-v2/internal/domain/coupon/adapter/event_handler/user_criation_with_coupon_started_event_handler"
-	"getfund-api-v2/internal/domain/coupon/core/coupon_dto"
+	"getfund-api-v2/internal/domain/coupon/core/dto/coupon_payload"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
@@ -65,8 +65,8 @@ func GetValidateCouponInput() *validate_coupon.Input {
 	}
 }
 
-func GetUserCriationWithCouponPayloadDto(errorStatus string) *coupon_dto.UserCriationWithCouponPayloadDto {
-	return &coupon_dto.UserCriationWithCouponPayloadDto{
+func GetUserCriationWithCouponPayloadDto(errorStatus string) *coupon_payload.UserCriationWithCouponPayload {
+	return &coupon_payload.UserCriationWithCouponPayload{
 		CouponCode:     "fake-coupon-code",
 		ActivationCode: "fake-activation-code",
 		ErrorStatus:    errorStatus,

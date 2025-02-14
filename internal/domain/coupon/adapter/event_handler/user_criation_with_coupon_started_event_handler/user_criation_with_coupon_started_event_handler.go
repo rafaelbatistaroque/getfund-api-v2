@@ -2,7 +2,7 @@ package user_criation_with_coupon_started_event_handler
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/coupon/core/coupon_dto"
+	"getfund-api-v2/internal/domain/coupon/core/dto/coupon_payload"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
@@ -26,7 +26,7 @@ func New(usecase validate_coupon.UseCase, cache cache_service.Cache) bus.Handler
 }
 
 func (h *userCriationWithCouponStartedEventHandler) Handle(event bus.Event) {
-	var payload = &coupon_dto.UserCriationWithCouponPayloadDto{}
+	var payload = &coupon_payload.UserCriationWithCouponPayload{}
 	if err := json.Unmarshal(event.GetPayload(), payload); err != nil {
 		h.logger.Error("IsOk: False | get payload failed")
 		return

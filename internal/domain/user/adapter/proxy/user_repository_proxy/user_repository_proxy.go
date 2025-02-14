@@ -2,7 +2,7 @@ package user_repository_proxy
 
 import (
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/security"
 )

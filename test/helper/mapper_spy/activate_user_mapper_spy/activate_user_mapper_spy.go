@@ -1,8 +1,8 @@
 package activate_user_mapper_spy
 
 import (
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 	"getfund-api-v2/internal/domain/user/core/entity/user_entity"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
 )
 
 type ActivateUserMapperSpy struct {

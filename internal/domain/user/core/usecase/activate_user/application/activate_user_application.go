@@ -6,9 +6,10 @@ import (
 	"errors"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/domain_service/activate_user_mapper"
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
+	payload "getfund-api-v2/internal/domain/user/core/dto/user_payload"
 	"getfund-api-v2/internal/domain/user/core/entity/user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/app_constant"
 	"getfund-api-v2/internal/shared/result_app"
@@ -58,7 +59,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	defer a.cache.Delete(input.ActivationKey)
 
 	if userData.CouponCode != "" {
-		payloadCoupon := &user_dto.UserActivationWithCouponPayloadDto{
+		payloadCoupon := &payload.UserActivationWithCouponPayload{
 			ActivationCode: input.ActivationCode,
 			UserId:         userSaved.Id,
 		}
@@ -66,7 +67,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	}
 
 	channelResponse := make(chan []byte, 1)
-	payloadConfirmed := &user_dto.UserCreatedPayloadDto{
+	payloadConfirmed := &payload.UserCreatedPayload{
 		Id: userSaved.Id,
 	}
 

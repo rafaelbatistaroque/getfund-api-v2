@@ -3,8 +3,8 @@ package create_user_application
 import (
 	"errors"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
+	payload "getfund-api-v2/internal/domain/user/core/dto/user_payload"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/internal/shared/security"
@@ -86,7 +86,7 @@ func buildActivationCode(hasher security.Hasher) (string, error) {
 }
 
 func emitUserCriationStartedEvent(bus bus.EventBus, settings settings.ApplicationSettings, activationCode string) {
-	payload := &user_dto.UserCriationPayloadDto{
+	payload := &payload.UserCriationPayload{
 		ActivationCode: activationCode,
 		ActivationLink: settings.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
@@ -95,7 +95,7 @@ func emitUserCriationStartedEvent(bus bus.EventBus, settings settings.Applicatio
 }
 
 func emitUserCriationWithCouponCodeStarted(bus bus.EventBus, input *create_user.Input, activationCode string) {
-	payload := &user_dto.UserCriationWithCouponPayloadDto{
+	payload := &payload.UserCriationWithCouponPayload{
 		CouponCode:     input.CouponCode,
 		ActivationCode: activationCode,
 	}

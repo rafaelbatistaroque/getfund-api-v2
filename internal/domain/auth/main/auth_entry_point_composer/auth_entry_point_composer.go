@@ -27,7 +27,7 @@ import (
 
 type middlewareFunc = func(http.Handler) http.Handler
 
-type AuthEntryPointComposer struct {
+type authEntryPointComposer struct {
 	Signin                     http.HandlerFunc
 	Signout                    http.HandlerFunc
 	RecoverPassword            http.HandlerFunc
@@ -40,7 +40,7 @@ func Get(
 	settings settings.ApplicationSettings,
 	cache cache_service.Cache,
 	db *gorm.DB,
-	eventBus bus.EventBus) AuthEntryPointComposer {
+	eventBus bus.EventBus) authEntryPointComposer {
 
 	//dependencies
 	hasher := security.New()
@@ -67,7 +67,7 @@ func Get(
 	//Event Handler
 	// eventBus.Subscribe("UserCreated", user_created_event_handler.New(signin, cache))
 
-	return AuthEntryPointComposer{
+	return authEntryPointComposer{
 		Signin:                     response_proxy.New(signinGateway.Signin),
 		Signout:                    response_proxy.New(signoutGateway.Signout),
 		RecoverPassword:            response_proxy.New(recoverPasswordGateway.RecoverPassword),

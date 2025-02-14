@@ -2,7 +2,7 @@ package user_repository_spy
 
 import (
 	"errors"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 )
 
 type UserRepositorySpy struct {

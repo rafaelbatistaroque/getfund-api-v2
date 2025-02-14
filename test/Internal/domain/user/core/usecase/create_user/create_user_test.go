@@ -2,8 +2,8 @@ package create_user_test
 
 import (
 	"fmt"
+	payload "getfund-api-v2/internal/domain/user/core/dto/user_payload"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/create_user/create_user_fixture"
 	"testing"
@@ -347,7 +347,7 @@ func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadW
 	validInput := fixture.GetInput(fixture.WithEmptyCouponCode())
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	activationCode := "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
-	payload := &user_dto.UserCriationPayloadDto{
+	payload := &payload.UserCriationPayload{
 		ActivationCode: activationCode,
 		ActivationLink: spies.SettingsSpy.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
@@ -376,7 +376,7 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput()
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
-	payload := &user_dto.UserCriationWithCouponPayloadDto{
+	payload := &payload.UserCriationWithCouponPayload{
 		CouponCode:     validInput.CouponCode,
 		ActivationCode: "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
 	}

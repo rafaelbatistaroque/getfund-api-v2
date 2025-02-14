@@ -3,7 +3,7 @@ package user_repository_fixture
 import (
 	user_repository "getfund-api-v2/internal/domain/user/adapter/repository"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
-	"getfund-api-v2/internal/domain/user/core/user_dto"
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 	"getfund-api-v2/pkg/db/schema"
 	"getfund-api-v2/test/helper/db_fixture"
 
