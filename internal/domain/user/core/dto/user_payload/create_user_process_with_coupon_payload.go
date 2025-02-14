@@ -1,6 +1,6 @@
 package payload
 
-type UserCriationWithCouponPayload struct {
+type CreateUserProcessWithCouponPayload struct {
 	CouponCode     string `json:"coupon_code"`
 	ActivationCode string `json:"activation_code"`
 }

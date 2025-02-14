@@ -1,5 +1,5 @@
 package payload
 
-type UserCreatedPayload struct {
+type ActivateUserConfirmedPayload struct {
 	Id int `json:"user_id"`
 }

@@ -12,12 +12,19 @@ import (
 )
 
 func SubscribeEventHandlers(settings settings.ApplicationSettings, eventBus bus.EventBus, cacheService cache_service.Cache) {
+
+	//Services
+	mailService := mail_service.New(mail.New(settings))
+	templateFileService := template_file_service.New(settings)
+
+	//Applications
+	sendRecoverPasswordMailApplication := send_recover_password_mail_application.New(mailService, settings, templateFileService)
+
+	//Event Handler
+	recoverPasswordStartedEventHandler := recover_password_started_event_handler.New(sendRecoverPasswordMailApplication, cacheService)
+
 	handlers := map[string]bus.Handler{
-		"RecoverPasswordStarted": recover_password_started_event_handler.New(
-			send_recover_password_mail_application.New(
-				mail_service.New(mail.New(settings)),
-				settings,
-				template_file_service.New(settings)), cacheService),
+		"RecoverPasswordStarted": recoverPasswordStartedEventHandler,
 	}
 
 	for eventName, handler := range handlers {

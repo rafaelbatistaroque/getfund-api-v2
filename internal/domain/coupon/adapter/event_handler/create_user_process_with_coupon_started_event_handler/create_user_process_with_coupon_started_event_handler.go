@@ -1,4 +1,4 @@
-package user_criation_with_coupon_started_event_handler
+package create_user_process_with_coupon_started_event_handler
 
 import (
 	"encoding/json"
@@ -11,22 +11,22 @@ import (
 	"time"
 )
 
-type userCriationWithCouponStartedEventHandler struct {
+type crateUserProcessWithCouponStartedEventHandler struct {
 	validateCoupon validate_coupon.UseCase
 	cache          cache_service.Cache
 	logger         logger.Logger
 }
 
 func New(usecase validate_coupon.UseCase, cache cache_service.Cache) bus.Handler {
-	return &userCriationWithCouponStartedEventHandler{
-		logger:         *logger.New("userCriationWithCouponStartedEventHandler"),
+	return &crateUserProcessWithCouponStartedEventHandler{
+		logger:         *logger.New("crateUserProcessWithCouponStartedEventHandler"),
 		cache:          cache,
 		validateCoupon: usecase,
 	}
 }
 
-func (h *userCriationWithCouponStartedEventHandler) Handle(event bus.Event) {
-	var payload = &coupon_payload.UserCriationWithCouponPayload{}
+func (h *crateUserProcessWithCouponStartedEventHandler) Handle(event bus.Event) {
+	var payload = &coupon_payload.CreateUserProcessWithCouponPayload{}
 	if err := json.Unmarshal(event.GetPayload(), payload); err != nil {
 		h.logger.Error("IsOk: False | get payload failed")
 		return

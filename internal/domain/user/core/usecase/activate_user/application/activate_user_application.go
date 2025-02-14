@@ -59,7 +59,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	defer a.cache.Delete(input.ActivationKey)
 
 	if userData.CouponCode != "" {
-		payloadCoupon := &payload.UserActivationWithCouponPayload{
+		payloadCoupon := &payload.ActivateUserWithCouponConfirmedPayload{
 			ActivationCode: input.ActivationCode,
 			UserId:         userSaved.Id,
 		}
@@ -67,7 +67,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	}
 
 	channelResponse := make(chan []byte, 1)
-	payloadConfirmed := &payload.UserCreatedPayload{
+	payloadConfirmed := &payload.ActivateUserConfirmedPayload{
 		Id: userSaved.Id,
 	}
 

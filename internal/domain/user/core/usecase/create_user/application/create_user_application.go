@@ -54,10 +54,10 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to save user"))
 	}
 
-	emitUserCriationStartedEvent(c.bus, c.settings, keyCache)
+	emitCreateUserProcessStartedEvent(c.bus, c.settings, keyCache)
 
 	if input.CouponCode != "" {
-		emitUserCriationWithCouponCodeStarted(c.bus, input, keyCache)
+		emitCreateUserProcessWithCouponStartedEvent(c.bus, input, keyCache)
 	}
 
 	return &create_user.Output{Message: "user creation started"}, nil
@@ -85,20 +85,20 @@ func buildActivationCode(hasher security.Hasher) (string, error) {
 	return key_cache_prefix + activationCode, nil
 }
 
-func emitUserCriationStartedEvent(bus bus.EventBus, settings settings.ApplicationSettings, activationCode string) {
-	payload := &payload.UserCriationPayload{
+func emitCreateUserProcessStartedEvent(bus bus.EventBus, settings settings.ApplicationSettings, activationCode string) {
+	payload := &payload.CreateUserProcessPayload{
 		ActivationCode: activationCode,
 		ActivationLink: settings.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
 
-	bus.EmitWithPayload(&create_user.UserCriationStartedEvent{}, payload)
+	bus.EmitWithPayload(&create_user.CreateUserProcessStartedEvent{}, payload)
 }
 
-func emitUserCriationWithCouponCodeStarted(bus bus.EventBus, input *create_user.Input, activationCode string) {
-	payload := &payload.UserCriationWithCouponPayload{
+func emitCreateUserProcessWithCouponStartedEvent(bus bus.EventBus, input *create_user.Input, activationCode string) {
+	payload := &payload.CreateUserProcessWithCouponPayload{
 		CouponCode:     input.CouponCode,
 		ActivationCode: activationCode,
 	}
 
-	bus.EmitWithPayload(&create_user.UserCriationWithCouponStartedEvent{}, payload)
+	bus.EmitWithPayload(&create_user.CreateUserProcessWithCouponStartedEvent{}, payload)
 }

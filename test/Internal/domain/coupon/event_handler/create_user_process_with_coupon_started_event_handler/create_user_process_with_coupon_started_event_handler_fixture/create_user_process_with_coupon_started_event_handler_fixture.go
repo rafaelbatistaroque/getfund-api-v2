@@ -1,9 +1,9 @@
-package user_criation_with_coupon_started_event_handler_fixture
+package create_user_process_with_coupon_started_event_handler_fixture
 
 import (
 	"encoding/json"
 	"errors"
-	"getfund-api-v2/internal/domain/coupon/adapter/event_handler/user_criation_with_coupon_started_event_handler"
+	"getfund-api-v2/internal/domain/coupon/adapter/event_handler/create_user_process_with_coupon_started_event_handler"
 	"getfund-api-v2/internal/domain/coupon/core/dto/coupon_payload"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
@@ -12,7 +12,7 @@ import (
 	"getfund-api-v2/test/helper/cache_spy"
 )
 
-type UserCriationWithCouponStartedEventHandlerFixture struct {
+type CreateUserWithCouponStartedEventHandlerFixture struct {
 	CacheSpy   *cache_spy.RedisCacheSpy
 	UseCaseSpy *ValidateCouponApplicationSpy
 }
@@ -24,7 +24,7 @@ type ValidateCouponApplicationSpy struct {
 	SuccessResult map[string]*validate_coupon.Output
 }
 
-func NewSut() (bus.Handler, *UserCriationWithCouponStartedEventHandlerFixture) {
+func NewSut() (bus.Handler, *CreateUserWithCouponStartedEventHandlerFixture) {
 	cacheSpy := cache_spy.New()
 	usecase := &ValidateCouponApplicationSpy{
 		Params:        make(map[string]*validate_coupon.Input),
@@ -32,8 +32,8 @@ func NewSut() (bus.Handler, *UserCriationWithCouponStartedEventHandlerFixture) {
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*validate_coupon.Output)}
 
-	return user_criation_with_coupon_started_event_handler.New(usecase, cacheSpy),
-		&UserCriationWithCouponStartedEventHandlerFixture{
+	return create_user_process_with_coupon_started_event_handler.New(usecase, cacheSpy),
+		&CreateUserWithCouponStartedEventHandlerFixture{
 			CacheSpy:   cacheSpy,
 			UseCaseSpy: usecase,
 		}
@@ -55,8 +55,8 @@ func (uc *ValidateCouponApplicationSpy) DefineValidateCouponUsecaseSuccess() {
 	uc.SuccessResult["Execute"] = &validate_coupon.Output{}
 }
 
-func GetInvalidUserCriationWithCouponStarted() *create_user.UserCriationWithCouponStartedEvent {
-	return &create_user.UserCriationWithCouponStartedEvent{}
+func GetInvalidCreateUserProcessWithCouponStartedEvent() *create_user.CreateUserProcessWithCouponStartedEvent {
+	return &create_user.CreateUserProcessWithCouponStartedEvent{}
 }
 
 func GetValidateCouponInput() *validate_coupon.Input {
@@ -65,21 +65,21 @@ func GetValidateCouponInput() *validate_coupon.Input {
 	}
 }
 
-func GetUserCriationWithCouponPayloadDto(errorStatus string) *coupon_payload.UserCriationWithCouponPayload {
-	return &coupon_payload.UserCriationWithCouponPayload{
+func GetCreateUserProcessWithCouponPayload(errorStatus string) *coupon_payload.CreateUserProcessWithCouponPayload {
+	return &coupon_payload.CreateUserProcessWithCouponPayload{
 		CouponCode:     "fake-coupon-code",
 		ActivationCode: "fake-activation-code",
 		ErrorStatus:    errorStatus,
 	}
 }
 
-func GetValidUserCriationWithCouponStarted() *create_user.UserCriationWithCouponStartedEvent {
+func GetValidCreateUserProcessWithCouponStartedEvent() *create_user.CreateUserProcessWithCouponStartedEvent {
 	payload, _ := json.Marshal(map[string]string{
 		"coupon_code":     "fake-coupon-code",
 		"activation_code": "fake-activation-code",
 	})
 
-	event := &create_user.UserCriationWithCouponStartedEvent{}
+	event := &create_user.CreateUserProcessWithCouponStartedEvent{}
 	event.SetPayload(payload)
 
 	return event
