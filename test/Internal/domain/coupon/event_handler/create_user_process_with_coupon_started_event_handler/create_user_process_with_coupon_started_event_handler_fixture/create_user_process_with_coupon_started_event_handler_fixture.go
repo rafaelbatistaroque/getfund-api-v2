@@ -67,15 +67,15 @@ func GetValidateCouponInput() *validate_coupon.Input {
 func GetCreateUserProcessWithCouponPayload(errorStatus string) *coupon_payload.CreateUserProcessWithCouponPayload {
 	return &coupon_payload.CreateUserProcessWithCouponPayload{
 		CouponCode:        "fake-coupon-code",
-		ActivationDataKey: "fake-activation-code",
+		ActivationDataKey: "fake-activation-data-key",
 		ErrorStatus:       errorStatus,
 	}
 }
 
 func GetValidCreateUserProcessWithCouponStartedEvent() *create_user.CreateUserProcessWithCouponStartedEvent {
 	payload, _ := json.Marshal(map[string]string{
-		"coupon_code":     "fake-coupon-code",
-		"activation_code": "fake-activation-code",
+		"coupon_code":         "fake-coupon-code",
+		"activation_data_key": "fake-activation-data-key",
 	})
 
 	event := &create_user.CreateUserProcessWithCouponStartedEvent{}
