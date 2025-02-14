@@ -11,7 +11,8 @@ import (
 )
 
 type CreateUserProcessStartedEventHandlerFixture struct {
-	CacheSpy *cache_spy.RedisCacheSpy
+	CacheSpy                     *cache_spy.RedisCacheSpy
+	SendActivationAccountMailSpy *SendActivationAccountMailSpy
 }
 
 type SendActivationAccountMailSpy struct {
@@ -22,11 +23,18 @@ type SendActivationAccountMailSpy struct {
 }
 
 func NewSut() (bus.Handler, *CreateUserProcessStartedEventHandlerFixture) {
+	sendActivationAccountMailSpy := &SendActivationAccountMailSpy{
+		Params:        make(map[string]*send_activation_account_mail.Input, 1),
+		CallsCount:    make(map[string]int, 1),
+		ErrorResult:   make(map[string]*result_app.ApplicationError, 1),
+		SuccessResult: make(map[string]*send_activation_account_mail.Output, 1),
+	}
 	cacheSpy := cache_spy.New()
 
-	return create_user_process_started_event_handler.New(cacheSpy),
+	return create_user_process_started_event_handler.New(cacheSpy, sendActivationAccountMailSpy),
 		&CreateUserProcessStartedEventHandlerFixture{
-			CacheSpy: cacheSpy,
+			CacheSpy:                     cacheSpy,
+			SendActivationAccountMailSpy: sendActivationAccountMailSpy,
 		}
 }
 

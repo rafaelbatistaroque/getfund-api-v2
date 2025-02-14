@@ -40,3 +40,15 @@ func Test_GivenHandler_WhenCacheGetInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	//Assert
 	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(1)
 }
+
+func Test_GivenHandler_WhenCacheError_ThenEnsureNeverCallUsecaseExecute(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetError()
+
+	// Act
+	sut.Handle(fixture.GetValidCreateUserProcessStartedEvent(""))
+
+	//Assert
+	verify.Should(t, spies.SendActivationAccountMailSpy.CallsCount["Execute"]).Be(0)
+}
