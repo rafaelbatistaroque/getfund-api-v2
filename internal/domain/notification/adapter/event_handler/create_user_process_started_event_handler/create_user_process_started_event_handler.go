@@ -40,11 +40,13 @@ func (h *createUserProcessStartedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	var input = &send_activation_account_mail.Input{}
+	var input = &send_activation_account_mail.Input{
+		ActivationLink: payload.ActivationLink,
+	}
 	if err := json.Unmarshal([]byte(resultCache), input); err != nil {
 		h.logger.Errorf("IsOk: False | %v", err)
 		return
 	}
 
-	h.sendActivationAccountMail.Execute(nil)
+	h.sendActivationAccountMail.Execute(input)
 }
