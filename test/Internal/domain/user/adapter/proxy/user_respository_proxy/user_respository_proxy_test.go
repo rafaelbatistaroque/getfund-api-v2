@@ -178,3 +178,15 @@ func Test_GivenUserExistsByUsername_WhenUserExistsByUsernameError_ThenEnsureRetu
 	// Assert
 	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["UserExistsByUsername"])
 }
+
+func Test_GivenUserExistsByUsername_WhenUserExistsByUsernameSuccess_ThenEnsureReturnCorrectUserDto(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineUserExistsByUsernameSuccess()
+
+	// Act
+	existingUser, _ := sut.UserExistsByUsername(fixture.GetFakeUsername())
+
+	// Assert
+	verify.Should(t, existingUser).Be(spies.RepoSpy.SuccessResult["UserExistsByUsername"])
+}
