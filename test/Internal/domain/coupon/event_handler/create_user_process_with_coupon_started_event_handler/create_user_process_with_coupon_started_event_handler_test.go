@@ -48,7 +48,7 @@ func Test_GivenHandler_WhenValidadeCouponErrorWithStatus_ThenEnsureCallCacheSetW
 	expectedMessage := "any-message-status"
 	spies.UseCaseSpy.DefineValidateCouponUsecaseError("status:" + expectedMessage)
 	expectedCacheValue := fixture.GetCreateUserProcessWithCouponPayload(expectedMessage)
-	expectedCacheKey := "user_activation_" + expectedCacheValue.ActivationCode + "_coupon"
+	expectedCacheKey := expectedCacheValue.ActivationDataKey + "_coupon"
 
 	// Act
 	sut.Handle(fixture.GetValidCreateUserProcessWithCouponStartedEvent())
@@ -64,7 +64,7 @@ func Test_GivenHandler_WhenValidadeCouponSuccess_ThenEnsureCallCacheSetWithCorre
 	sut, spies := fixture.NewSut()
 	spies.UseCaseSpy.DefineValidateCouponUsecaseSuccess()
 	expectedCacheValue := fixture.GetCreateUserProcessWithCouponPayload("")
-	expectedCacheKey := "user_activation_" + expectedCacheValue.ActivationCode + "_coupon"
+	expectedCacheKey := expectedCacheValue.ActivationDataKey + "_coupon"
 
 	// Act
 	sut.Handle(fixture.GetValidCreateUserProcessWithCouponStartedEvent())

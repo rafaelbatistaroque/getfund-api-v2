@@ -346,10 +346,12 @@ func Test_GivenCreateUserExecute_WhenCacheSuccess_ThenEnsureCallEmitWithPayloadW
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput(fixture.WithEmptyCouponCode())
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
-	activationCode := "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
+	activationCode := spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
+	activationCodeDataKey := "user_activation_" + activationCode
 	payload := &payload.CreateUserProcessPayload{
-		ActivationCode: activationCode,
-		ActivationLink: spies.SettingsSpy.GetBaseUrl() + "/user-activation/" + activationCode,
+		ActivationDataKey: activationCodeDataKey,
+		ActivationCode:    spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
+		ActivationLink:    spies.SettingsSpy.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
 
 	// Act
@@ -376,9 +378,11 @@ func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayload
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput()
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
+	activationCode := spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
+	activationCodeDataKey := "user_activation_" + activationCode
 	payload := &payload.CreateUserProcessWithCouponPayload{
-		CouponCode:     validInput.CouponCode,
-		ActivationCode: "user_activation_" + spies.HasherSpy.SuccessResult["GetRandomCode"].(string),
+		CouponCode:        validInput.CouponCode,
+		ActivationDataKey: activationCodeDataKey,
 	}
 
 	// Act

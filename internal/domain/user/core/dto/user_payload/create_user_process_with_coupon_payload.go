@@ -1,6 +1,6 @@
 package payload
 
 type CreateUserProcessWithCouponPayload struct {
-	CouponCode     string `json:"coupon_code"`
-	ActivationCode string `json:"activation_code"`
+	ActivationDataKey string `json:"activation_data_key"`
+	CouponCode        string `json:"coupon_code"`
 }

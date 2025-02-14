@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	key_cache_prefix = "user_activation_"
+	KEY_CACHE_PREFIX = "user_activation_"
 )
 
 type createUserApplication struct {
@@ -45,19 +45,19 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 		return nil, invalidUser
 	}
 
-	keyCache, errCode := buildActivationCode(c.hasher)
+	activationCode, errCode := buildActivationCode(c.hasher)
 	if errCode != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
 	}
 
-	if err := c.cache.Set(keyCache, input, 24*time.Hour); err != nil {
+	if err := c.cache.Set(KEY_CACHE_PREFIX+activationCode, input, 24*time.Hour); err != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error to save user"))
 	}
 
-	emitCreateUserProcessStartedEvent(c.bus, c.settings, keyCache)
+	emitCreateUserProcessStartedEvent(c.bus, c.settings, activationCode)
 
 	if input.CouponCode != "" {
-		emitCreateUserProcessWithCouponStartedEvent(c.bus, input, keyCache)
+		emitCreateUserProcessWithCouponStartedEvent(c.bus, input, activationCode)
 	}
 
 	return &create_user.Output{Message: "user creation started"}, nil
@@ -82,13 +82,14 @@ func buildActivationCode(hasher security.Hasher) (string, error) {
 		return "", errors.New("error to save user")
 	}
 
-	return key_cache_prefix + activationCode, nil
+	return activationCode, nil
 }
 
 func emitCreateUserProcessStartedEvent(bus bus.EventBus, settings settings.ApplicationSettings, activationCode string) {
 	payload := &payload.CreateUserProcessPayload{
-		ActivationCode: activationCode,
-		ActivationLink: settings.GetBaseUrl() + "/user-activation/" + activationCode,
+		ActivationDataKey: KEY_CACHE_PREFIX + activationCode,
+		ActivationCode:    activationCode,
+		ActivationLink:    settings.GetBaseUrl() + "/user-activation/" + activationCode,
 	}
 
 	bus.EmitWithPayload(&create_user.CreateUserProcessStartedEvent{}, payload)
@@ -96,8 +97,8 @@ func emitCreateUserProcessStartedEvent(bus bus.EventBus, settings settings.Appli
 
 func emitCreateUserProcessWithCouponStartedEvent(bus bus.EventBus, input *create_user.Input, activationCode string) {
 	payload := &payload.CreateUserProcessWithCouponPayload{
-		CouponCode:     input.CouponCode,
-		ActivationCode: activationCode,
+		ActivationDataKey: KEY_CACHE_PREFIX + activationCode,
+		CouponCode:        input.CouponCode,
 	}
 
 	bus.EmitWithPayload(&create_user.CreateUserProcessWithCouponStartedEvent{}, payload)
