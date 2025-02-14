@@ -52,3 +52,15 @@ func Test_GivenHandler_WhenCacheError_ThenEnsureNeverCallUsecaseExecute(t *testi
 	//Assert
 	verify.Should(t, spies.SendActivationAccountMailSpy.CallsCount["Execute"]).Be(0)
 }
+
+func Test_GivenHandler_WhenUnmarshalError_ThenEnsureNeverCallUsecaseExecute(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccessWithValue("invalid-serialized-json")
+
+	// Act
+	sut.Handle(fixture.GetValidCreateUserProcessStartedEvent(""))
+
+	// Assert
+	verify.Should(t, spies.SendActivationAccountMailSpy.CallsCount["Execute"]).Be(0)
+}
