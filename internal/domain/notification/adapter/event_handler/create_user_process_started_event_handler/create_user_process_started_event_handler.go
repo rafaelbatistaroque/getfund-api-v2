@@ -34,9 +34,15 @@ func (h *createUserProcessStartedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	_, err := h.cache.Get(payload.ActivationCode)
+	resultCache, err := h.cache.Get(payload.ActivationCode)
 	if err != nil {
 		h.logger.Error("IsOk: False | get cache failed")
+		return
+	}
+
+	var input = &send_activation_account_mail.Input{}
+	if err := json.Unmarshal([]byte(resultCache), input); err != nil {
+		h.logger.Errorf("IsOk: False | %v", err)
 		return
 	}
 
