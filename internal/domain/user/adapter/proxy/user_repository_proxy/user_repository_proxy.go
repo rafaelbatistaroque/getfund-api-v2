@@ -51,7 +51,10 @@ func (u *userRepositoryProxy) UserExistsByUsername(username string) (*user_dto.U
 		return nil, err
 	}
 
-	u.repository.UserExistsByUsername(usernameHashed)
+	_, errRepo := u.repository.UserExistsByUsername(usernameHashed)
+	if errRepo != nil {
+		return nil, errRepo
+	}
 
 	return nil, nil
 }
