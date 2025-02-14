@@ -155,7 +155,7 @@ func Test_GivenUserExistsByUsername_WhenHashWithSaltError_ThenEnsureCallsOnce(t 
 	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
 }
 
-func Test_GivenUserExistsByUsername_WhenHashWithSaltSuccess_ThenEnsureCallREpoUserExistsByUsernameWithCorrectPaameter(t *testing.T) {
+func Test_GivenUserExistsByUsername_WhenHashWithSaltSuccess_ThenEnsureCallRepoUserExistsByUsernameWithCorrectPaameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess(uuid.NewString())
@@ -165,4 +165,16 @@ func Test_GivenUserExistsByUsername_WhenHashWithSaltSuccess_ThenEnsureCallREpoUs
 
 	// Assert
 	verify.Should(t, spies.RepoSpy.Params["UserExistsByUsername:username"]).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
+}
+
+func Test_GivenUserExistsByUsername_WhenUserExistsByUsernameError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineUserExistsByUsernameError()
+
+	// Act
+	_, err := sut.UserExistsByUsername(fixture.GetFakeUsername())
+
+	// Assert
+	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["UserExistsByUsername"])
 }
