@@ -48,5 +48,11 @@ func (h *createUserProcessStartedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	h.sendActivationAccountMail.Execute(input)
+	success, errUsecase := h.sendActivationAccountMail.Execute(input)
+	if errUsecase != nil {
+		h.logger.Errorf("IsOk: False | Code: %d | Message %v", errUsecase.Code, errUsecase.Message)
+		return
+	}
+
+	h.logger.Infof("IsOk: True | %v", success.Message)
 }

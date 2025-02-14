@@ -42,7 +42,7 @@ func (uc *SendActivationAccountMailSpy) Execute(input *send_activation_account_m
 	uc.Params["Execute:input"] = input
 
 	uc.CallsCount["Execute"]++
-
+	uc.DefineSendActivationAccountMailSuccess()
 	return uc.SuccessResult["Execute"], uc.ErrorResult["Execute"]
 }
 
