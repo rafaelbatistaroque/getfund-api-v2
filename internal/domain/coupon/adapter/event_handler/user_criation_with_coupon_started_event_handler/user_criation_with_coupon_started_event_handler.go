@@ -12,16 +12,16 @@ import (
 )
 
 type userCriationWithCouponStartedEventHandler struct {
-	usecase validate_coupon.UseCase
-	cache   cache_service.Cache
-	logger  logger.Logger
+	validateCoupon validate_coupon.UseCase
+	cache          cache_service.Cache
+	logger         logger.Logger
 }
 
 func New(usecase validate_coupon.UseCase, cache cache_service.Cache) bus.Handler {
 	return &userCriationWithCouponStartedEventHandler{
-		logger:  *logger.New("userCriationWithCouponStartedEventHandler"),
-		cache:   cache,
-		usecase: usecase,
+		logger:         *logger.New("userCriationWithCouponStartedEventHandler"),
+		cache:          cache,
+		validateCoupon: usecase,
 	}
 }
 
@@ -32,7 +32,7 @@ func (h *userCriationWithCouponStartedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	_, err := h.usecase.Execute(&validate_coupon.Input{
+	_, err := h.validateCoupon.Execute(&validate_coupon.Input{
 		CouponCode: payload.CouponCode,
 	})
 
