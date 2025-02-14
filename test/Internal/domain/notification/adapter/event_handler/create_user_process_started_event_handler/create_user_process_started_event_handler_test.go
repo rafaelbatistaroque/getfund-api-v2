@@ -64,3 +64,20 @@ func Test_GivenHandler_WhenUnmarshalError_ThenEnsureNeverCallUsecaseExecute(t *t
 	// Assert
 	verify.Should(t, spies.SendActivationAccountMailSpy.CallsCount["Execute"]).Be(0)
 }
+
+func Test_GivenHandler_WhenUnmarshalSuccess_ThenEnsureCallUsecaseWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetValidCacheData())
+	expectedInput := fixture.GetSendActivationAccountMailInput()
+	expectedPayloadData := fixture.GetCreateUserProcessPayload()
+
+	// Act
+	sut.Handle(fixture.GetValidCreateUserProcessStartedEvent(""))
+
+	//Assert
+	inputParams := spies.SendActivationAccountMailSpy.Params["Execute:input"]
+	verify.Should(t, inputParams.FirstName).Be(expectedInput.FirstName)
+	verify.Should(t, inputParams.Email).Be(expectedInput.Email)
+	verify.Should(t, inputParams.ActivationLink).Be(expectedPayloadData.ActivationLink)
+}

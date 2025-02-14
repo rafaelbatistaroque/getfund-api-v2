@@ -2,7 +2,7 @@ package create_user_process_started_event_handler_fixture
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/notification/adapter/event_handler/create_user_process_started_event_handler"
+	notification_payload "getfund-api-v2/internal/domain/notification/adapter/event_handler/create_user_process_started_event_handler"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_activation_account_mail"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
@@ -31,7 +31,7 @@ func NewSut() (bus.Handler, *CreateUserProcessStartedEventHandlerFixture) {
 	}
 	cacheSpy := cache_spy.New()
 
-	return create_user_process_started_event_handler.New(cacheSpy, sendActivationAccountMailSpy),
+	return notification_payload.New(cacheSpy, sendActivationAccountMailSpy),
 		&CreateUserProcessStartedEventHandlerFixture{
 			CacheSpy:                     cacheSpy,
 			SendActivationAccountMailSpy: sendActivationAccountMailSpy,
@@ -62,10 +62,33 @@ func GetValidCreateUserProcessStartedEvent(withValue string) *create_user.Create
 	event := &create_user.CreateUserProcessStartedEvent{}
 	data := map[string]string{
 		"activation_code": withValue,
+		"activation_link": "fake-activation-link",
 	}
 
 	payload, _ := json.Marshal(data)
 	event.SetPayload(payload)
 
 	return event
+}
+
+func GetValidCacheData() string {
+	return `{"first_name":"fake-first-name", "email": "fake-email"}`
+}
+
+func GetSendActivationAccountMailInput() *send_activation_account_mail.Input {
+	var input = &send_activation_account_mail.Input{}
+
+	json.Unmarshal([]byte(GetValidCacheData()), input)
+
+	return input
+}
+
+func GetCreateUserProcessPayload() *notification_payload.CreateUserProcessPayload {
+	var input = &notification_payload.CreateUserProcessPayload{}
+
+	event := GetValidCreateUserProcessStartedEvent("")
+
+	json.Unmarshal(event.GetPayload(), input)
+
+	return input
 }
