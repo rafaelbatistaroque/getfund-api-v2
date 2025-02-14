@@ -142,3 +142,15 @@ func Test_GivenUserExistsByUsername_WhenHashWithSaltInvoked_ThenEnsureCallsOnce(
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
 }
+
+func Test_GivenUserExistsByUsername_WhenHashWithSaltError_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltError()
+
+	// Act
+	_, err := sut.UserExistsByUsername(fixture.GetFakeUsername())
+
+	// Assert
+	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
+}
