@@ -17,3 +17,15 @@ func Test_GivenHandler_WhenPayloadParseError_ThenEnsureNeverCallGetCache(t *test
 	//Assert
 	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(0)
 }
+
+func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetCacheWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	expectedPayload := "user_activation_fake_activation_code"
+
+	// Act
+	sut.Handle(fixture.GetValidCreateUserProcessStartedEvent(expectedPayload))
+
+	//Assert
+	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(expectedPayload)
+}

@@ -1,6 +1,7 @@
 package create_user_process_started_event_handler_fixture
 
 import (
+	"encoding/json"
 	"getfund-api-v2/internal/domain/notification/adapter/event_handler/create_user_process_started_event_handler"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_activation_account_mail"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
@@ -51,7 +52,12 @@ func GetInvalidCreateUserProcessStartedEvent() *create_user.CreateUserProcessSta
 
 func GetValidCreateUserProcessStartedEvent(withValue string) *create_user.CreateUserProcessStartedEvent {
 	event := &create_user.CreateUserProcessStartedEvent{}
-	event.SetPayload([]byte(withValue))
+	data := map[string]string{
+		"activation_code": withValue,
+	}
+
+	payload, _ := json.Marshal(data)
+	event.SetPayload(payload)
 
 	return event
 }
