@@ -46,10 +46,12 @@ func (u *userRepositoryProxy) CreateUser(user *user_dto.ActivationUserDto) (*use
 }
 
 func (u *userRepositoryProxy) UserExistsByUsername(username string) (*user_dto.UserDto, error) {
-	_, err := u.hasher.HashWithSalt(username, u.settings.GetServerSalt())
+	usernameHashed, err := u.hasher.HashWithSalt(username, u.settings.GetServerSalt())
 	if err != nil {
 		return nil, err
 	}
+
+	u.repository.UserExistsByUsername(usernameHashed)
 
 	return nil, nil
 }
