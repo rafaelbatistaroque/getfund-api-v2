@@ -29,3 +29,14 @@ func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetCacheWithCorrect
 	//Assert
 	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(expectedPayload)
 }
+
+func Test_GivenHandler_WhenCacheGetInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Handle(fixture.GetValidCreateUserProcessStartedEvent(""))
+
+	//Assert
+	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(1)
+}
