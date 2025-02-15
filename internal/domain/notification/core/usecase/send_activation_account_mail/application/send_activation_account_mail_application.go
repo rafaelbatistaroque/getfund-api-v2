@@ -38,12 +38,13 @@ func (s *sendActivationAccountMailApplication) Execute(input *send_activation_ac
 		replacer.Replaceable{Tag: "{{activation_link}}", Value: input.ActivationLink},
 	)
 
-	s.mailService.SendMail(
+	if err := s.mailService.SendMail(
 		input.Email,
 		"Activation Account",
 		activationAccountTemplate,
-		nil,
-	)
+		nil); err != nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
+	}
 
 	return nil, nil
 }
