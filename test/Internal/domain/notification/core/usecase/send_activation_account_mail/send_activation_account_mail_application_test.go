@@ -68,3 +68,16 @@ func Test_GivenExecute_WhenValidInput_ThenEnsureCallGetActivationAccountTemplate
 	// Assert
 	verify.Should(t, spies.TemplateFileSpy.CallsCount["GetActivationAccountTemplate"]).Be(1)
 }
+
+func Test_GivenExecute_WhenGetActivationAccountTemplateError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+	spies.TemplateFileSpy.DefineGetActivationAccountTemplateError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.TemplateFileSpy.ErrorResult["GetActivationAccountTemplate"])
+}
