@@ -98,3 +98,16 @@ func Test_GivenExecute_WhenGotActivationAccountTemplate_ThenEnsureSendMailWithCo
 	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
 	verify.Should(t, spies.MailSpy.Params["SendMail:replayTo"]).Nil()
 }
+
+func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+	spies.MailSpy.DefineSendMailError()
+
+	// Act
+	_, err := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.MailSpy.ErrorResult["SendMail"])
+}
