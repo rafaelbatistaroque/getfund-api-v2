@@ -2,6 +2,7 @@ package send_activation_account_mail_application
 
 import (
 	notification_contract "getfund-api-v2/internal/domain/notification/core/contract"
+	"getfund-api-v2/internal/domain/notification/core/domain_service"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_activation_account_mail"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
@@ -27,10 +28,22 @@ func (s *sendActivationAccountMailApplication) Execute(input *send_activation_ac
 		return nil, result_app.New(result_app.UNPROCESSABLE_CONTENT_CODE, validatable.GetErrors())
 	}
 
-	_, errTemplate := s.template.GetActivationAccountTemplate()
+	activationAccountTemplate, errTemplate := s.template.GetActivationAccountTemplate()
 	if errTemplate != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errTemplate)
 	}
+
+	domain_service.Replacer(&activationAccountTemplate,
+		domain_service.Replaceable{Tag: "{{first_name}}", Value: input.FirstName},
+		domain_service.Replaceable{Tag: "{{activation_link}}", Value: input.ActivationLink},
+	)
+
+	s.mailService.SendMail(
+		input.Email,
+		"Activation Account",
+		activationAccountTemplate,
+		nil,
+	)
 
 	return nil, nil
 }

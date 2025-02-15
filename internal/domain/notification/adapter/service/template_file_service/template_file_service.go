@@ -24,3 +24,7 @@ func (t *templateFileService) GetRecoveryPasswordTemplate() (string, error) {
 
 	return string(template), nil
 }
+
+func (t *templateFileService) GetActivationAccountTemplate() (string, error) {
+	return "", nil
+}
