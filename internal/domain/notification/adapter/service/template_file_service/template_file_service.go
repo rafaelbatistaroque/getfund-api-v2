@@ -26,5 +26,9 @@ func (t *templateFileService) GetRecoveryPasswordTemplate() (string, error) {
 }
 
 func (t *templateFileService) GetActivationAccountTemplate() (string, error) {
+	_, err := os.ReadFile(t.settings.GetTemplateDir() + "/activation_account_template.html")
+	if err != nil {
+		return "", errors.New("template does not exist")
+	}
 	return "", nil
 }
