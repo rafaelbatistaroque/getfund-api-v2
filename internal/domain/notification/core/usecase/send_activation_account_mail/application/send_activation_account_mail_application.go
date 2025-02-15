@@ -46,5 +46,5 @@ func (s *sendActivationAccountMailApplication) Execute(input *send_activation_ac
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
 	}
 
-	return nil, nil
+	return &send_activation_account_mail.Output{Message: "Email sent successfully"}, nil
 }
