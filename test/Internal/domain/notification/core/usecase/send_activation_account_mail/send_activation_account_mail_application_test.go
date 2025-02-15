@@ -111,3 +111,14 @@ func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithSer
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.MailSpy.ErrorResult["SendMail"])
 }
+
+func Test_GivenExecute_WhenSuccess_ThenEnsureReturnOutputWithCorrectMessage(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSUT()
+
+	// Act
+	result, _ := sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, result.Message).Be("Email sent successfully")
+}
