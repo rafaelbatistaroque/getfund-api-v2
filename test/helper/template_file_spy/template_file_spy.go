@@ -41,3 +41,26 @@ func (t *TemplateFileSpy) GetRecoveryPasswordTemplateReplaced(firstName, recover
 func (t *TemplateFileSpy) DefineGetRecoveryPasswordTemplateError() {
 	t.ErrorResult["GetRecoveryPasswordTemplate"] = errors.New("fake-error")
 }
+
+func (t *TemplateFileSpy) GetActivationAccountTemplate() (string, error) {
+	t.CallsCount["GetActivationAccountTemplate"]++
+
+	success := t.SuccessResult["GetActivationAccountTemplate"]
+	if success != nil {
+		return success.(string), nil
+	}
+
+	return "", t.ErrorResult["GetActivationAccountTemplate"]
+}
+
+func (t *TemplateFileSpy) DefineGetActivationAccountTemplateSuccess() {
+	t.SuccessResult["GetActivationAccountTemplate"] = "<div>{{first_name}}</div><div>{{activation_link}}</div>"
+}
+
+func (t *TemplateFileSpy) GetGetActivationAccountTemplateReplaced(firstName, activationLink string) string {
+	return "<div>" + firstName + "</div><div>" + activationLink + "</div>"
+}
+
+func (t *TemplateFileSpy) DefineGetActivationAccountTemplateError() {
+	t.ErrorResult["GetActivationAccountTemplate"] = errors.New("fake-error")
+}

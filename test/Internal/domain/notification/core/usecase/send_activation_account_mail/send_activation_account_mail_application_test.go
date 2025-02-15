@@ -57,3 +57,14 @@ func Test_GivenExecute_WhenActivationLinkEmpty_ThenEnsureReturnUnprocessableErro
 	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ActivationLink"))
 }
+
+func Test_GivenExecute_WhenValidInput_ThenEnsureCallGetActivationAccountTemplateOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, spies.TemplateFileSpy.CallsCount["GetActivationAccountTemplate"]).Be(1)
+}
