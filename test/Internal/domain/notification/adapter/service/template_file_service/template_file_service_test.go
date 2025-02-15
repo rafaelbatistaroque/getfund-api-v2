@@ -50,3 +50,24 @@ func Test_GivenGetActivationAccountTemplate_WhenTemplateNotFound_ThenEnsureRetur
 	// Assert
 	verify.Should(t, err.Error()).Be("template does not exist")
 }
+
+func Test_GivenGetActivationAccountTemplate_WhenTemplateFound_ThenEnsureReturnCorrectTemplate(t *testing.T) {
+	// Arrange
+	templateDir, _ := os.Getwd()
+	filePath := templateDir + "/activation_account_template.html"
+	templateContent := "fake-template-content"
+	file, _ := os.Create(filePath)
+	file.WriteString(templateContent)
+
+	defer os.Remove(filePath)
+	defer file.Close()
+
+	sut, spies := fixture.NewSUT()
+	spies.SettingsSpy.SetTemplateDir(templateDir)
+
+	// Act
+	result, _ := sut.GetActivationAccountTemplate()
+
+	// Assert
+	verify.Should(t, result).Be(templateContent)
+}
