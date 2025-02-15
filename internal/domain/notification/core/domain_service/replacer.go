@@ -1,4 +1,4 @@
-package domain_service
+package replacer
 
 import "strings"
 
@@ -7,7 +7,7 @@ type Replaceable struct {
 	Value string
 }
 
-func Replacer(template *string, options ...Replaceable) {
+func Build(template *string, options ...Replaceable) {
 	for _, opt := range options {
 		*template = strings.ReplaceAll(*template, opt.Tag, opt.Value)
 	}

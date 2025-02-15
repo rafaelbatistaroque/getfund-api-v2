@@ -2,9 +2,9 @@ package send_recover_password_mail_application
 
 import (
 	contract "getfund-api-v2/internal/domain/notification/core/contract"
+	replacer "getfund-api-v2/internal/domain/notification/core/domain_service"
 
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail"
-	"strings"
 
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
@@ -35,7 +35,10 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errTemplate)
 	}
 
-	recoveryPasswordTemplate = replaceTags(recoveryPasswordTemplate, input)
+	replacer.Build(&recoveryPasswordTemplate,
+		replacer.Replaceable{Tag: "{{first_name}}", Value: input.FirstName},
+		replacer.Replaceable{Tag: "{{recovery_link}}", Value: input.RecoveryLink},
+	)
 
 	err := uc.mailService.SendMail(
 		input.Username,
@@ -47,11 +50,4 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 	}
 
 	return &send_recover_password_mail.Output{Messagem: "Email sent successfully"}, nil
-}
-
-func replaceTags(template string, model *send_recover_password_mail.Input) string {
-	template = strings.ReplaceAll(template, "{{first_name}}", model.FirstName)
-	template = strings.ReplaceAll(template, "{{recovery_link}}", model.RecoveryLink)
-
-	return template
 }
