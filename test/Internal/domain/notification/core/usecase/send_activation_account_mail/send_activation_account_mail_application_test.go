@@ -81,3 +81,20 @@ func Test_GivenExecute_WhenGetActivationAccountTemplateError_ThenEnsureReturnApp
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.TemplateFileSpy.ErrorResult["GetActivationAccountTemplate"])
 }
+
+func Test_GivenExecute_WhenGotActivationAccountTemplate_ThenEnsureSendMailWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+	validInput := fixture.GetValidInput()
+	spies.TemplateFileSpy.DefineGetActivationAccountTemplateSuccess()
+	templateReplaced := spies.TemplateFileSpy.GetGetActivationAccountTemplateReplaced(validInput.FirstName, validInput.ActivationLink)
+
+	// Act
+	sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, spies.MailSpy.Params["SendMail:to"]).Be(validInput.Email)
+	verify.Should(t, spies.MailSpy.Params["SendMail:subject"]).Be("Activation Account")
+	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
+	verify.Should(t, spies.MailSpy.Params["SendMail:replayTo"]).Nil()
+}

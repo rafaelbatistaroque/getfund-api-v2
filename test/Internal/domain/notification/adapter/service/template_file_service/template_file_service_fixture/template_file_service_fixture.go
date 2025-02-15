@@ -12,6 +12,7 @@ type TemplateFileSpy struct {
 
 func NewSUT() (contract.TemplateFileService, *TemplateFileSpy) {
 	settingsSpy := settings_spy.New()
+
 	return template_file_service.New(settingsSpy),
 		&TemplateFileSpy{
 			SettingsSpy: settingsSpy,
