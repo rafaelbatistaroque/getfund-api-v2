@@ -15,5 +15,10 @@ type sendActivationAccountMailInput struct {
 }
 
 func (i *sendActivationAccountMailInput) Validate() validation.Validatable {
+	i.rules.
+		ApplyRules(i.FirstName, "FirstName",
+			&validation.RequiredRule{},
+		)
+
 	return i.rules.GetResult()
 }
