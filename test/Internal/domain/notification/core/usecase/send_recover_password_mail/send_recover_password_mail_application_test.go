@@ -36,6 +36,17 @@ func Test_GivenExecute_WhenValidInput_ThenEnsureCallGetRecoveryPasswordTemplateO
 	verify.Should(t, spies.TemplateFileSpy.CallsCount["GetRecoveryPasswordTemplate"]).Be(1)
 }
 
+func Test_GivenExecute_WhenGetRecoveryPasswordTemplateInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, spies.TemplateFileSpy.CallsCount["GetRecoveryPasswordTemplate"]).Be(1)
+}
+
 func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
@@ -63,6 +74,17 @@ func Test_GivenExecute_WhenGotTemplateAndRecoveryPasswordModel_ThenEnsureSendMai
 	verify.Should(t, spies.MailSpy.Params["SendMail:to"]).Be(validInput.Username)
 	verify.Should(t, spies.MailSpy.Params["SendMail:subject"]).Be("Password Recovery")
 	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
+}
+
+func Test_GivenExecute_WhenSendMailInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, spies.MailSpy.CallsCount["SendMail"]).Be(1)
 }
 
 func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {

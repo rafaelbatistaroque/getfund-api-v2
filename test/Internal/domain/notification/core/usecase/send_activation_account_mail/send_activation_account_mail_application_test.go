@@ -69,6 +69,17 @@ func Test_GivenExecute_WhenValidInput_ThenEnsureCallGetActivationAccountTemplate
 	verify.Should(t, spies.TemplateFileSpy.CallsCount["GetActivationAccountTemplate"]).Be(1)
 }
 
+func Test_GivenExecute_WhenGetActivationAccountTemplateInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, spies.TemplateFileSpy.CallsCount["GetActivationAccountTemplate"]).Be(1)
+}
+
 func Test_GivenExecute_WhenGetActivationAccountTemplateError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSUT()
@@ -97,6 +108,17 @@ func Test_GivenExecute_WhenGotActivationAccountTemplate_ThenEnsureSendMailWithCo
 	verify.Should(t, spies.MailSpy.Params["SendMail:subject"]).Be("Activation Account")
 	verify.Should(t, spies.MailSpy.Params["SendMail:content"]).Be(templateReplaced)
 	verify.Should(t, spies.MailSpy.Params["SendMail:replayTo"]).Nil()
+}
+
+func Test_GivenExecute_WhenSendMailInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSUT()
+
+	// Act
+	sut.Execute(fixture.GetValidInput())
+
+	// Assert
+	verify.Should(t, spies.MailSpy.CallsCount["SendMail"]).Be(1)
 }
 
 func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithServerError(t *testing.T) {
