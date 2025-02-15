@@ -33,3 +33,15 @@ func Test_GivenExecute_WhenEmailEmpty_ThenEnsureReturnUnprocessableError(t *test
 	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Email"))
 }
+
+func Test_GivenExecute_WhenEmailInvalid_ThenEnsureReturnUnprocessableError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSUT()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInvalidInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_EMAIL_INVALID.Error(), "Email"))
+}
