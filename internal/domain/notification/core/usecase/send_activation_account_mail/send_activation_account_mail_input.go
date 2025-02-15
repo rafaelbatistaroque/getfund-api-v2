@@ -21,6 +21,7 @@ func (i *sendActivationAccountMailInput) Validate() validation.Validatable {
 		).
 		ApplyRules(i.Email, "Email",
 			&validation.RequiredRule{},
+			&validation.EmailRule{},
 		)
 
 	return i.rules.GetResult()
