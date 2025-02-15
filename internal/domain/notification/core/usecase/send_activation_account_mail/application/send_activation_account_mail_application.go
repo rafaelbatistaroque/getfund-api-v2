@@ -27,5 +27,7 @@ func (s *sendActivationAccountMailApplication) Execute(input *send_activation_ac
 		return nil, result_app.New(result_app.UNPROCESSABLE_CONTENT_CODE, validatable.GetErrors())
 	}
 
+	s.template.GetActivationAccountTemplate()
+
 	return nil, nil
 }
