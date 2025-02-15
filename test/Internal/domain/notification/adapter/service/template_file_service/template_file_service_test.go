@@ -39,3 +39,14 @@ func Test_GivenGetRecoveryPasswordTemplate_WhenTemplateFound_ThenEnsureReturnCor
 	// Assert
 	verify.Should(t, result).Be(templateContent)
 }
+
+func Test_GivenGetActivationAccountTemplate_WhenTemplateNotFound_ThenEnsureReturnCorrectError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSUT()
+
+	// Act
+	_, err := sut.GetActivationAccountTemplate()
+
+	// Assert
+	verify.Should(t, err.Error()).Be("template does not exist")
+}
