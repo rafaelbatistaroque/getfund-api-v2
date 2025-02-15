@@ -7,7 +7,9 @@ import (
 )
 
 const (
-	_TEMPLATE_NOTFOUND_MESSAGE = "template does not exist"
+	_TEMPLATE_NOTFOUND_MESSAGE   = "template does not exist"
+	_RECOVER_PASSWORD_TEMPLATE   = "/recovery_password_template.html"
+	_ACTIVATION_ACCOUNT_TEMPLATE = "/activation_account_template.html"
 )
 
 type templateFileService struct {
@@ -21,7 +23,7 @@ func New(settings settings.ApplicationSettings) *templateFileService {
 }
 
 func (t *templateFileService) GetRecoveryPasswordTemplate() (string, error) {
-	template, err := os.ReadFile(t.settings.GetTemplateDir() + "/recovery_password_template.html")
+	template, err := os.ReadFile(t.settings.GetTemplateDir() + _RECOVER_PASSWORD_TEMPLATE)
 	if err != nil {
 		return "", errors.New(_TEMPLATE_NOTFOUND_MESSAGE)
 	}
@@ -30,7 +32,7 @@ func (t *templateFileService) GetRecoveryPasswordTemplate() (string, error) {
 }
 
 func (t *templateFileService) GetActivationAccountTemplate() (string, error) {
-	template, err := os.ReadFile(t.settings.GetTemplateDir() + "/activation_account_template.html")
+	template, err := os.ReadFile(t.settings.GetTemplateDir() + _ACTIVATION_ACCOUNT_TEMPLATE)
 	if err != nil {
 		return "", errors.New(_TEMPLATE_NOTFOUND_MESSAGE)
 	}
