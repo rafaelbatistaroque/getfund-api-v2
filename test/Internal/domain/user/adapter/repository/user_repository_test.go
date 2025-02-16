@@ -22,15 +22,16 @@ func Test_GivenUserExistsByUsername_WhenQueryError_ThenEnsureReturnError(t *test
 	verify.Should(t, err).NotNil()
 }
 
-func Test_GivenUserExistsByUsername_WhenNotFound_ThenEnsureReturnApropriateError(t *testing.T) {
+func Test_GivenUserExistsByUsername_WhenNotFound_ThenEnsureReturnNuloValue(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSUT()
 
 	// Act
-	_, err := sut.UserExistsByUsername("non-existent-username")
+	result, err := sut.UserExistsByUsername("non-existent-username")
 
 	// Assert
-	verify.Should(t, err.Error()).Be("user not found")
+	verify.Should(t, result).Nil()
+	verify.Should(t, err).Nil()
 }
 
 func Test_GivenUserExistsByUsername_WhenFound_ThenEnsureReturnSuccess(t *testing.T) {
@@ -87,5 +88,5 @@ func Test_GivenCreateUser_WhenUserCreatedSuccess_ThenEnsureReturnUserDtoFilled(t
 	verify.Should(t, userSaved.RegisteredUrl).Be(expectedUserCreated.RegisteredUrl)
 	verify.Should(t, userSaved.Email).Be(expectedUserCreated.Email)
 	verify.Should(t, userSaved.Username).Be(expectedUserCreated.Username)
-	verify.Should(t, userSaved.CreatedAt).NotNil()
+	verify.Should(t, userSaved.RegisteredAt).Be(expectedUserCreated.RegisteredAt)
 }

@@ -6,6 +6,7 @@ import (
 	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 	"getfund-api-v2/pkg/db/schema"
 	"getfund-api-v2/test/helper/db_fixture"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -33,5 +34,6 @@ func GetFilledActivationUserDto() *user_dto.ActivationUserDto {
 		MainSocialNetwork: "@FakeSocial",
 		RegisteredUrl:     "https://social.com",
 		IsAdmin:           false,
+		RegisteredAt:      time.Now().Unix(),
 	}
 }

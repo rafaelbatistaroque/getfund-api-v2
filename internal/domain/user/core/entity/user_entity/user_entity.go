@@ -2,6 +2,7 @@ package user_entity
 
 import (
 	"slices"
+	"time"
 )
 
 type User struct {
@@ -17,6 +18,7 @@ type User struct {
 	registeredUrl     string
 	isActive          bool
 	isAdmin           bool
+	RegisteredAt      time.Time
 }
 
 func New(firstName, lastName, email, gender, password, mainSocialNetwork, registeredUrl string, countryId, userCategoryId int) *User {
@@ -33,6 +35,7 @@ func New(firstName, lastName, email, gender, password, mainSocialNetwork, regist
 		registeredUrl:     getValidValue(registeredUrl),
 		isActive:          true,
 		isAdmin:           false,
+		RegisteredAt:      time.Now(),
 	}
 }
 
@@ -98,4 +101,8 @@ func (u *User) GetIsActive() bool {
 
 func (u *User) GetIsAdmin() bool {
 	return u.isAdmin
+}
+
+func (u *User) GetRegisteredAt() time.Time {
+	return u.RegisteredAt
 }

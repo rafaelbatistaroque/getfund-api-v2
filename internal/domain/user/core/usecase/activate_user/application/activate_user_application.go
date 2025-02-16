@@ -51,12 +51,25 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, err
 	}
 
-	userSaved, err := createUser(userData, a.mapper, a.repository)
+	user := user_entity.New(
+		userData.FirstName,
+		userData.LastName,
+		userData.Email,
+		userData.Gender,
+		userData.Password,
+		userData.MainSocialNetwork,
+		userData.RegisteredUrl,
+		userData.CountryId,
+		userData.UserCategoryId)
+
+	userDto := a.mapper.ToDto(user)
+
+	userSaved, err := createUser(userDto, a.repository)
 	if err != nil {
 		return nil, err
 	}
 
-	defer a.cache.Delete(input.ActivationKey)
+	defer a.cache.Delete(input.ActivationDataKey)
 
 	if userData.CouponCode != "" {
 		payloadCoupon := &payload.ActivateUserWithCouponConfirmedPayload{
@@ -68,7 +81,9 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 
 	channelResponse := make(chan []byte, 1)
 	payloadConfirmed := &payload.ActivateUserConfirmedPayload{
-		Id: userSaved.Id,
+		Id:       userSaved.Id,
+		Username: user.GetUsername(),
+		Password: user.GetPassword(),
 	}
 
 	a.bus.EmitWithPayloadAndResponse(&activate_user.ActivateUserConfirmedEvent{}, payloadConfirmed, channelResponse)
@@ -77,7 +92,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 }
 
 func getUserData(input *activate_user.Input, cache cache_service.Cache) (*user_dto.ActivationUserData, *result_app.ApplicationError) {
-	userSerialized, errCache := cache.Get(input.ActivationKey)
+	userSerialized, errCache := cache.Get(input.ActivationDataKey)
 	if errCache != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("activation code not found"))
 	}
@@ -97,27 +112,14 @@ func checkForDuplicateUser(input *activate_user.Input, userData *user_dto.Activa
 	}
 
 	if userDuplicated != nil {
-		defer cache.Delete(input.ActivationKey)
+		defer cache.Delete(input.ActivationDataKey)
 		return result_app.New(result_app.DUPLICATED_ENTRY_CODE, errors.New("user already exists"))
 	}
 
 	return nil
 }
 
-func createUser(userData *user_dto.ActivationUserData, mapper activate_user_mapper.Mapper, repository user_contract.Repository) (*user_dto.UserDto, *result_app.ApplicationError) {
-	user := user_entity.New(
-		userData.FirstName,
-		userData.LastName,
-		userData.Email,
-		userData.Gender,
-		userData.Password,
-		userData.MainSocialNetwork,
-		userData.RegisteredUrl,
-		userData.CountryId,
-		userData.UserCategoryId)
-
-	userDto := mapper.ToDto(user)
-
+func createUser(userDto *user_dto.ActivationUserDto, repository user_contract.Repository) (*user_dto.UserDto, *result_app.ApplicationError) {
 	userSaved, err := repository.CreateUser(userDto)
 	if err != nil {
 		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)

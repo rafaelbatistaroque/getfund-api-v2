@@ -47,7 +47,7 @@ func (ms *mailService) SendMail(to, subject, content string, replyTo []string) e
 
 	ms.message.SetBody(_CONTENT_TYPE, content)
 
-	//ms.dialer.DialAndSend(ms.message)
+	ms.dialer.DialAndSend(ms.message)
 
 	return nil
 }

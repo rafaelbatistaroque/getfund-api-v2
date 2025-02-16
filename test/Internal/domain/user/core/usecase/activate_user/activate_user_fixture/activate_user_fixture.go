@@ -42,8 +42,8 @@ type Option func(*activate_user.Input)
 func GetInput(options ...Option) *activate_user.Input {
 	fakeValidActivationCode := "fakeActivationCodeVl"
 	input := &activate_user.Input{
-		ActivationCode: fakeValidActivationCode,
-		ActivationKey:  "user_activation_" + fakeValidActivationCode,
+		ActivationCode:    fakeValidActivationCode,
+		ActivationDataKey: "user_activation_" + fakeValidActivationCode,
 	}
 
 	for _, opt := range options {
@@ -65,15 +65,15 @@ func WithInvalidActivationCodeLength() Option {
 	}
 }
 
-func WithEmptyActivationKey() Option {
+func WithEmptyActivationDataKey() Option {
 	return func(params *activate_user.Input) {
-		params.ActivationKey = ""
+		params.ActivationDataKey = ""
 	}
 }
 
-func WithInvalidActivationKey() Option {
+func WithInvalidActivationDataKey() Option {
 	return func(params *activate_user.Input) {
-		params.ActivationKey = "invalid-activation-key"
+		params.ActivationDataKey = "invalid-activation-data-key"
 	}
 }
 
@@ -102,7 +102,7 @@ func GetResponseSession() ([]byte, *activate_user.Output) {
 	response := &activate_user.Output{
 		Token: "fake-token",
 		Session: activate_user.SessionOutput{
-			ID:        "fake-id",
+			ID:        1,
 			FirstName: "fake-first-name",
 			IsAdmin:   true,
 		},

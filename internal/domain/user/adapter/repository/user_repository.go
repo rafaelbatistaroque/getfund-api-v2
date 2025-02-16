@@ -1,7 +1,6 @@
 package user_repository
 
 import (
-	"errors"
 	user_contract "getfund-api-v2/internal/domain/user/core/contract"
 	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 	"getfund-api-v2/pkg/db/schema"
@@ -25,7 +24,7 @@ func (u *userRepository) UserExistsByUsername(username string) (*user_dto.UserDt
 		First(&user)
 
 	if result.Error == gorm.ErrRecordNotFound {
-		return nil, errors.New("user not found")
+		return nil, nil
 	}
 
 	if result.Error != nil {
@@ -51,6 +50,7 @@ func (u *userRepository) CreateUser(dto *user_dto.ActivationUserDto) (*user_dto.
 		IsActive:          dto.IsActive,
 		UserCategoryID:    uint(dto.UserCategoryId),
 		CountryID:         uint(dto.CountryId),
+		RegisteredAt:      dto.RegisteredAt,
 	}
 
 	result := u.db.Create(&user)

@@ -42,30 +42,30 @@ func Test_GivenExecute_WhenActivationCodeInvalid_ThenEnsureReturnError(t *testin
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "ActivationCode", 20))
 }
 
-func Test_GivenExecute_WhenActivationKeyEmpty_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenExecute_WhenActivationDataKeyEmpty_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	inputWithActivationCodeEmpty := fixture.GetInput(fixture.WithEmptyActivationKey())
+	inputWithActivationCodeEmpty := fixture.GetInput(fixture.WithEmptyActivationDataKey())
 
 	// Act
 	_, err := sut.Execute(inputWithActivationCodeEmpty)
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
-	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ActivationKey"))
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ActivationDataKey"))
 }
 
-func Test_GivenExecute_WhenActivationKeyInvalid_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenExecute_WhenActivationDataKeyInvalid_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	inputWithActivationCodeInvalid := fixture.GetInput(fixture.WithInvalidActivationKey())
+	inputWithActivationCodeInvalid := fixture.GetInput(fixture.WithInvalidActivationDataKey())
 
 	// Act
 	_, err := sut.Execute(inputWithActivationCodeInvalid)
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
-	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_INVALID.Error(), "ActivationKey"))
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_INVALID.Error(), "ActivationDataKey"))
 }
 
 func Test_GivenExecute_WhenInputValid_ThenEnsureCallCacheGetWithCorrectParameter(t *testing.T) {
@@ -77,7 +77,7 @@ func Test_GivenExecute_WhenInputValid_ThenEnsureCallCacheGetWithCorrectParameter
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(validInput.ActivationKey)
+	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(validInput.ActivationDataKey)
 }
 
 func Test_GivenExecute_WhenCacheGetInvoked_ThenEnsureCallsOnce(t *testing.T) {
@@ -202,6 +202,7 @@ func Test_GivenExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallMapperToDt
 	verify.Should(t, entityParam.GetRegisteredUrl()).Be(expectedParam.RegisteredUrl)
 	verify.Should(t, entityParam.GetIsActive()).BeTrue()
 	verify.Should(t, entityParam.GetIsAdmin()).BeFalse()
+	verify.Should(t, entityParam.GetRegisteredAt()).NotNil()
 }
 
 func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
@@ -311,8 +312,12 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
 	spies.RepoSpy.DefineCreateUserSuccess()
+	var expectedParam = user_dto.ActivationUserData{}
+	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 	expectedPayload := &payload.ActivateUserConfirmedPayload{
-		Id: spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
+		Username: expectedParam.Email,
+		Password: expectedParam.Password,
+		Id:       spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
 	}
 
 	// Act
@@ -322,6 +327,8 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	payloadReceived := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*payload.ActivateUserConfirmedPayload)
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&activate_user.ActivateUserConfirmedEvent{})
 	verify.Should(t, payloadReceived.Id).Be(expectedPayload.Id)
+	verify.Should(t, payloadReceived.Username).Be(expectedPayload.Username)
+	verify.Should(t, payloadReceived.Password).Be(expectedPayload.Password)
 }
 
 func Test_GivenExecute_WhenEmitWithPayloadWithUserCreatedEventInvoked_ThenEnsureCallsOnce(t *testing.T) {

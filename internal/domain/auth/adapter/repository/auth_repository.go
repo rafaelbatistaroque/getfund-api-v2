@@ -20,7 +20,7 @@ func New(db *gorm.DB) auth_contract.AuthRepository {
 func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
 	var user = schema.User{}
 	result := r.db.
-		Select("id, first_name, is_admin, username").
+		Select("id, first_name, is_admin, username, password").
 		Where("is_active = ? AND username = ?", true, username).
 		First(&user)
 

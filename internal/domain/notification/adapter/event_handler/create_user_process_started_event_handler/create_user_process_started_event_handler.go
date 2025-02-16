@@ -23,8 +23,8 @@ func New(cache cache_service.Cache, sendActivationAccountMail send_activation_ac
 }
 
 type CreateUserProcessPayload struct {
-	ActivationCode string `json:"activation_code"`
-	ActivationLink string `json:"activation_link"`
+	ActivationDataKey string `json:"activation_data_key"`
+	ActivationLink    string `json:"activation_link"`
 }
 
 func (h *createUserProcessStartedEventHandler) Handle(event bus.Event) {
@@ -34,7 +34,7 @@ func (h *createUserProcessStartedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	resultCache, err := h.cache.Get(payload.ActivationCode)
+	resultCache, err := h.cache.Get(payload.ActivationDataKey)
 	if err != nil {
 		h.logger.Error("IsOk: False | get cache failed")
 		return

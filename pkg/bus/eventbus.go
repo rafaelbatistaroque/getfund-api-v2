@@ -6,16 +6,6 @@ import (
 	"sync"
 )
 
-// Event é a interface genérica para eventos
-type Event interface {
-	GetName() string
-	GetPayload() []byte
-	SetPayload(payload []byte)
-
-	SetChannel(channel chan []byte)
-	DefineResponse(response []byte)
-}
-
 type Handler interface {
 	Handle(event Event)
 }

@@ -61,8 +61,8 @@ func GetInvalidCreateUserProcessStartedEvent() *create_user.CreateUserProcessSta
 func GetValidCreateUserProcessStartedEvent(withValue string) *create_user.CreateUserProcessStartedEvent {
 	event := &create_user.CreateUserProcessStartedEvent{}
 	data := map[string]string{
-		"activation_code": withValue,
-		"activation_link": "fake-activation-link",
+		"activation_data_key": withValue,
+		"activation_link":     "fake-activation-link",
 	}
 
 	payload, _ := json.Marshal(data)

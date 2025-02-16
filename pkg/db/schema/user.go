@@ -1,7 +1,5 @@
 package schema
 
-import "time"
-
 type User struct {
 	ID                uint   `gorm:"primaryKey;autoIncrement"`
 	UserCategoryID    uint   `gorm:"index"`
@@ -16,11 +14,13 @@ type User struct {
 	RegisteredUrl     string `gorm:"not null"`
 	IsAdmin           bool   `gorm:"not null"`
 	IsActive          bool   `gorm:"not null"`
+	RegisteredAt      int64  `gorm:"column:registered_at"`
 
 	// Relacionamentos
-	UserCategory UserCategory `gorm:"foreignKey:UserCategoryID;constraint:OnDelete:CASCADE"`
-	Country      Country      `gorm:"foreignKey:CountryID;constraint:OnDelete:CASCADE"`
+	// UserCategory UserCategory `gorm:"foreignKey:UserCategoryID;constraint:OnDelete:CASCADE"`
+	// Country      Country      `gorm:"foreignKey:CountryID;constraint:OnDelete:CASCADE"`
+}
 
-	CreatedAt time.Time
-	UpdatedAt time.Time
+func (User) TableName() string {
+	return "user"
 }

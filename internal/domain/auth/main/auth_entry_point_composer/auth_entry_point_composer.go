@@ -1,6 +1,7 @@
 package auth_entry_point_composer
 
 import (
+	"getfund-api-v2/internal/domain/auth/adapter/event_handler/activate_user_confirmed_event_handler"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/recover_password_gateway"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/reset_password_gateway"
 	signin_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signin_auth_gateway"
@@ -65,7 +66,13 @@ func Get(
 	auth_middleware := auth_middleware.New(sessionService)
 
 	//Event Handler
-	// eventBus.Subscribe("UserCreated", user_created_event_handler.New(signin, cache))
+	handlers := map[string]bus.Handler{
+		"ActivateUserConfirmedEvent": activate_user_confirmed_event_handler.New(signin),
+	}
+
+	for eventName, handler := range handlers {
+		eventBus.Subscribe(eventName, handler)
+	}
 
 	return authEntryPointComposer{
 		Signin:                     response_proxy.New(signinGateway.Signin),
