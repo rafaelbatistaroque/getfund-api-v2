@@ -2,6 +2,7 @@ package create_user_process_with_coupon_started_event_handler
 
 import (
 	"encoding/json"
+	coupon_common "getfund-api-v2/internal/domain/coupon/adapter/common"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
@@ -27,7 +28,6 @@ func New(usecase validate_coupon.UseCase, cache cache_service.Cache) bus.Handler
 type CreateUserProcessWithCouponPayload struct {
 	CouponCode        string `json:"coupon_code"`
 	ActivationDataKey string `json:"activation_data_key"`
-	ErrorStatus       string `json:"error_status"`
 }
 
 func (h *crateUserProcessWithCouponStartedEventHandler) Handle(event bus.Event) {
@@ -41,10 +41,30 @@ func (h *crateUserProcessWithCouponStartedEventHandler) Handle(event bus.Event) 
 		CouponCode: payload.CouponCode,
 	})
 
-	if err != nil && strings.HasPrefix(err.Message.Error(), "status:") {
-		payload.ErrorStatus = strings.TrimPrefix(err.Message.Error(), "status:")
+	var cacheData = coupon_common.CacheCouponData{IsValid: true}
+	if err != nil {
+		if errorCode, errorMessage, ok := parseCouponValidationError(err.Message.Error()); ok {
+			cacheData.IsValid = false
+			cacheData.ErrorCode = errorCode
+			cacheData.ErrorMessage = errorMessage
+		}
 	}
 
 	key := payload.ActivationDataKey + "_coupon"
-	h.cache.Set(key, payload, 24*time.Hour)
+	h.cache.Set(key, cacheData, 24*time.Hour)
+}
+
+func parseCouponValidationError(errorStr string) (code, message string, valid bool) {
+	const tag_prefix = "coupon_validation:"
+	if !strings.HasPrefix(errorStr, tag_prefix) {
+		return "", "", false
+	}
+
+	parts := strings.SplitN(strings.TrimPrefix(errorStr, tag_prefix), "|", 2)
+
+	if len(parts) < 2 {
+		return "", "", false
+	}
+
+	return parts[0], parts[1], true
 }
