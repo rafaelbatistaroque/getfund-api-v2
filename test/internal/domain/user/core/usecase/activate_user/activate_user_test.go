@@ -282,8 +282,9 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	spies.RepoSpy.DefineCreateUserSuccess()
 	inputValid := fixture.GetInput()
 	expectedPaylod := &payload.ActivateUserWithCouponConfirmedPayload{
-		ActivationCode: inputValid.ActivationCode,
-		UserId:         spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
+		ActivationDataKey: inputValid.ActivationDataKey,
+		ActivationCode:    inputValid.ActivationCode,
+		UserId:            spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
 	}
 
 	// Act
