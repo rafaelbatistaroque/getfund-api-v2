@@ -19,10 +19,6 @@ func (eb *EventBusSpy) Subscribe(eventName string, handler bus.Handler) {
 
 }
 
-func (eb *EventBusSpy) EmitWithResponse(event bus.Event, payload any, responseChannel chan string) {
-
-}
-
 func (eb *EventBusSpy) Emit(event bus.Event) {
 	eb.Params["Publish:event"] = append(eb.Params["Publish:event"], event)
 
@@ -37,9 +33,9 @@ func (eb *EventBusSpy) EmitWithPayload(event bus.Event, payload any) {
 }
 
 func (eb *EventBusSpy) EmitWithPayloadAndResponse(event bus.Event, payload any, responseChannel chan []byte) {
-	eb.Params["EmitWithPayload:event"] = append(eb.Params["EmitWithPayload:event"], event)
-	eb.Params["EmitWithPayload:payload"] = append(eb.Params["EmitWithPayload:payload"], payload)
-	eb.Params["EmitWithPayload:responseChannel"] = append(eb.Params["EmitWithPayload:responseChannel"], responseChannel)
+	eb.Params["EmitWithPayloadAndResponse:event"] = append(eb.Params["EmitWithPayloadAndResponse:event"], event)
+	eb.Params["EmitWithPayloadAndResponse:payload"] = append(eb.Params["EmitWithPayloadAndResponse:payload"], payload)
+	eb.Params["EmitWithPayloadAndResponse:responseChannel"] = append(eb.Params["EmitWithPayloadAndResponse:responseChannel"], responseChannel)
 
 	eb.CallsCount["EmitWithPayload"]++
 }
