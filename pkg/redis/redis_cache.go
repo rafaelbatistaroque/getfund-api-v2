@@ -16,6 +16,7 @@ func New(context context.Context, settings settings.ApplicationSettings) *redis.
 
 	if _, err := client.Ping(context).Result(); err != nil {
 		logger.Errorf("Can't get Redis connection: %v", err)
+		return nil
 	}
 
 	logger.Info("Redis connected")
