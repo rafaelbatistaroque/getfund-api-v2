@@ -1,0 +1,55 @@
+name: CI
+
+# Define os eventos que acionam o workflow
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # Job para criar ou atualizar automaticamente o pull request
+  create_pull_request:
+    name: Create Pull Request from develop to main
+    runs-on: ubuntu-latest
+    # Executa este job apenas quando o push acontecer na develop
+    if: github.ref == 'refs/heads/develop'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create/Update Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: main
+          branch: develop
+          title: "MERGE: Updates from develop to main"
+          body: "This PR was generated automatic after new pushes in develop branch."
+          draft: false
+
+  # Job para executar os testes do projeto
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    # O job de testes pode depender do job de criação do PR
+    needs: create_pull_request
+    services:
+      # Define o Redis como serviço para os testes
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Settings Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '1.24'
+
+      - name: Execute tests
+        run: go test ./test/...
