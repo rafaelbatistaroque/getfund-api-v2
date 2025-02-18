@@ -16,7 +16,7 @@ permissions:
 jobs:
     # Job para executar os testes do projeto
   test:
-    name: Tests
+    name: QA Tests
     runs-on: ubuntu-latest
     services:
       # Define o Redis como serviço para os testes
