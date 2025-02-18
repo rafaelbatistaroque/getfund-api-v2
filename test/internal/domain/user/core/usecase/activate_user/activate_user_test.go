@@ -283,7 +283,6 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	inputValid := fixture.GetInput()
 	expectedPaylod := &payload.ActivateUserWithCouponConfirmedPayload{
 		ActivationDataKey: inputValid.ActivationDataKey,
-		ActivationCode:    inputValid.ActivationCode,
 		UserId:            spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
 	}
 
@@ -325,8 +324,8 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	payloadReceived := spies.BusSpy.Params["EmitWithPayload:payload"][0].(*payload.ActivateUserConfirmedPayload)
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&activate_user.ActivateUserConfirmedEvent{})
+	payloadReceived := spies.BusSpy.Params["EmitWithPayloadAndResponse:payload"][0].(*payload.ActivateUserConfirmedPayload)
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayloadAndResponse:event"][0]).Be(&activate_user.ActivateUserConfirmedEvent{})
 	verify.Should(t, payloadReceived.Id).Be(expectedPayload.Id)
 	verify.Should(t, payloadReceived.Username).Be(expectedPayload.Username)
 	verify.Should(t, payloadReceived.Password).Be(expectedPayload.Password)
@@ -373,7 +372,7 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseEmpty_ThenEnsureReturnServerEr
 		errChannel <- err
 	}()
 	time.Sleep(1 * time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayload:responseChannel"][0].(chan []byte)
+	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
 	responseChannel <- []byte("")
 	close(responseChannel)
 
@@ -397,7 +396,7 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseInvalid_ThenEnsureReturnServer
 		errChannel <- err
 	}()
 	time.Sleep(1 * time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayload:responseChannel"][0].(chan []byte)
+	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
 	responseChannel <- []byte("{invalid-response}")
 	close(responseChannel)
 
@@ -422,7 +421,7 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSessio
 		resultChannel <- result
 	}()
 	time.Sleep(1 * time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayload:responseChannel"][0].(chan []byte)
+	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
 	responseChannel <- responseEvent
 	close(responseChannel)
 

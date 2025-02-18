@@ -3,25 +3,25 @@ package create_user_process_with_coupon_started_event_handler
 import (
 	"encoding/json"
 	coupon_common "getfund-api-v2/internal/domain/coupon/adapter/common"
-	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
+	coupon_contract "getfund-api-v2/internal/domain/coupon/core/contract"
+	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
 	logger "getfund-api-v2/pkg/log"
-	"strings"
 	"time"
 )
 
 type crateUserProcessWithCouponStartedEventHandler struct {
-	validateCoupon validate_coupon.UseCase
-	cache          cache_service.Cache
-	logger         logger.Logger
+	couponRepository coupon_contract.Repository
+	cache            cache_service.Cache
+	logger           logger.Logger
 }
 
-func New(usecase validate_coupon.UseCase, cache cache_service.Cache) bus.Handler {
+func New(couponRepository coupon_contract.Repository, cache cache_service.Cache) bus.Handler {
 	return &crateUserProcessWithCouponStartedEventHandler{
-		logger:         *logger.New("crateUserProcessWithCouponStartedEventHandler"),
-		cache:          cache,
-		validateCoupon: usecase,
+		logger:           *logger.New("crateUserProcessWithCouponStartedEventHandler"),
+		cache:            cache,
+		couponRepository: couponRepository,
 	}
 }
 
@@ -37,34 +37,45 @@ func (h *crateUserProcessWithCouponStartedEventHandler) Handle(event bus.Event) 
 		return
 	}
 
-	_, err := h.validateCoupon.Execute(&validate_coupon.Input{
-		CouponCode: payload.CouponCode,
-	})
-
-	var cacheData = coupon_common.CacheCouponData{IsValid: true}
-	if err != nil {
-		if errorCode, errorMessage, ok := parseCouponValidationError(err.Message.Error()); ok {
-			cacheData.IsValid = false
-			cacheData.ErrorCode = errorCode
-			cacheData.ErrorMessage = errorMessage
-		}
+	var cacheData = &coupon_common.CacheCouponData{
+		IsValid: true,
 	}
+
+	coupon, err := h.couponRepository.GetCouponByCouponCode(payload.CouponCode)
+	if err != nil {
+		cacheData.IsValid = false
+		cacheData.Error = getErrorDataFrom(err)
+	}
+
+	cacheData.CouponData = getCouponDataFrom(coupon)
 
 	key := payload.ActivationDataKey + "_coupon"
 	h.cache.Set(key, cacheData, 24*time.Hour)
 }
 
-func parseCouponValidationError(errorStr string) (code, message string, valid bool) {
-	const tag_prefix = "coupon_validation:"
-	if !strings.HasPrefix(errorStr, tag_prefix) {
-		return "", "", false
+func getErrorDataFrom(err error) *coupon_common.ErrorData {
+	if err == nil {
+		return nil
 	}
 
-	parts := strings.SplitN(strings.TrimPrefix(errorStr, tag_prefix), "|", 2)
+	return &coupon_common.ErrorData{
+		Code:    "COUPON_REPOSITORY",
+		Message: err.Error(),
+	}
+}
 
-	if len(parts) < 2 {
-		return "", "", false
+func getCouponDataFrom(coupon *coupon_dto.CouponDto) *coupon_common.CouponData {
+	if coupon == nil {
+		return nil
 	}
 
-	return parts[0], parts[1], true
+	return &coupon_common.CouponData{
+		Id:          coupon.Id,
+		Code:        coupon.Code,
+		PrizeDrawId: coupon.PrizeDrawId,
+		ProductId:   coupon.ProductId,
+		StartAt:     coupon.StartAt,
+		EndAt:       coupon.EndAt,
+		Discount:    coupon.Discount,
+	}
 }
