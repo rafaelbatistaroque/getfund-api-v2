@@ -3,6 +3,7 @@ package create_user_process_with_coupon_started_event_handler_fixture
 import (
 	"encoding/json"
 	"errors"
+	coupon_common "getfund-api-v2/internal/domain/coupon/adapter/common"
 	coupon_payload "getfund-api-v2/internal/domain/coupon/adapter/event_handler/create_user_process_with_coupon_started_event_handler"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
@@ -64,11 +65,11 @@ func GetValidateCouponInput() *validate_coupon.Input {
 	}
 }
 
-func GetCreateUserProcessWithCouponPayload(errorStatus string) *coupon_payload.CreateUserProcessWithCouponPayload {
-	return &coupon_payload.CreateUserProcessWithCouponPayload{
-		CouponCode:        "fake-coupon-code",
-		ActivationDataKey: "fake-activation-data-key",
-		ErrorStatus:       errorStatus,
+func GetCachedCouponData(code, message string, isValid bool) coupon_common.CacheCouponData {
+	return coupon_common.CacheCouponData{
+		IsValid:      isValid,
+		ErrorCode:    code,
+		ErrorMessage: message,
 	}
 }
 
