@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - develop
   pull_request:
     branches:
       - main
@@ -34,4 +33,4 @@ jobs:
           go-version: '1.24'
 
       - name: Run tests
-        run: go test ./test/*_test.go
+        run: go test ./test/...
