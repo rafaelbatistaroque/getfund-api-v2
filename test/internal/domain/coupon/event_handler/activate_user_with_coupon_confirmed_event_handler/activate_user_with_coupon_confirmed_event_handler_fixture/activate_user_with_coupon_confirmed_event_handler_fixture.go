@@ -32,9 +32,9 @@ func GetInvalidActivateUserWithCouponConfirmedEvent() *activate_user.ActivateUse
 	return &activate_user.ActivateUserWithCouponConfirmedEvent{}
 }
 
-func GetValidActivateUserWithCouponConfirmedEvent(activationDataKey string) *activate_user.ActivateUserWithCouponConfirmedEvent {
+func GetValidActivateUserWithCouponConfirmedEvent(activationDataKey string, userId int) *activate_user.ActivateUserWithCouponConfirmedEvent {
 	payload, _ := json.Marshal(map[string]any{
-		"user_id":             1,
+		"user_id":             userId,
 		"activation_data_key": activationDataKey,
 	})
 

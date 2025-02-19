@@ -74,6 +74,7 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		StartAt:     couponData.CouponData.StartAt,
 		EndAt:       couponData.CouponData.EndAt,
 		Discount:    couponData.CouponData.Discount,
+		UserId:      payload.UserId,
 	})
 
 	if erroUsecase != nil {

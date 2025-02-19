@@ -29,7 +29,7 @@ func (a *ApplyCouponApplicationSpy) Execute(input *apply_coupon.Input) (*apply_c
 	return a.SuccessResult["Execute"], a.ErrorResult["Execute"]
 }
 
-func GetApplyCouponInput(from coupon_common.CouponData) *apply_coupon.Input {
+func GetApplyCouponInput(from coupon_common.CouponData, userId int) *apply_coupon.Input {
 	return &apply_coupon.Input{
 		Id:          from.Id,
 		Code:        from.Code,
@@ -38,5 +38,6 @@ func GetApplyCouponInput(from coupon_common.CouponData) *apply_coupon.Input {
 		StartAt:     from.StartAt,
 		EndAt:       from.EndAt,
 		Discount:    from.Discount,
+		UserId:      userId,
 	}
 }

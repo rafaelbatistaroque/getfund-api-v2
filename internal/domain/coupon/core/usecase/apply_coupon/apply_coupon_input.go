@@ -14,6 +14,7 @@ type applyCouponInput struct {
 	StartAt     uint64 `json:"start_at"`
 	EndAt       int    `json:"end_at"`
 	Discount    int    `json:"discount"`
+	UserId      int    `json:"user_id"`
 
 	rules validation.Rule
 }
