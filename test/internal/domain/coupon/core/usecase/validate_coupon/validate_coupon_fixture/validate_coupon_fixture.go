@@ -70,3 +70,7 @@ func GetValidCoupon() *coupon_dto.CouponDto {
 func GetPrizeDrawResponse() []byte {
 	return []byte(`{"prize_draw": {"winner_entrance_id": 1}}`)
 }
+
+func GetProductResponse() []byte {
+	return []byte(`{"product": {"total_price": 100, "is_active": true}}`)
+}
