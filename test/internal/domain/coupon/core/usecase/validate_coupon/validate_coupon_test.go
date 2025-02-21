@@ -178,3 +178,28 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseEmpty_ThenEnsureReturnAprop
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [response empty]")
 }
+
+func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errResult := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	go func() {
+		_, err := sut.Execute(fixture.GetInput())
+		errResult <- err
+	}()
+
+	time.Sleep(time.Second)
+	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
+	responseChannel <- []byte("invalid-value")
+	defer close(responseChannel)
+	defer close(errResult)
+
+	// Assert
+	errUnwrapped := <-errResult
+	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [response invalid]")
+}
