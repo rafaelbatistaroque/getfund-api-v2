@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	_NOW = uint64(time.Now().Unix())
+	_NOW = time.Now().Unix()
 )
 
 type validateCouponApplication struct {
@@ -35,6 +35,10 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 
 	if couponFound.StartAt > _NOW {
 		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("coupon validity has not start yet"))
+	}
+
+	if couponFound.EndAt != nil && *couponFound.EndAt < _NOW {
+		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("coupon expired"))
 	}
 
 	//"coupon validity has not start yet"
