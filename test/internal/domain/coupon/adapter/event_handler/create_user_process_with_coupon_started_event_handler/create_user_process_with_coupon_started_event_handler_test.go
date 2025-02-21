@@ -3,7 +3,7 @@ package create_user_process_with_coupon_started_event_handler_test
 import (
 	coupon_common "getfund-api-v2/internal/domain/coupon/adapter/common"
 	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto"
-	fixture "getfund-api-v2/test/internal/domain/coupon/event_handler/create_user_process_with_coupon_started_event_handler/create_user_process_with_coupon_started_event_handler_fixture"
+	fixture "getfund-api-v2/test/internal/domain/coupon/adapter/event_handler/create_user_process_with_coupon_started_event_handler/create_user_process_with_coupon_started_event_handler_fixture"
 	"testing"
 	"time"
 

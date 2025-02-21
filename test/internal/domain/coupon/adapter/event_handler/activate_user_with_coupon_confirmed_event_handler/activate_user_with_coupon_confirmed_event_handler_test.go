@@ -1,7 +1,7 @@
 package activate_user_with_coupon_confirmed_event_handler_test
 
 import (
-	fixture "getfund-api-v2/test/internal/domain/coupon/event_handler/activate_user_with_coupon_confirmed_event_handler/activate_user_with_coupon_confirmed_event_handler_fixture"
+	fixture "getfund-api-v2/test/internal/domain/coupon/adapter/event_handler/activate_user_with_coupon_confirmed_event_handler/activate_user_with_coupon_confirmed_event_handler_fixture"
 	"testing"
 
 	"github.com/rafaelbatistaroque/verify"
