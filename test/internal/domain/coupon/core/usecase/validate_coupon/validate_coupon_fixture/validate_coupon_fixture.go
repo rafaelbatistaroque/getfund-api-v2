@@ -3,15 +3,20 @@ package validate_coupon_fixture
 import (
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	validate_coupon_application "getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon/application"
+	"getfund-api-v2/test/helper/repository_spy/coupon_repository_spy"
 )
 
 type ValidateCouponFixture struct {
+	RepoSpy *coupon_repository_spy.CouponRepositorySpy
 }
 
 func NewSut() (validate_coupon.UseCase, *ValidateCouponFixture) {
+	repoSpy := coupon_repository_spy.New()
 
-	return validate_coupon_application.New(),
-		&ValidateCouponFixture{}
+	return validate_coupon_application.New(repoSpy),
+		&ValidateCouponFixture{
+			RepoSpy: repoSpy,
+		}
 
 }
 
@@ -19,7 +24,7 @@ type Option func(*validate_coupon.Input)
 
 func GetInput(options ...Option) *validate_coupon.Input {
 	input := &validate_coupon.Input{
-		CouponCode:  "fake-coupon-code",
+		CouponCode:  "FAKE_CPN",
 		ProductId:   1,
 		PrizeDrawId: 1,
 	}
