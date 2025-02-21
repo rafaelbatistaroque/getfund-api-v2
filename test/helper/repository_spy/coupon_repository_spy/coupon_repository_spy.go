@@ -38,6 +38,11 @@ func (r *CouponRepositorySpy) DefineGetCouponByCodeError() {
 	r.ErrorResult["GetCouponByCode"] = errors.New("fake-error")
 }
 
-func (r *CouponRepositorySpy) DefineGetCouponByCodeSuccess() {
+func (r *CouponRepositorySpy) DefineGetCouponByCodeSuccess(coupon *coupon_dto.CouponDto) {
+	if coupon != nil {
+		r.SuccessResult["GetCouponByCode"] = coupon
+		return
+	}
+
 	r.SuccessResult["GetCouponByCode"] = &coupon_dto.CouponDto{}
 }

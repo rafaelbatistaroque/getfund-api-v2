@@ -2,9 +2,11 @@ package validate_coupon_test
 
 import (
 	"fmt"
+	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto"
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/coupon/core/usecase/validate_coupon/validate_coupon_fixture"
 	"testing"
+	"time"
 
 	"github.com/rafaelbatistaroque/validation"
 	"github.com/rafaelbatistaroque/verify"
@@ -60,4 +62,19 @@ func Test_GivenExecute_WhenGetCouponByCodeError_ThenEnsureReturnError(t *testing
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetCouponByCode"])
+}
+
+func Test_GivenExecute_WhenCouponFoundValidityNotStartYet_ThenEnsureApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	expectedCouponFound := &coupon_dto.CouponDto{StartAt: uint64(time.Hour * 72)}
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(expectedCouponFound)
+	validInput := fixture.GetInput()
+
+	// Act
+	_, err := sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Message.Error()).Be("coupon validity has not start yet")
 }
