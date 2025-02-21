@@ -67,7 +67,7 @@ func Test_GivenExecute_WhenGetCouponByCodeError_ThenEnsureReturnError(t *testing
 func Test_GivenExecute_WhenCouponFoundValidityNotStartYet_ThenEnsureApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	expectedCouponFound := &coupon_dto.CouponDto{StartAt: uint64(time.Hour * 72)}
+	expectedCouponFound := &coupon_dto.CouponDto{StartAt: int64(time.Hour * 72)}
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(expectedCouponFound)
 	validInput := fixture.GetInput()
 
@@ -77,4 +77,24 @@ func Test_GivenExecute_WhenCouponFoundValidityNotStartYet_ThenEnsureApropriateEr
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, err.Message.Error()).Be("coupon validity has not start yet")
+}
+
+func Test_GivenExecute_WhenCouponFoundValidityHasEndAtLessThanNow_ThenEnsureApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	minus72Hours := time.Now().Add(-72 * time.Hour).Unix()
+	minus24Hours := time.Now().Add(-24 * time.Hour).Unix()
+	expectedCouponFound := &coupon_dto.CouponDto{
+		StartAt: minus72Hours,
+		EndAt:   &minus24Hours,
+	}
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(expectedCouponFound)
+	validInput := fixture.GetInput()
+
+	// Act
+	_, err := sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Message.Error()).Be("coupon expired")
 }
