@@ -140,3 +140,16 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvoked_ThenEnsureCallsOnce
 	// Assert
 	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayloadAndResponse"]).Be(1)
 }
+
+func Test_GivenExecute_WhenEmitWithPayloadAndResponseTimeout_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Message.Error()).Be("error on get coupon data [timeout]")
+}
