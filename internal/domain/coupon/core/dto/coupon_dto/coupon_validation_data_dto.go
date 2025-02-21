@@ -1,7 +1,7 @@
 package coupon_dto
 
 type CouponValidationData struct {
-	Product   *ProductData
+	Product   *ProductData   `json:"product"`
 	PrizeDraw *PrizeDrawData `json:"prize_draw"`
 }
 

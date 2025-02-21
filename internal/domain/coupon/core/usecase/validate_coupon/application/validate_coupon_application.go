@@ -44,6 +44,10 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, err)
 	}
 
+	if couponFound == nil {
+		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get coupon data [found null]"))
+	}
+
 	if couponFound.StartAt > _NOW {
 		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("coupon validity has not start yet"))
 	}

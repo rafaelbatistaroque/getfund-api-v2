@@ -294,7 +294,7 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][0]).Be(expectedPaylod)
 }
 
-func Test_GivenExecute_WhenEmitWithPayloadWithUserActivationWithCouponConfirmedEventInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenExecute_WhenEmitWithPayloadWithActivateUserWithCouponConfirmedEventInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
@@ -304,10 +304,10 @@ func Test_GivenExecute_WhenEmitWithPayloadWithUserActivationWithCouponConfirmedE
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(2)
+	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(1)
 }
 
-func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenUserSaved_ThenEnsureCallEmitWithPayloadAndResponseWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
@@ -331,7 +331,7 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallPublishWithPayloadWithCorrect
 	verify.Should(t, payloadReceived.Password).Be(expectedPayload.Password)
 }
 
-func Test_GivenExecute_WhenEmitWithPayloadWithUserCreatedEventInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithActivateUserConfirmedEventInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
@@ -341,10 +341,10 @@ func Test_GivenExecute_WhenEmitWithPayloadWithUserCreatedEventInvoked_ThenEnsure
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(1)
+	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayloadAndResponse"]).Be(1)
 }
 
-func Test_GivenExecute_WhenResponsePublishWithPayloadTimeout_ThenEnsureReturnServerErrorWithAppropriateMessage(t *testing.T) {
+func Test_GivenExecute_WhenEmitWithPayloadAndResponseTimeout_ThenEnsureReturnServerErrorWithAppropriateMessage(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())

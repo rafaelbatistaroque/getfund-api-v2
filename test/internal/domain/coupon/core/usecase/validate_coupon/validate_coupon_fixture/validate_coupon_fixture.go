@@ -66,3 +66,7 @@ func GetValidCoupon() *coupon_dto.CouponDto {
 		PrizeDrawId: 5,
 	}
 }
+
+func GetPrizeDrawResponse() []byte {
+	return []byte(`{"prize_draw": {"winner_entrance_id": 1}}`)
+}

@@ -52,6 +52,18 @@ func Test_GivenExecute_WhenInputValid_ThenEnsureCallGetCouponByCodeWithCorrectPa
 	verify.Should(t, spies.RepoSpy.Params["GetCouponByCode:couponCode"]).Be(validInput.CouponCode)
 }
 
+func Test_GivenExecute_WhenGetCouponByCodeWithSuccessNull_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+
+	// Act
+	_, err := sut.Execute(fixture.GetInput())
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message.Error()).Be("error on get coupon data [found null]")
+}
+
 func Test_GivenExecute_WhenGetCouponByCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
@@ -202,4 +214,29 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApr
 	errUnwrapped := <-errResult
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [response invalid]")
+}
+
+func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errResult := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	go func() {
+		_, err := sut.Execute(fixture.GetInput())
+		errResult <- err
+	}()
+
+	time.Sleep(time.Second)
+	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
+	responseChannel <- fixture.GetPrizeDrawResponse()
+	defer close(responseChannel)
+	defer close(errResult)
+
+	// Assert
+	errUnwrapped := <-errResult
+	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [product invalid]")
 }

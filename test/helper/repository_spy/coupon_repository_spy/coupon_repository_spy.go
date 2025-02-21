@@ -31,7 +31,7 @@ func (r *CouponRepositorySpy) GetCouponByCode(couponCode string) (*coupon_dto.Co
 		return sucess.(*coupon_dto.CouponDto), nil
 	}
 
-	return &coupon_dto.CouponDto{}, r.ErrorResult["GetCouponByCode"]
+	return nil, r.ErrorResult["GetCouponByCode"]
 }
 
 func (r *CouponRepositorySpy) DefineGetCouponByCodeError() {
