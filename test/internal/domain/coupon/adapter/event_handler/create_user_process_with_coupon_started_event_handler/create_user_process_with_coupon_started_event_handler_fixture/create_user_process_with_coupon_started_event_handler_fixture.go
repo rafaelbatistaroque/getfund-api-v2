@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	coupon_common "getfund-api-v2/internal/domain/coupon/adapter/common"
 	event_handler "getfund-api-v2/internal/domain/coupon/adapter/event_handler/create_user_process_with_coupon_started_event_handler"
-	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto"
+	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto/coupon_dto"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/pkg/bus"

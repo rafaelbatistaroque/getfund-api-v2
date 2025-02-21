@@ -2,7 +2,7 @@ package create_user_process_with_coupon_started_event_handler_test
 
 import (
 	coupon_common "getfund-api-v2/internal/domain/coupon/adapter/common"
-	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto"
+	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto/coupon_dto"
 	fixture "getfund-api-v2/test/internal/domain/coupon/adapter/event_handler/create_user_process_with_coupon_started_event_handler/create_user_process_with_coupon_started_event_handler_fixture"
 	"testing"
 	"time"
@@ -63,7 +63,7 @@ func Test_GivenHandler_WhenGetCouponByCodeError_ThenEnsureCallCacheSetWithCorrec
 func Test_GivenHandler_WhenGetCouponByCodeSuccess_ThenEnsureCallCacheSetWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetCouponByCodeSuccess()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(nil)
 	expectedCacheKey := "fake-activation-data-key_coupon"
 	expectedSuccess := fixture.GetCouponDataFromSuccessDB(spies.RepoSpy.SuccessResult["GetCouponByCode"].(*coupon_dto.CouponDto))
 	expectedCacheValue := fixture.GetCachedCouponData(nil, expectedSuccess)

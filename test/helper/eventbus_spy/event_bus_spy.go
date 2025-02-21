@@ -37,5 +37,5 @@ func (eb *EventBusSpy) EmitWithPayloadAndResponse(event bus.Event, payload any, 
 	eb.Params["EmitWithPayloadAndResponse:payload"] = append(eb.Params["EmitWithPayloadAndResponse:payload"], payload)
 	eb.Params["EmitWithPayloadAndResponse:responseChannel"] = append(eb.Params["EmitWithPayloadAndResponse:responseChannel"], responseChannel)
 
-	eb.CallsCount["EmitWithPayload"]++
+	eb.CallsCount["EmitWithPayloadAndResponse"]++
 }

@@ -1,21 +1,27 @@
 package validate_coupon_fixture
 
 import (
+	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto/coupon_dto"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	validate_coupon_application "getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon/application"
+	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/repository_spy/coupon_repository_spy"
+	"time"
 )
 
 type ValidateCouponFixture struct {
 	RepoSpy *coupon_repository_spy.CouponRepositorySpy
+	BusSpy  *eventbus_spy.EventBusSpy
 }
 
 func NewSut() (validate_coupon.UseCase, *ValidateCouponFixture) {
 	repoSpy := coupon_repository_spy.New()
+	busSpy := eventbus_spy.New()
 
-	return validate_coupon_application.New(repoSpy),
+	return validate_coupon_application.New(repoSpy, busSpy),
 		&ValidateCouponFixture{
 			RepoSpy: repoSpy,
+			BusSpy:  busSpy,
 		}
 
 }
@@ -43,5 +49,16 @@ func WithEmptyCouponCode() Option {
 func WithInvalidCouponCode() Option {
 	return func(params *validate_coupon.Input) {
 		params.CouponCode = "fake" //less than 8 characters
+	}
+}
+
+func GetValidCoupon() *coupon_dto.CouponDto {
+	minus72Hours := time.Now().Add(-24 * time.Hour).Unix()
+	minus24Hours := time.Now().Add(24 * time.Hour).Unix()
+	return &coupon_dto.CouponDto{
+		StartAt:     minus72Hours,
+		EndAt:       &minus24Hours,
+		ProductId:   10,
+		PrizeDrawId: 5,
 	}
 }

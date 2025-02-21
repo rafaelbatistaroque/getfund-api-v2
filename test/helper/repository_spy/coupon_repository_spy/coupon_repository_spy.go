@@ -2,7 +2,7 @@ package coupon_repository_spy
 
 import (
 	"errors"
-	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto"
+	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto/coupon_dto"
 )
 
 type CouponRepositorySpy struct {
@@ -31,7 +31,7 @@ func (r *CouponRepositorySpy) GetCouponByCode(couponCode string) (*coupon_dto.Co
 		return sucess.(*coupon_dto.CouponDto), nil
 	}
 
-	return nil, r.ErrorResult["GetCouponByCode"]
+	return &coupon_dto.CouponDto{}, r.ErrorResult["GetCouponByCode"]
 }
 
 func (r *CouponRepositorySpy) DefineGetCouponByCodeError() {
