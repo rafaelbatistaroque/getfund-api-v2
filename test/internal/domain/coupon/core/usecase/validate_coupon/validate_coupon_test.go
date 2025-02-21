@@ -1,11 +1,24 @@
 package validate_coupon_test
 
-//fail-fast
-// validate coupn info
-//validate from product
-//validate from prizedraw
+import (
+	"fmt"
+	"getfund-api-v2/internal/shared/result_app"
+	fixture "getfund-api-v2/test/internal/domain/coupon/core/usecase/validate_coupon/validate_coupon_fixture"
+	"testing"
 
-//apply
-//create purchase
-//create entraces
-//make coupon applied
+	"github.com/rafaelbatistaroque/validation"
+	"github.com/rafaelbatistaroque/verify"
+)
+
+func Test_GivenExecute_WhenCouponCodeEmpty_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithEmptyCouponCode())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "CouponCode"))
+}
