@@ -39,8 +39,6 @@ func (uc *ValidateCouponApplicationSpy) DefineValidateCouponUsecaseSuccess() {
 
 func GetValidateCouponInput() *validate_coupon.Input {
 	return &validate_coupon.Input{
-		CouponCode:  "fake-coupon-code",
-		PrizeDrawId: 1,
-		ProductId:   1,
+		CouponCode: "fake-coupon-code",
 	}
 }

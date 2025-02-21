@@ -24,9 +24,7 @@ type Option func(*validate_coupon.Input)
 
 func GetInput(options ...Option) *validate_coupon.Input {
 	input := &validate_coupon.Input{
-		CouponCode:  "FAKE_CPN",
-		ProductId:   1,
-		PrizeDrawId: 1,
+		CouponCode: "FAKE_CPN",
 	}
 
 	for _, opt := range options {
