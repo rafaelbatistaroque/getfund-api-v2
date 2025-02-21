@@ -36,3 +36,9 @@ func WithEmptyCouponCode() Option {
 		params.CouponCode = ""
 	}
 }
+
+func WithInvalidCouponCode() Option {
+	return func(params *validate_coupon.Input) {
+		params.CouponCode = "fake" //less than 8 characters
+	}
+}
