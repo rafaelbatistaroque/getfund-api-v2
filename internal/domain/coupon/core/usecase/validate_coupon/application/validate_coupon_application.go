@@ -22,6 +22,9 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 		return nil, result_app.New(result_app.UNPROCESSABLE_CONTENT_CODE, validatable.GetErrors())
 	}
 
-	v.repository.GetCouponByCode(input.CouponCode)
+	_, err := v.repository.GetCouponByCode(input.CouponCode)
+	if err != nil {
+		return nil, result_app.New(result_app.NOT_FOUND_CODE, err)
+	}
 	return nil, nil
 }
