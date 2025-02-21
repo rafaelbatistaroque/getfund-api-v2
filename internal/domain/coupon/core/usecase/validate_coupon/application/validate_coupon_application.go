@@ -53,5 +53,10 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 
 	v.bus.EmitWithPayloadAndResponse(&validate_coupon.ValidateCouponStartedEvent{}, payload, responseChannel)
 
-	return nil, nil
+	select {
+	case <-responseChannel:
+		return nil, nil
+	case <-time.After(time.Second):
+		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [timeout]"))
+	}
 }
