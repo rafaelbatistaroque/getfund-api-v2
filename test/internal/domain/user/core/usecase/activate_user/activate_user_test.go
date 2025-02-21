@@ -412,8 +412,8 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSessio
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
 	spies.RepoSpy.DefineCreateUserSuccess()
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	resultChannel := make(chan *activate_user.Output, 1)
 	responseEvent, expectedOutput := fixture.GetResponseSession()
+	resultChannel := make(chan *activate_user.Output, 1)
 
 	// Act
 	go func() {

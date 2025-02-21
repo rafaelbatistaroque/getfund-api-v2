@@ -2,8 +2,10 @@ package validate_coupon_application
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	coupon_contract "getfund-api-v2/internal/domain/coupon/core/contract"
+	"getfund-api-v2/internal/domain/coupon/core/dto/coupon_dto"
 	"getfund-api-v2/internal/domain/coupon/core/dto/coupon_payload"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/settings"
@@ -62,6 +64,11 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 	case response := <-responseChannel:
 		if bytes.Equal(response, app_constant.EMPTYB) {
 			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [response empty]"))
+		}
+
+		var couponData = &coupon_dto.CouponValidationData{}
+		if err := json.Unmarshal(response, &couponData); err != nil {
+			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [response invalid]"))
 		}
 
 		return nil, nil
