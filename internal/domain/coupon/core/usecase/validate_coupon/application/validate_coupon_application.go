@@ -3,8 +3,10 @@ package validate_coupon_application
 import (
 	"errors"
 	coupon_contract "getfund-api-v2/internal/domain/coupon/core/contract"
+	"getfund-api-v2/internal/domain/coupon/core/dto/coupon_payload"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/pkg/bus"
 	"time"
 )
 
@@ -14,11 +16,13 @@ var (
 
 type validateCouponApplication struct {
 	repository coupon_contract.Repository
+	bus        bus.EventBus
 }
 
-func New(repository coupon_contract.Repository) validate_coupon.UseCase {
+func New(repository coupon_contract.Repository, bus bus.EventBus) validate_coupon.UseCase {
 	return &validateCouponApplication{
 		repository: repository,
+		bus:        bus,
 	}
 }
 
@@ -41,6 +45,13 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("coupon expired"))
 	}
 
-	//"coupon validity has not start yet"
+	responseChannel := make(chan []byte, 2)
+	payload := &coupon_payload.ValidateCouponStartedPayload{
+		ProductId:   couponFound.ProductId,
+		PrizeDrawId: couponFound.PrizeDrawId,
+	}
+
+	v.bus.EmitWithPayloadAndResponse(&validate_coupon.ValidateCouponStartedEvent{}, payload, responseChannel)
+
 	return nil, nil
 }

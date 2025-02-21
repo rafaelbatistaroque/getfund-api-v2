@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	coupon_common "getfund-api-v2/internal/domain/coupon/adapter/common"
 	coupon_contract "getfund-api-v2/internal/domain/coupon/core/contract"
-	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto"
+	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto/coupon_dto"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
 	logger "getfund-api-v2/pkg/log"
