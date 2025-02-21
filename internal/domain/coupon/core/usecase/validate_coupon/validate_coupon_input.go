@@ -15,5 +15,10 @@ type validateCouponInput struct {
 }
 
 func (i *validateCouponInput) Validate() validation.Validatable {
+	i.rules.
+		ApplyRules(i.CouponCode, "CouponCode",
+			&validation.RequiredRule{},
+		)
+
 	return i.rules.GetResult()
 }
