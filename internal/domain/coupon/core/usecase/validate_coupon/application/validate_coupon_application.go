@@ -1,10 +1,13 @@
 package validate_coupon_application
 
 import (
+	"bytes"
 	"errors"
 	coupon_contract "getfund-api-v2/internal/domain/coupon/core/contract"
 	"getfund-api-v2/internal/domain/coupon/core/dto/coupon_payload"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
+	"getfund-api-v2/internal/settings"
+	"getfund-api-v2/internal/shared/app_constant"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus"
 	"time"
@@ -17,12 +20,14 @@ var (
 type validateCouponApplication struct {
 	repository coupon_contract.Repository
 	bus        bus.EventBus
+	settings   settings.ApplicationSettings
 }
 
-func New(repository coupon_contract.Repository, bus bus.EventBus) validate_coupon.UseCase {
+func New(repository coupon_contract.Repository, bus bus.EventBus, settings settings.ApplicationSettings) validate_coupon.UseCase {
 	return &validateCouponApplication{
 		repository: repository,
 		bus:        bus,
+		settings:   settings,
 	}
 }
 
@@ -54,9 +59,13 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 	v.bus.EmitWithPayloadAndResponse(&validate_coupon.ValidateCouponStartedEvent{}, payload, responseChannel)
 
 	select {
-	case <-responseChannel:
+	case response := <-responseChannel:
+		if bytes.Equal(response, app_constant.EMPTYB) {
+			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [response empty]"))
+		}
+
 		return nil, nil
-	case <-time.After(time.Second):
+	case <-time.After(time.Duration(v.settings.GetTimeoutResponseEvent()) * time.Second):
 		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [timeout]"))
 	}
 }
