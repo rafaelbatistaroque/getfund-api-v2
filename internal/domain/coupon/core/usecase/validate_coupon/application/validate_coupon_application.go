@@ -71,6 +71,10 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [response invalid]"))
 		}
 
+		if couponData.Product == nil {
+			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [product invalid]"))
+		}
+
 		return nil, nil
 	case <-time.After(time.Duration(v.settings.GetTimeoutResponseEvent()) * time.Second):
 		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New("error on get coupon data [timeout]"))
