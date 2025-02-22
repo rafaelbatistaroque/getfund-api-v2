@@ -11,5 +11,5 @@ type ProductData struct {
 }
 
 type PrizeDrawData struct {
-	WinnerEntranceId int `json:"winner_entrance_id"`
+	WinnerEntranceId *int `json:"winner_entrance_id"`
 }

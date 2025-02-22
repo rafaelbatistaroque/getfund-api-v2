@@ -16,15 +16,16 @@ import (
 )
 
 const (
-	_EMPTY_RESPONSE     = "error on get coupon data [empty response]"
-	_INVALID_RESPONSE   = "error on get coupon data [invalid response]"
-	_INVALID_PRODUCT    = "error on get coupon data [invalid product]"
-	_INACTIVE_PRODUCT   = "error on get coupon data [inactive product]"
-	_INVALID_PRIZE_DRAW = "error on get coupon data [invalid prizedraw]"
-	_TIME_OUT           = "error on get coupon data [timeout]"
-	_EXPIRED_COUPON     = "coupon expired"
-	_HAS_NOT_START      = "coupon validity has not start yet"
-	_FOUND_NULL         = "error on get coupon data [found null]"
+	_EMPTY_RESPONSE        = "error on get coupon data [empty response]"
+	_INVALID_RESPONSE      = "error on get coupon data [invalid response]"
+	_INVALID_PRODUCT       = "error on get coupon data [invalid product]"
+	_INACTIVE_PRODUCT      = "error on get coupon data [inactive product]"
+	_INVALID_PRIZE_DRAW    = "error on get coupon data [invalid prizedraw]"
+	_PRIZE_DRAW_HAS_WINNER = "error on get coupon data [prizedraw has winner]"
+	_TIME_OUT              = "error on get coupon data [timeout]"
+	_EXPIRED_COUPON        = "coupon expired"
+	_HAS_NOT_START         = "coupon validity has not start yet"
+	_FOUND_NULL            = "error on get coupon data [found null]"
 )
 
 var _NOW = time.Now().Unix()
@@ -144,6 +145,10 @@ func (*validateCouponApplication) isProductValid(productData *coupon_dto.Product
 func (*validateCouponApplication) isPrizeDrawValid(prizeDrawData *coupon_dto.PrizeDrawData) *result_app.ApplicationError {
 	if prizeDrawData == nil {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRIZE_DRAW))
+	}
+
+	if prizeDrawData.WinnerEntranceId != nil {
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_PRIZE_DRAW_HAS_WINNER))
 	}
 
 	return nil
