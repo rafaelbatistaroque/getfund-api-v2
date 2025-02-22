@@ -68,6 +68,10 @@ func GetValidCoupon() *coupon_dto.CouponDto {
 }
 
 func GetPrizeDrawResponse() []byte {
+	return []byte(`{"prize_draw": {}}`)
+}
+
+func GetPrizeDrawWithWinnerResponse() []byte {
 	return []byte(`{"prize_draw": {"winner_entrance_id": 1}}`)
 }
 
@@ -81,4 +85,16 @@ func GetInactiveProductResponse() []byte {
 
 func GetNullResponse() []byte {
 	return []byte(`{}`)
+}
+
+func (f *ValidateCouponFixture) RunSutWithEventResponse(sut func(), responses ...[]byte) {
+	go sut()
+
+	time.Sleep(100 * time.Millisecond)
+	responseChannel := f.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
+	for _, response := range responses {
+		responseChannel <- response
+	}
+
+	defer close(responseChannel)
 }

@@ -174,19 +174,17 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseEmpty_ThenEnsureReturnAprop
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	go func() {
-		_, err := sut.Execute(fixture.GetInput())
-		errResult <- err
-	}()
-
-	time.Sleep(time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- []byte("")
-	defer close(responseChannel)
-	defer close(errResult)
+	spies.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errResult <- err
+		},
+		[]byte(""),
+	)
 
 	// Assert
 	errUnwrapped := <-errResult
+	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [empty response]")
 }
@@ -199,19 +197,17 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApr
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	go func() {
-		_, err := sut.Execute(fixture.GetInput())
-		errResult <- err
-	}()
-
-	time.Sleep(time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- []byte("invalid-value")
-	defer close(responseChannel)
-	defer close(errResult)
+	spies.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errResult <- err
+		},
+		[]byte("invalid-value"),
+	)
 
 	// Assert
 	errUnwrapped := <-errResult
+	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [invalid response]")
 }
@@ -224,20 +220,18 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureR
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	go func() {
-		_, err := sut.Execute(fixture.GetInput())
-		errResult <- err
-	}()
-
-	time.Sleep(time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- fixture.GetPrizeDrawResponse()
-	responseChannel <- fixture.GetNullResponse()
-	defer close(responseChannel)
-	defer close(errResult)
+	spies.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errResult <- err
+		},
+		fixture.GetPrizeDrawResponse(),
+		fixture.GetNullResponse(),
+	)
 
 	// Assert
 	errUnwrapped := <-errResult
+	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [invalid product]")
 }
@@ -250,20 +244,18 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullPrizeDraw_ThenEnsur
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	go func() {
-		_, err := sut.Execute(fixture.GetInput())
-		errResult <- err
-	}()
-
-	time.Sleep(time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- fixture.GetProductResponse()
-	responseChannel <- fixture.GetNullResponse()
-	defer close(responseChannel)
-	defer close(errResult)
+	spies.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errResult <- err
+		},
+		fixture.GetProductResponse(),
+		fixture.GetNullResponse(),
+	)
 
 	// Assert
 	errUnwrapped := <-errResult
+	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [invalid prizedraw]")
 }
@@ -276,20 +268,42 @@ func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *te
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	go func() {
-		_, err := sut.Execute(fixture.GetInput())
-		errResult <- err
-	}()
-
-	time.Sleep(time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- fixture.GetInactiveProductResponse()
-	responseChannel <- fixture.GetPrizeDrawResponse()
-	defer close(responseChannel)
-	defer close(errResult)
+	spies.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errResult <- err
+		},
+		fixture.GetInactiveProductResponse(),
+		fixture.GetPrizeDrawResponse(),
+	)
 
 	// Assert
 	errUnwrapped := <-errResult
+	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [inactive product]")
+}
+
+func Test_GivenExecute_WhenPrizeDrawhasWinner_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errResult := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	spies.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errResult <- err
+		},
+		fixture.GetProductResponse(),
+		fixture.GetPrizeDrawWithWinnerResponse(),
+	)
+
+	// Assert
+	errUnwrapped := <-errResult
+	defer close(errResult)
+	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [prizedraw has winner]")
 }
