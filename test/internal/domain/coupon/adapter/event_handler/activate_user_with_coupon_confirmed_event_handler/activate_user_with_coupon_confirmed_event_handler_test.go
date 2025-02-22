@@ -78,7 +78,7 @@ func Test_GivenHandler_WhenInvalidCouponData_ThenEnsureReturn(t *testing.T) {
 	verify.Should(t, spies.ValidateCouponSpy.CallsCount["Execute"]).Be(0)
 }
 
-func Test_GivenHandler_WhenValidateCouponInvoked_ThenEnsureCallsWithCorrectParamenter(t *testing.T) {
+func Test_GivenHandler_WhenValidCouponData_ThenEnsureCallValidateCouponWithCorrectParamenter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetCacheDataWithValidCoupon())

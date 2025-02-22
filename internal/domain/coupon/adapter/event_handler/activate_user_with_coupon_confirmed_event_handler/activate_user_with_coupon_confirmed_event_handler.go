@@ -58,7 +58,9 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 
 	var erroUsecase = &result_app.ApplicationError{}
 	_, erroUsecase = h.validateCoupon.Execute(&validate_coupon.Input{
-		CouponCode: couponData.CouponData.Code,
+		CouponCode:          couponData.CouponData.Code,
+		SelectedProductId:   couponData.CouponData.ProductId,
+		SelectedPrizeDrawId: couponData.CouponData.PrizeDrawId,
 	})
 
 	if erroUsecase != nil {
