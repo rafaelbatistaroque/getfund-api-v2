@@ -92,6 +92,15 @@ func (*validateCouponApplication) isCouponValid(couponFound *coupon_dto.CouponDt
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_HAS_NOT_START))
 	}
 
+	//validar coupon:
+	//validar se userid está na lista de aplicação
+
+	//validar tipo
+	//se 1 - validar aplicação unica (se já existe 1 aplicado)
+
+	// se 2 - validar limite maximo de uso
+
+	//se 3 - validar expiração
 	if couponFound.EndAt != nil && *couponFound.EndAt < _NOW {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_EXPIRED_COUPON))
 	}

@@ -43,5 +43,6 @@ func GetValidateCouponInput() *validate_coupon.Input {
 		CouponCode:          "fake-coupon-code",
 		SelectedProductId:   1,
 		SelectedPrizeDrawId: 1,
+		UserId:              1,
 	}
 }

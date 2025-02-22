@@ -10,6 +10,7 @@ type validateCouponInput struct {
 	CouponCode          string `json:"coupon_code"`
 	SelectedProductId   int    `json:"selected_product_id"`
 	SelectedPrizeDrawId int    `json:"selected_prize_draw_id"`
+	UserId              int    `json:"user_id"`
 
 	rules validation.Rule
 }

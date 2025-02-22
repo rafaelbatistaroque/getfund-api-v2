@@ -61,6 +61,7 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		CouponCode:          couponData.CouponData.Code,
 		SelectedProductId:   couponData.CouponData.ProductId,
 		SelectedPrizeDrawId: couponData.CouponData.PrizeDrawId,
+		UserId:              payload.UserId,
 	})
 
 	if erroUsecase != nil {
