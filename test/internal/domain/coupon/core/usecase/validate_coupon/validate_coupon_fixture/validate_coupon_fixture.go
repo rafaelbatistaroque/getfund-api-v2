@@ -1,6 +1,7 @@
 package validate_coupon_fixture
 
 import (
+	"encoding/json"
 	coupon_dto "getfund-api-v2/internal/domain/coupon/core/dto/coupon_dto"
 	"getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon"
 	validate_coupon_application "getfund-api-v2/internal/domain/coupon/core/usecase/validate_coupon/application"
@@ -76,13 +77,20 @@ func GetPrizeDrawWithWinnerResponse() []byte {
 }
 
 func GetProductResponse() []byte {
-	return []byte(`{"product": {"total_price": 100, "is_active": true}}`)
+	return []byte(`{"product": {"total_price": 100, "is_active": true, "entrance_qty": 1}}`)
 }
 
 func GetInactiveProductResponse() []byte {
-	return []byte(`{"product": {"total_price": 100, "is_active": false}}`)
+	return []byte(`{"product": {"total_price": 100, "is_active": false, "entrance_qty": 1}}`)
 }
 
 func GetNullResponse() []byte {
 	return []byte(`{}`)
+}
+
+func GetProductData() *coupon_dto.ProductData {
+	var product = &coupon_dto.CouponValidationData{}
+	json.Unmarshal(GetProductResponse(), product)
+
+	return product.Product
 }

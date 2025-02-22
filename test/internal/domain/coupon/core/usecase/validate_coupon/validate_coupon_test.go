@@ -284,7 +284,7 @@ func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *te
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [inactive product]")
 }
 
-func Test_GivenExecute_WhenPrizeDrawhasWinner_ThenEnsureReturnApropriateError(t *testing.T) {
+func Test_GivenExecute_WhenPrizeDrawHasWinner_ThenEnsureReturnApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
@@ -306,4 +306,28 @@ func Test_GivenExecute_WhenPrizeDrawhasWinner_ThenEnsureReturnApropriateError(t 
 	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [prizedraw has winner]")
+}
+
+func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	resultChannel := make(chan *validate_coupon.Output, 1)
+	expectedResult := fixture.GetProductData()
+
+	// Act
+	spies.BusSpy.RunSutWithEventResponse(
+		func() {
+			result, _ := sut.Execute(fixture.GetInput())
+			resultChannel <- result
+		},
+		fixture.GetProductResponse(),
+		fixture.GetPrizeDrawResponse(),
+	)
+
+	// Assert
+	resultUnwrapped := <-resultChannel
+	defer close(resultChannel)
+	verify.Should(t, resultUnwrapped.EntranceQuantity).Be(expectedResult.EntranceQuantity)
 }
