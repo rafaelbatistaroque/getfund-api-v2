@@ -16,16 +16,18 @@ import (
 )
 
 const (
-	_EMPTY_RESPONSE        = "error on get coupon data [empty response]"
-	_INVALID_RESPONSE      = "error on get coupon data [invalid response]"
-	_INVALID_PRODUCT       = "error on get coupon data [invalid product]"
-	_INACTIVE_PRODUCT      = "error on get coupon data [inactive product]"
-	_INVALID_PRIZE_DRAW    = "error on get coupon data [invalid prizedraw]"
-	_PRIZE_DRAW_HAS_WINNER = "error on get coupon data [prizedraw has winner]"
-	_TIME_OUT              = "error on get coupon data [timeout]"
-	_EXPIRED_COUPON        = "coupon expired"
-	_HAS_NOT_START         = "coupon validity has not start yet"
-	_FOUND_NULL            = "error on get coupon data [found null]"
+	_EMPTY_RESPONSE               = "empty response from coupon validation"
+	_INVALID_RESPONSE             = "invalid response from coupon validation"
+	_INVALID_PRODUCT              = "invalid product data"
+	_COUPON_INVALID_FOR_PRODUCT   = "coupon is not valid for this product"
+	_INACTIVE_PRODUCT             = "inactive product"
+	_INVALID_PRIZE_DRAW           = "invalid prizedraw data"
+	_PRIZE_DRAW_HAS_WINNER        = "prizedraw has winner"
+	_COUPON_INVALID_FOR_PRIZEDRAW = "prizedraw is not valid for this coupon"
+	_TIME_OUT                     = "timeout waiting for coupon validation"
+	_EXPIRED_COUPON               = "coupon expired"
+	_HAS_NOT_START                = "coupon validity has not start yet"
+	_FOUND_NULL                   = "coupon null"
 )
 
 var _NOW = time.Now().Unix()
@@ -67,11 +69,11 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 		return nil, errResponse
 	}
 
-	if err := v.isProductValid(couponData.Product); err != nil {
+	if err := v.isProductValid(couponData.Product, input.SelectedProductId); err != nil {
 		return nil, err
 	}
 
-	if err := v.isPrizeDrawValid(couponData.PrizeDraw); err != nil {
+	if err := v.isPrizeDrawValid(couponData.PrizeDraw, input.SelectedPrizeDrawId); err != nil {
 		return nil, err
 	}
 
@@ -132,7 +134,7 @@ func (v *validateCouponApplication) getCouponValidationFromResponse(responseChan
 	return couponData, nil
 }
 
-func (*validateCouponApplication) isProductValid(productData *coupon_dto.ProductData) *result_app.ApplicationError {
+func (*validateCouponApplication) isProductValid(productData *coupon_dto.ProductData, selectedProductId int) *result_app.ApplicationError {
 	if productData == nil {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRODUCT))
 	}
@@ -141,16 +143,24 @@ func (*validateCouponApplication) isProductValid(productData *coupon_dto.Product
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INACTIVE_PRODUCT))
 	}
 
+	if productData.Id != selectedProductId {
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_INVALID_FOR_PRODUCT))
+	}
+
 	return nil
 }
 
-func (*validateCouponApplication) isPrizeDrawValid(prizeDrawData *coupon_dto.PrizeDrawData) *result_app.ApplicationError {
+func (*validateCouponApplication) isPrizeDrawValid(prizeDrawData *coupon_dto.PrizeDrawData, selectedPrizeDrawId int) *result_app.ApplicationError {
 	if prizeDrawData == nil {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRIZE_DRAW))
 	}
 
 	if prizeDrawData.WinnerEntranceId != nil {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_PRIZE_DRAW_HAS_WINNER))
+	}
+
+	if prizeDrawData.Id != selectedPrizeDrawId {
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_INVALID_FOR_PRIZEDRAW))
 	}
 
 	return nil

@@ -61,7 +61,7 @@ func Test_GivenExecute_WhenGetCouponByCodeWithSuccessNull_ThenEnsureReturnApropr
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message.Error()).Be("error on get coupon data [found null]")
+	verify.Should(t, err.Message.Error()).Be("coupon null")
 }
 
 func Test_GivenExecute_WhenGetCouponByCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
@@ -163,7 +163,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseTimeout_ThenEnsureReturnApr
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, err.Message.Error()).Be("error on get coupon data [timeout]")
+	verify.Should(t, err.Message.Error()).Be("timeout waiting for coupon validation")
 }
 
 func Test_GivenExecute_WhenEmitWithPayloadAndResponseEmpty_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -186,7 +186,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseEmpty_ThenEnsureReturnAprop
 	errUnwrapped := <-errResult
 	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [empty response]")
+	verify.Should(t, errUnwrapped.Message.Error()).Be("empty response from coupon validation")
 }
 
 func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -209,7 +209,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApr
 	errUnwrapped := <-errResult
 	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [invalid response]")
+	verify.Should(t, errUnwrapped.Message.Error()).Be("invalid response from coupon validation")
 }
 
 func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -233,31 +233,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureR
 	errUnwrapped := <-errResult
 	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [invalid product]")
-}
-
-func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullPrizeDraw_ThenEnsureReturnApropriateError(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
-	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	errResult := make(chan *result_app.ApplicationError, 1)
-
-	// Act
-	spies.BusSpy.RunSutWithEventResponse(
-		func() {
-			_, err := sut.Execute(fixture.GetInput())
-			errResult <- err
-		},
-		fixture.GetProductResponse(),
-		fixture.GetNullResponse(),
-	)
-
-	// Assert
-	errUnwrapped := <-errResult
-	defer close(errResult)
-	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [invalid prizedraw]")
+	verify.Should(t, errUnwrapped.Message.Error()).Be("invalid product data")
 }
 
 func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -281,7 +257,55 @@ func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *te
 	errUnwrapped := <-errResult
 	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [inactive product]")
+	verify.Should(t, errUnwrapped.Message.Error()).Be("inactive product")
+}
+
+func Test_GivenExecute_WhenCouponProductDifferentFromSelectedProduct_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errResult := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	spies.BusSpy.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput(fixture.WithSelectedProductId(2)))
+			errResult <- err
+		},
+		fixture.GetProductResponse(),
+		fixture.GetPrizeDrawResponse(),
+	)
+
+	// Assert
+	errUnwrapped := <-errResult
+	defer close(errResult)
+	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("coupon is not valid for this product")
+}
+
+func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullPrizeDraw_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errResult := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	spies.BusSpy.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errResult <- err
+		},
+		fixture.GetProductResponse(),
+		fixture.GetNullResponse(),
+	)
+
+	// Assert
+	errUnwrapped := <-errResult
+	defer close(errResult)
+	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("invalid prizedraw data")
 }
 
 func Test_GivenExecute_WhenPrizeDrawHasWinner_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -305,7 +329,31 @@ func Test_GivenExecute_WhenPrizeDrawHasWinner_ThenEnsureReturnApropriateError(t 
 	errUnwrapped := <-errResult
 	defer close(errResult)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get coupon data [prizedraw has winner]")
+	verify.Should(t, errUnwrapped.Message.Error()).Be("prizedraw has winner")
+}
+
+func Test_GivenExecute_WhenCouponPrizeDrawDifferentFromSelectedPrizeDraw_ThenEnsureReturnApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.SettingsSpy.SetTimeoutResponseEvent(2)
+	errResult := make(chan *result_app.ApplicationError, 1)
+
+	// Act
+	spies.BusSpy.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput(fixture.WithSelectedPrizeDrawId(2)))
+			errResult <- err
+		},
+		fixture.GetProductResponse(),
+		fixture.GetPrizeDrawResponse(),
+	)
+
+	// Assert
+	errUnwrapped := <-errResult
+	defer close(errResult)
+	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, errUnwrapped.Message.Error()).Be("prizedraw is not valid for this coupon")
 }
 
 func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testing.T) {

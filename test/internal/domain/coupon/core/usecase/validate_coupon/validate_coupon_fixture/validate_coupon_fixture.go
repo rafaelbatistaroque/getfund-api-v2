@@ -35,7 +35,9 @@ type Option func(*validate_coupon.Input)
 
 func GetInput(options ...Option) *validate_coupon.Input {
 	input := &validate_coupon.Input{
-		CouponCode: "FAKE_CPN",
+		CouponCode:          "FAKE_CPN",
+		SelectedProductId:   1,
+		SelectedPrizeDrawId: 1,
 	}
 
 	for _, opt := range options {
@@ -57,6 +59,18 @@ func WithInvalidCouponCode() Option {
 	}
 }
 
+func WithSelectedProductId(id int) Option {
+	return func(params *validate_coupon.Input) {
+		params.SelectedProductId = id
+	}
+}
+
+func WithSelectedPrizeDrawId(id int) Option {
+	return func(params *validate_coupon.Input) {
+		params.SelectedPrizeDrawId = id
+	}
+}
+
 func GetValidCoupon() *coupon_dto.CouponDto {
 	minus72Hours := time.Now().Add(-24 * time.Hour).Unix()
 	minus24Hours := time.Now().Add(24 * time.Hour).Unix()
@@ -69,19 +83,19 @@ func GetValidCoupon() *coupon_dto.CouponDto {
 }
 
 func GetPrizeDrawResponse() []byte {
-	return []byte(`{"prize_draw": {}}`)
+	return []byte(`{"prize_draw": {"id":1}}`)
 }
 
 func GetPrizeDrawWithWinnerResponse() []byte {
-	return []byte(`{"prize_draw": {"winner_entrance_id": 1}}`)
+	return []byte(`{"prize_draw": {"id":1, "winner_entrance_id": 1}}`)
 }
 
 func GetProductResponse() []byte {
-	return []byte(`{"product": {"total_price": 100, "is_active": true, "entrance_qty": 1}}`)
+	return []byte(`{"product": {"id":1, "total_price": 100, "is_active": true, "entrance_qty": 1}}`)
 }
 
 func GetInactiveProductResponse() []byte {
-	return []byte(`{"product": {"total_price": 100, "is_active": false, "entrance_qty": 1}}`)
+	return []byte(`{"product": {"id":1, "total_price": 100, "is_active": false, "entrance_qty": 1}}`)
 }
 
 func GetNullResponse() []byte {
