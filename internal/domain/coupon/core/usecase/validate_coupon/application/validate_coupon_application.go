@@ -16,12 +16,13 @@ import (
 )
 
 const (
-	_RESPONSE_EMPTY     = "error on get coupon data [response empty]"
-	_RESPONSE_INVALID   = "error on get coupon data [response invalid]"
-	_PRODUCT_INVALID    = "error on get coupon data [product invalid]"
-	_PRIZE_DRAW_INVALID = "error on get coupon data [prizedraw invalid]"
+	_EMPTY_RESPONSE     = "error on get coupon data [empty response]"
+	_INVALID_RESPONSE   = "error on get coupon data [invalid response]"
+	_INVALID_PRODUCT    = "error on get coupon data [invalid product]"
+	_INACTIVE_PRODUCT   = "error on get coupon data [inactive product]"
+	_INVALID_PRIZE_DRAW = "error on get coupon data [invalid prizedraw]"
 	_TIME_OUT           = "error on get coupon data [timeout]"
-	_COUPON_EXPIRED     = "coupon expired"
+	_EXPIRED_COUPON     = "coupon expired"
 	_HAS_NOT_START      = "coupon validity has not start yet"
 	_FOUND_NULL         = "error on get coupon data [found null]"
 )
@@ -87,7 +88,7 @@ func (*validateCouponApplication) isCouponValid(couponFound *coupon_dto.CouponDt
 	}
 
 	if couponFound.EndAt != nil && *couponFound.EndAt < _NOW {
-		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_EXPIRED))
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_EXPIRED_COUPON))
 	}
 
 	return nil
@@ -110,11 +111,11 @@ func (v *validateCouponApplication) getCouponValidationFromResponse(responseChan
 		select {
 		case response := <-responseChannel:
 			if bytes.Equal(response, app_constant.EMPTYB) {
-				return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_RESPONSE_EMPTY))
+				return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_EMPTY_RESPONSE))
 			}
 
 			if err := json.Unmarshal(response, &couponData); err != nil {
-				return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_RESPONSE_INVALID))
+				return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_RESPONSE))
 			}
 
 			received++
@@ -130,7 +131,11 @@ func (v *validateCouponApplication) getCouponValidationFromResponse(responseChan
 
 func (*validateCouponApplication) isProductValid(productData *coupon_dto.ProductData) *result_app.ApplicationError {
 	if productData == nil {
-		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_PRODUCT_INVALID))
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRODUCT))
+	}
+
+	if !productData.IsActive {
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INACTIVE_PRODUCT))
 	}
 
 	return nil
@@ -138,7 +143,7 @@ func (*validateCouponApplication) isProductValid(productData *coupon_dto.Product
 
 func (*validateCouponApplication) isPrizeDrawValid(prizeDrawData *coupon_dto.PrizeDrawData) *result_app.ApplicationError {
 	if prizeDrawData == nil {
-		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_PRIZE_DRAW_INVALID))
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRIZE_DRAW))
 	}
 
 	return nil
