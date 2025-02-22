@@ -74,3 +74,7 @@ func GetPrizeDrawResponse() []byte {
 func GetProductResponse() []byte {
 	return []byte(`{"product": {"total_price": 100, "is_active": true}}`)
 }
+
+func GetNullResponse() []byte {
+	return []byte(`{}`)
+}

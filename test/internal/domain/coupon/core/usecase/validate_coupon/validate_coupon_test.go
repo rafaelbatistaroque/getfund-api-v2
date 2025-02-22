@@ -232,6 +232,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureR
 	time.Sleep(time.Second)
 	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
 	responseChannel <- fixture.GetPrizeDrawResponse()
+	responseChannel <- fixture.GetNullResponse()
 	defer close(responseChannel)
 	defer close(errResult)
 
@@ -257,6 +258,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullPrizeDraw_ThenEnsur
 	time.Sleep(time.Second)
 	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
 	responseChannel <- fixture.GetProductResponse()
+	responseChannel <- fixture.GetNullResponse()
 	defer close(responseChannel)
 	defer close(errResult)
 
