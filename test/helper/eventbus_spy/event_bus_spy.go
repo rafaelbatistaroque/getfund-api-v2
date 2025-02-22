@@ -2,6 +2,7 @@ package eventbus_spy
 
 import (
 	"getfund-api-v2/pkg/bus"
+	"time"
 )
 
 type EventBusSpy struct {
@@ -38,4 +39,16 @@ func (eb *EventBusSpy) EmitWithPayloadAndResponse(event bus.Event, payload any, 
 	eb.Params["EmitWithPayloadAndResponse:responseChannel"] = append(eb.Params["EmitWithPayloadAndResponse:responseChannel"], responseChannel)
 
 	eb.CallsCount["EmitWithPayloadAndResponse"]++
+}
+
+func (f *EventBusSpy) RunSutWithEventResponse(sut func(), responses ...[]byte) {
+	go sut()
+
+	time.Sleep(100 * time.Millisecond)
+	responseChannel := f.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
+	for _, response := range responses {
+		responseChannel <- response
+	}
+
+	defer close(responseChannel)
 }

@@ -10,7 +10,6 @@ import (
 	"getfund-api-v2/internal/shared/result_app"
 	fixture "getfund-api-v2/test/internal/domain/user/core/usecase/activate_user/activate_user_fixture"
 	"testing"
-	"time"
 
 	"github.com/rafaelbatistaroque/validation"
 	"github.com/rafaelbatistaroque/verify"
@@ -367,17 +366,17 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseEmpty_ThenEnsureReturnServerEr
 	errChannel := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	go func() {
-		_, err := sut.Execute(fixture.GetInput())
-		errChannel <- err
-	}()
-	time.Sleep(1 * time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- []byte("")
-	close(responseChannel)
+	spies.BusSpy.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errChannel <- err
+		},
+		[]byte(""),
+	)
 
 	// Assert
 	errUnwrapped := <-errChannel
+	close(errChannel)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response empty]")
 }
@@ -391,17 +390,17 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseInvalid_ThenEnsureReturnServer
 	errChannel := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	go func() {
-		_, err := sut.Execute(fixture.GetInput())
-		errChannel <- err
-	}()
-	time.Sleep(1 * time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- []byte("{invalid-response}")
-	close(responseChannel)
+	spies.BusSpy.RunSutWithEventResponse(
+		func() {
+			_, err := sut.Execute(fixture.GetInput())
+			errChannel <- err
+		},
+		[]byte("{invalid-response}"),
+	)
 
 	// Assert
 	errUnwrapped := <-errChannel
+	close(errChannel)
 	verify.Should(t, errUnwrapped.Code).Be(result_app.SERVER_ERROR_CODE)
 	verify.Should(t, errUnwrapped.Message.Error()).Be("error on get session [response invalid]")
 }
@@ -416,17 +415,17 @@ func Test_GivenExecute_WhenEmitWithPayloadResponseSuccess_ThenEnsureReturnSessio
 	resultChannel := make(chan *activate_user.Output, 1)
 
 	// Act
-	go func() {
-		result, _ := sut.Execute(fixture.GetInput())
-		resultChannel <- result
-	}()
-	time.Sleep(1 * time.Second)
-	responseChannel := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	responseChannel <- responseEvent
-	close(responseChannel)
+	spies.BusSpy.RunSutWithEventResponse(
+		func() {
+			result, _ := sut.Execute(fixture.GetInput())
+			resultChannel <- result
+		},
+		responseEvent,
+	)
 
 	// Assert
 	resultUnwrapped := <-resultChannel
+	close(resultChannel)
 	verify.Should(t, resultUnwrapped).NotNil()
 	verify.Should(t, resultUnwrapped.Token).Be(expectedOutput.Token)
 	verify.Should(t, resultUnwrapped.Session.ID).Be(expectedOutput.Session.ID)

@@ -86,15 +86,3 @@ func GetInactiveProductResponse() []byte {
 func GetNullResponse() []byte {
 	return []byte(`{}`)
 }
-
-func (f *ValidateCouponFixture) RunSutWithEventResponse(sut func(), responses ...[]byte) {
-	go sut()
-
-	time.Sleep(100 * time.Millisecond)
-	responseChannel := f.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	for _, response := range responses {
-		responseChannel <- response
-	}
-
-	defer close(responseChannel)
-}

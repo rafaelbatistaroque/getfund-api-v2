@@ -174,7 +174,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseEmpty_ThenEnsureReturnAprop
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.RunSutWithEventResponse(
+	spies.BusSpy.RunSutWithEventResponse(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -197,7 +197,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApr
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.RunSutWithEventResponse(
+	spies.BusSpy.RunSutWithEventResponse(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -220,7 +220,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureR
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.RunSutWithEventResponse(
+	spies.BusSpy.RunSutWithEventResponse(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -244,7 +244,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullPrizeDraw_ThenEnsur
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.RunSutWithEventResponse(
+	spies.BusSpy.RunSutWithEventResponse(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -268,7 +268,7 @@ func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *te
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.RunSutWithEventResponse(
+	spies.BusSpy.RunSutWithEventResponse(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -292,7 +292,7 @@ func Test_GivenExecute_WhenPrizeDrawhasWinner_ThenEnsureReturnApropriateError(t 
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.RunSutWithEventResponse(
+	spies.BusSpy.RunSutWithEventResponse(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
