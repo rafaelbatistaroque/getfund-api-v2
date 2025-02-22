@@ -76,7 +76,7 @@ func (v *validateCouponApplication) Execute(input *validate_coupon.Input) (*vali
 	}
 
 	return &validate_coupon.Output{
-		EntranceQuantity: couponData.Product.EntranceQuantity,
+		Message: "coupon is valid",
 	}, nil
 }
 

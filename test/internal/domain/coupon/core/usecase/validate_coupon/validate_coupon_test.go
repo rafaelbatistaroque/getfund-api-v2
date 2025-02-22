@@ -314,7 +314,6 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
 	resultChannel := make(chan *validate_coupon.Output, 1)
-	expectedResult := fixture.GetProductData()
 
 	// Act
 	spies.BusSpy.RunSutWithEventResponse(
@@ -329,5 +328,5 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	// Assert
 	resultUnwrapped := <-resultChannel
 	defer close(resultChannel)
-	verify.Should(t, resultUnwrapped.EntranceQuantity).Be(expectedResult.EntranceQuantity)
+	verify.Should(t, resultUnwrapped.Message).Be("coupon is valid")
 }
