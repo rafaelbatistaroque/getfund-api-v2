@@ -6,8 +6,9 @@ type CouponValidationData struct {
 }
 
 type ProductData struct {
-	TotalPrice int  `json:"total_price"`
-	IsActive   bool `json:"is_active"`
+	TotalPrice       int  `json:"total_price"`
+	IsActive         bool `json:"is_active"`
+	EntranceQuantity int  `json:"entrance_qty"`
 }
 
 type PrizeDrawData struct {
