@@ -12,6 +12,7 @@ func New() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("getfund.db"), &gorm.Config{})
 	if err != nil {
 		logger.Errorf("Erro ao conectar ao banco de dados:", err)
+		return nil
 	}
 
 	logger.Info("Database connected")
