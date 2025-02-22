@@ -75,6 +75,10 @@ func GetProductResponse() []byte {
 	return []byte(`{"product": {"total_price": 100, "is_active": true}}`)
 }
 
+func GetInactiveProductResponse() []byte {
+	return []byte(`{"product": {"total_price": 100, "is_active": false}}`)
+}
+
 func GetNullResponse() []byte {
 	return []byte(`{}`)
 }
