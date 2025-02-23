@@ -34,12 +34,12 @@ func New(appSettings settings.ApplicationSettings) *gorm.DB {
 		&schema.User{},
 		&schema.Product{},
 		&schema.CouponType{},
+		&schema.Entrance{},
 		&schema.PrizeDraw{},
 		&schema.Coupon{},
 		&schema.Purchase{},
 		&schema.UserCoupon{},
 		&schema.FreeFundingUserEntrances{},
-		&schema.Entrance{},
 	)
 
 	if errMigration != nil {

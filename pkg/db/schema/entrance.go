@@ -13,9 +13,9 @@ type Entrance struct {
 	UpdatedAt   int64  `gorm:"column:updated_at"`
 
 	// Relacionamentos
-	User      User      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
-	PrizeDraw PrizeDraw `gorm:"foreignKey:PrizeDrawID;constraint:OnDelete:CASCADE"`
-	Purchase  Purchase  `gorm:"foreignKey:PurchaseID;constraint:OnDelete:CASCADE"`
+	User User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
+	// PrizeDraw PrizeDraw `gorm:"foreignKey:PrizeDrawID;constraint:OnDelete:CASCADE"`
+	// Purchase Purchase `gorm:"foreignKey:PurchaseID;constraint:OnDelete:CASCADE"`
 }
 
 func (Entrance) TableName() string {

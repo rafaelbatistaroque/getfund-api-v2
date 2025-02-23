@@ -25,3 +25,5 @@ go.work
 *.http
 launch.json
 .vscode/settings.json
+.DS_Store
+export.txt
