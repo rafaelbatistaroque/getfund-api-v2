@@ -13,5 +13,6 @@ type ActivationUserDto struct {
 	RegisteredUrl     string `json:"registered_url"`
 	IsAdmin           bool   `json:"is_admin"`
 	IsActive          bool   `json:"is_active"`
-	RegisteredAt      int64  `json:"registered_at"`
+	CreatedAt         int64  `json:"created_at"`
+	UpdatedAt         int64  `json:"updated_at"`
 }

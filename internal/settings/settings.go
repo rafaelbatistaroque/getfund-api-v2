@@ -23,6 +23,11 @@ type ApplicationSettings interface {
 	GetSMTPFrom() string
 	GetTemplateDir() string
 	GetTimeoutResponseEvent() int
+	GetDBHost() string
+	GetDBPort() int
+	GetDBUser() string
+	GetDBPassword() string
+	GetDBName() string
 }
 
 type applicationSettings struct {
@@ -35,6 +40,7 @@ type applicationSettings struct {
 	stripeSecretKey      string
 	masterToken          string
 	smtp                 *smtpData
+	db                   *dbData
 	templateDir          string
 	timeoutResposenEvent int
 }
@@ -45,6 +51,14 @@ type smtpData struct {
 	from      string
 	userName  string
 	passsword string
+}
+
+type dbData struct {
+	host     string
+	port     int
+	user     string
+	password string
+	name     string
 }
 
 func (s *applicationSettings) GetPort() string              { return s.port }
@@ -60,6 +74,11 @@ func (s *applicationSettings) GetSMTPUsername() string      { return s.smtp.user
 func (s *applicationSettings) GetSMTPFrom() string          { return s.smtp.from }
 func (s *applicationSettings) GetTemplateDir() string       { return s.templateDir }
 func (s *applicationSettings) GetTimeoutResponseEvent() int { return s.timeoutResposenEvent }
+func (s *applicationSettings) GetDBHost() string            { return s.db.host }
+func (s *applicationSettings) GetDBPort() int               { return s.db.port }
+func (s *applicationSettings) GetDBUser() string            { return s.db.user }
+func (s *applicationSettings) GetDBPassword() string        { return s.db.password }
+func (s *applicationSettings) GetDBName() string            { return s.db.name }
 
 func Load() ApplicationSettings {
 	logger := logger.New("Settings")
@@ -97,6 +116,13 @@ func Load() ApplicationSettings {
 			passsword: getEnv("SMTP_PASSWORD", ""),
 			userName:  getEnv("SMTP_USERNAME", ""),
 			from:      getEnv("SMTP_FROM", ""),
+		},
+		db: &dbData{
+			host:     getEnv("DB_HOST", ""),
+			port:     getIntEnv("DB_PORT", ""),
+			user:     getEnv("DB_USER", ""),
+			password: getEnv("DB_PASSWORD", ""),
+			name:     getEnv("DB_NAME", ""),
 		},
 		templateDir:          "internal/domain/notification/adapter/template",
 		timeoutResposenEvent: getIntEnv("TIME_OUT_RESPONSE_EVENT", ""),

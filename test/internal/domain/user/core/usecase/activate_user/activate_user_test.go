@@ -201,7 +201,7 @@ func Test_GivenExecute_WhenUserExistsByUsernameNotFound_ThenEnsureCallMapperToDt
 	verify.Should(t, entityParam.GetRegisteredUrl()).Be(expectedParam.RegisteredUrl)
 	verify.Should(t, entityParam.GetIsActive()).BeTrue()
 	verify.Should(t, entityParam.GetIsAdmin()).BeFalse()
-	verify.Should(t, entityParam.GetRegisteredAt()).NotNil()
+	verify.Should(t, entityParam.GetCreatedAt()).NotNil()
 }
 
 func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {

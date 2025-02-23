@@ -18,7 +18,8 @@ type User struct {
 	registeredUrl     string
 	isActive          bool
 	isAdmin           bool
-	RegisteredAt      time.Time
+	createdAt         time.Time
+	updatedAt         time.Time
 }
 
 func New(firstName, lastName, email, gender, password, mainSocialNetwork, registeredUrl string, countryId, userCategoryId int) *User {
@@ -35,7 +36,8 @@ func New(firstName, lastName, email, gender, password, mainSocialNetwork, regist
 		registeredUrl:     getValidValue(registeredUrl),
 		isActive:          true,
 		isAdmin:           false,
-		RegisteredAt:      time.Now(),
+		createdAt:         time.Now(),
+		updatedAt:         time.Now(),
 	}
 }
 
@@ -103,6 +105,10 @@ func (u *User) GetIsAdmin() bool {
 	return u.isAdmin
 }
 
-func (u *User) GetRegisteredAt() time.Time {
-	return u.RegisteredAt
+func (u *User) GetCreatedAt() time.Time {
+	return u.createdAt
+}
+
+func (u *User) GetUpdatedAt() time.Time {
+	return u.updatedAt
 }

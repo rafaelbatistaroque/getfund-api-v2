@@ -8,7 +8,7 @@ import (
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
-	sqlitedb "getfund-api-v2/pkg/db/sqlite"
+	postgresdb "getfund-api-v2/pkg/db/postgres"
 	redisconfig "getfund-api-v2/pkg/redis"
 	"net/http"
 
@@ -17,10 +17,10 @@ import (
 
 func main() {
 	//general dependences
-	db := sqlitedb.New()
 	eventBus := bus.New()
 	ctx := context.Background()
 	appSettings := settings.Load()
+	db := postgresdb.New(appSettings)
 	redis := redisconfig.New(ctx, appSettings)
 
 	//Services

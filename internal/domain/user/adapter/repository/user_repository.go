@@ -50,7 +50,8 @@ func (u *userRepository) CreateUser(dto *user_dto.ActivationUserDto) (*user_dto.
 		IsActive:          dto.IsActive,
 		UserCategoryID:    uint(dto.UserCategoryId),
 		CountryID:         uint(dto.CountryId),
-		RegisteredAt:      dto.RegisteredAt,
+		CreatedAt:         dto.CreatedAt,
+		UpdatedAt:         dto.UpdatedAt,
 	}
 
 	result := u.db.Create(&user)

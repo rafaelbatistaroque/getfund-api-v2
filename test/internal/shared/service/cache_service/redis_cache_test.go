@@ -13,7 +13,7 @@ import (
 func Test_GivenCacheSet_WhenMarshalError_ThenEnsureSetCorrectValues(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
-	invalidValue := map[interface{}]interface{}{123: "invalid-value"}
+	invalidValue := map[any]any{123: "invalid-value"}
 	defer sut.Close()
 
 	// Act
@@ -74,7 +74,7 @@ func Test_GivenCache_WhenRigisterExpired_ThenEnsureReturnEmpty(t *testing.T) {
 
 	// Act
 	sut.Set(uniqueKey, expectedValue, 1*time.Second)
-	time.Sleep(2 * time.Second)
+	time.Sleep(1500 * time.Millisecond)
 
 	// Assert
 	content, err := sut.Get(uniqueKey)

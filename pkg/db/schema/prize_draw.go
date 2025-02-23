@@ -1,24 +1,22 @@
 package schema
 
-import "time"
-
 type PrizeDraw struct {
-	ID                  uint   `gorm:"primaryKey;autoIncrement"`
-	Name                string `gorm:"not null"`
-	DetailedDescription string `gorm:"not null"`
-	PrizeDescription    string `gorm:"not null"`
-	ExpectedAmount      int    `gorm:"not null"`
-	StartAt             int    `gorm:"not null;index:idx_prize_draw_list"`
-	EndAt               *int
-	PrizeDrawAt         *int
-	WinnerEntranceID    *uint `gorm:"index:idx_prize_draw_winner"`
-	IsActive            *bool
-	RetentionRate       *int
-	FreeFunding         *int
+	ID                  uint   `gorm:"primaryKey;autoIncrement;column:id"`
+	Name                string `gorm:"not null;column:name"`
+	DetailedDescription string `gorm:"not null;column:detailed_description"`
+	PrizeDescription    string `gorm:"not null;column:prize_description"`
+	ExpectedAmount      int    `gorm:"not null;column:expected_amount"`
+	StartAt             int    `gorm:"not null;index:idx_prize_draw_list;column:start_at"`
+	EndAt               *int   `gorm:"column:end_at"`
+	PrizeDrawAt         *int   `gorm:"column:prize_draw_at"`
+	WinnerEntranceID    *uint  `gorm:"index:idx_prize_draw_winner;column:winner_entrance_id"`
+	IsActive            *bool  `gorm:"column:is_active"`
+	RetentionRate       *int   `gorm:"column:retention_rate"`
+	FreeFunding         *int   `gorm:"column:free_funding"`
+	CreatedAt           int64  `gorm:"column:created_at"`
+	UpdatedAt           int64  `gorm:"column:updated_at"`
+}
 
-	// Relacionamento com Entrance
-	WinnerEntrance *Entrance `gorm:"foreignKey:WinnerEntranceID;constraint:OnDelete:SET NULL"`
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
+func (PrizeDraw) TableName() string {
+	return "prize_draw"
 }

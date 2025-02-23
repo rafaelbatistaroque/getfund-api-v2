@@ -34,6 +34,7 @@ func GetFilledActivationUserDto() *user_dto.ActivationUserDto {
 		MainSocialNetwork: "@FakeSocial",
 		RegisteredUrl:     "https://social.com",
 		IsAdmin:           false,
-		RegisteredAt:      time.Now().Unix(),
+		CreatedAt:         time.Now().Unix(),
+		UpdatedAt:         time.Now().Unix(),
 	}
 }

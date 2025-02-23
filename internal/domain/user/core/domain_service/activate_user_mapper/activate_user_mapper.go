@@ -31,6 +31,7 @@ func (m *activateUserMapper) ToDto(entity *user_entity.User) *user_dto.Activatio
 		RegisteredUrl:     entity.GetRegisteredUrl(),
 		IsAdmin:           entity.GetIsAdmin(),
 		IsActive:          entity.GetIsActive(),
-		RegisteredAt:      entity.GetRegisteredAt().Unix(),
+		CreatedAt:         entity.GetCreatedAt().Unix(),
+		UpdatedAt:         entity.GetUpdatedAt().Unix(),
 	}
 }

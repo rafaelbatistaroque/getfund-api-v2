@@ -1,0 +1,287 @@
+package postgresdb
+
+import (
+	"fmt"
+	"getfund-api-v2/internal/settings"
+	"getfund-api-v2/pkg/db/schema"
+	logger "getfund-api-v2/pkg/log"
+	"log"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+func New(appSettings settings.ApplicationSettings) *gorm.DB {
+	logger := logger.New("Postgres config")
+
+	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
+		appSettings.GetDBHost(),
+		appSettings.GetDBPort(),
+		appSettings.GetDBUser(),
+		appSettings.GetDBPassword(),
+		appSettings.GetDBName(),
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		logger.Errorf("Erro ao conectar ao banco de dados: %v", err)
+		return nil
+	}
+
+	errMigration := db.AutoMigrate(
+		&schema.UserCategory{},
+		&schema.Country{},
+		&schema.User{},
+		&schema.Product{},
+		&schema.CouponType{},
+		&schema.PrizeDraw{},
+		&schema.Coupon{},
+		&schema.Purchase{},
+		&schema.UserCoupon{},
+		&schema.FreeFundingUserEntrances{},
+		&schema.Entrance{},
+	)
+
+	if errMigration != nil {
+		log.Fatalf("Erro no auto migration: %v", errMigration)
+		return nil
+	}
+
+	Seed(db)
+	// errMigration = db.Exec(`
+	// 	ALTER TABLE entrance
+	// 	ADD CONSTRAINT fk_entrance_prize_draw
+	// 	FOREIGN KEY (prize_draw_id) REFERENCES prize_draw(id) ON DELETE CASCADE;
+	// `).Error
+	// if errMigration != nil {
+	// 	log.Fatalf("Erro ao adicionar a constraint fk_entrance_prize_draw: %v", err)
+	// }
+
+	logger.Info("Database connected")
+	return db
+}
+
+func Seed(db *gorm.DB) {
+	sql := `
+    INSERT INTO user_category (name, created_at, updated_at) VALUES
+        ('Other', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Actors', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Artists', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Athletes', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Bloggers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Comedians', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Dancers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Designers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Entrepreneurs', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Fashion Designers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Film Directors / Producers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Gamers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Influencers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Journalists', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Models', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Music Producers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Musicians', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Photographers', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Radio Personalities', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Songwriters', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Supporters', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Writers', extract(epoch from now())::bigint, extract(epoch from now())::bigint);
+
+    INSERT INTO country (name, code, created_at, updated_at) VALUES
+        ('Argentina', 'AR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Australia', 'AU', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Austria', 'AT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Bangladesh', 'BD', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Belgium', 'BE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Brazil', 'BR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Bulgaria', 'BG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Canada', 'CA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Chile', 'CL', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('China', 'CN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Colombia', 'CO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Costa Rica', 'CR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Cyprus', 'CY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Czech Republic', 'CZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Denmark', 'DK', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Egypt', 'EG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Estonia', 'EE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Finland', 'FI', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('France', 'FR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Georgia', 'GE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Germany', 'DE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Ghana', 'GH', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Greece', 'GR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Hong Kong', 'HK', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Hungary', 'HU', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('India', 'IN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Indonesia', 'ID', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Ireland', 'IE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Israel', 'IL', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Italy', 'IT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Japan', 'JP', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Kenya', 'KE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Latvia', 'LV', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Liechtenstein', 'LI', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Lithuania', 'LT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Luxembourg', 'LU', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Malaysia', 'MY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Malta', 'MT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Mexico', 'MX', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Morocco', 'MA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Nepal', 'NP', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Netherlands', 'NL', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('New Zealand', 'NZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Norway', 'NO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Pakistan', 'PK', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Philippines', 'PH', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Poland', 'PL', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Portugal', 'PT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Romania', 'RO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Singapore', 'SG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Slovakia', 'SK', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Slovenia', 'SI', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('South Africa', 'ZA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('South Korea', 'KP', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Spain', 'ES', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Sri Lanka', 'LK', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Sweden', 'SE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Switzerland', 'CH', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Tanzania', 'TZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Thailand', 'TH', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Turkey', 'TR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Uganda', 'UG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Ukraine', 'UA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('United Arab Emirates', 'AE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('United Kingdom', 'GB', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('United States of America', 'US', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Uruguay', 'UY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Viet Nam', 'VN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Zambia', 'ZM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Afghanistan', 'AF', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Albania', 'AL', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Algeria', 'DZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Andorra', 'AD', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Angola', 'AO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Antigua and Barbuda', 'AG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Armenia', 'AM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Azerbaijan', 'AZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Bahrain', 'BH', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Barbados', 'BB', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Belarus', 'BY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Belize', 'BZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Benin', 'BJ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Bhutan', 'BT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Bolivia', 'BO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Bosnia and Herzegovina', 'BA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Botswana', 'BW', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Brunei', 'BN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Burkina Faso', 'BF', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Burundi', 'BI', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Cabo Verde', 'CV', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Cambodia', 'KH', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Cameroon', 'CM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Central African Republic', 'CF', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Chad', 'TD', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Comoros', 'KM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Congo (Congo-Brazzaville)', 'CG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Congo, Democratic Republic of the', 'CD', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Croatia', 'HR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Cuba', 'CU', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Djibouti', 'DJ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Dominica', 'DM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Dominican Republic', 'DO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Ecuador', 'EC', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('El Salvador', 'SV', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Equatorial Guinea', 'GQ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Eritrea', 'ER', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Eswatini', 'SZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Ethiopia', 'ET', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Fiji', 'FJ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Gabon', 'GA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Gambia', 'GM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Grenada', 'GD', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Guatemala', 'GT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Guinea', 'GN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Guinea-Bissau', 'GW', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Guyana', 'GY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Haiti', 'HT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Honduras', 'HN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Iceland', 'IS', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Iran', 'IR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Iraq', 'IQ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Jamaica', 'JM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Jordan', 'JO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Kazakhstan', 'KZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Kiribati', 'KI', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Kuwait', 'KW', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Kyrgyzstan', 'KG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Laos', 'LA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Lebanon', 'LB', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Lesotho', 'LS', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Liberia', 'LR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Libya', 'LY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Macedonia (North Macedonia)', 'MK', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Madagascar', 'MG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Malawi', 'MW', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Maldives', 'MV', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Mali', 'ML', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Marshall Islands', 'MH', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Mauritania', 'MR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Mauritius', 'MU', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Micronesia', 'FM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Moldova', 'MD', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Monaco', 'MC', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Mongolia', 'MN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Montenegro', 'ME', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Mozambique', 'MZ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Myanmar (formerly Burma)', 'MM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Namibia', 'NA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Nauru', 'NR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Nicaragua', 'NI', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Niger', 'NE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Nigeria', 'NG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Oman', 'OM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Palau', 'PW', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Palestine State', 'PS', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Panama', 'PA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Papua New Guinea', 'PG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Paraguay', 'PY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Peru', 'PE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Qatar', 'QA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Russia', 'RU', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Rwanda', 'RW', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Saint Kitts and Nevis', 'KN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Saint Lucia', 'LC', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Saint Vincent and the Grenadines', 'VC', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Samoa', 'WS', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('San Marino', 'SM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Sao Tome and Principe', 'ST', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Saudi Arabia', 'SA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Senegal', 'SN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Serbia', 'RS', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Seychelles', 'SC', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Sierra Leone', 'SL', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Solomon Islands', 'SB', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Somalia', 'SO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('South Sudan', 'SS', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Suriname', 'SR', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Syria', 'SY', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Tajikistan', 'TJ', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Timor-Leste', 'TL', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Togo', 'TG', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Tonga', 'TO', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Trinidad and Tobago', 'TT', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Tunisia', 'TN', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Turkmenistan', 'TM', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Tuvalu', 'TV', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Vanuatu', 'VU', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Vatican City (Holy See)', 'VA', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Venezuela', 'VE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Yemen', 'YE', extract(epoch from now())::bigint, extract(epoch from now())::bigint),
+        ('Zimbabwe', 'ZW', extract(epoch from now())::bigint, extract(epoch from now())::bigint);
+	`
+
+	if err := db.Exec(sql).Error; err != nil {
+		log.Fatalf("Erro ao seed: %v", err)
+	}
+}

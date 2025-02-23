@@ -18,6 +18,11 @@ func (s *ApplicationSettingsSpy) GetSMTPUsername() string      { return "fake-us
 func (s *ApplicationSettingsSpy) GetSMTPFrom() string          { return "fake-smtp-from" }
 func (s *ApplicationSettingsSpy) GetTemplateDir() string       { return s.templateDir }
 func (s *ApplicationSettingsSpy) GetTimeoutResponseEvent() int { return s.timeoutResposenEvent }
+func (s *ApplicationSettingsSpy) GetDBHost() string            { return "fake-host" }
+func (s *ApplicationSettingsSpy) GetDBPort() int               { return 123 }
+func (s *ApplicationSettingsSpy) GetDBUser() string            { return "fake-user" }
+func (s *ApplicationSettingsSpy) GetDBPassword() string        { return "fake-password" }
+func (s *ApplicationSettingsSpy) GetDBName() string            { return "fake-name" }
 
 func New() *ApplicationSettingsSpy {
 	return &ApplicationSettingsSpy{}
