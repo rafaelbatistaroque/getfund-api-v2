@@ -279,14 +279,13 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.RepoSpy.DefineCreateUserSuccess()
-	inputValid := fixture.GetInput()
 	expectedPaylod := &payload.ActivateUserWithCouponConfirmedPayload{
-		ActivationDataKey: inputValid.ActivationDataKey,
-		UserId:            spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
+		UserId:     spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
+		CouponCode: fixture.GetUserDataWithCoupon().CouponCode,
 	}
 
 	// Act
-	sut.Execute(inputValid)
+	sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&activate_user.ActivateUserWithCouponConfirmedEvent{})
@@ -311,8 +310,7 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureCallEmitWithPayloadAndResponseWit
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
 	spies.RepoSpy.DefineCreateUserSuccess()
-	var expectedParam = user_dto.ActivationUserData{}
-	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
+	var expectedParam = spies.GetActivationUserData()
 	expectedPayload := &payload.ActivateUserConfirmedPayload{
 		Username: expectedParam.Email,
 		Password: expectedParam.Password,

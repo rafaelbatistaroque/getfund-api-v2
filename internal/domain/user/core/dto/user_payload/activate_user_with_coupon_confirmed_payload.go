@@ -1,7 +1,6 @@
 package payload
 
 type ActivateUserWithCouponConfirmedPayload struct {
-	UserId            int    `json:"iser_id"`
-	ActivationCode    string `json:"activation_code"`
-	ActivationDataKey string `json:"activation_data_key"`
+	UserId     int    `json:"iser_id"`
+	CouponCode string `json:"coupon_code"`
 }

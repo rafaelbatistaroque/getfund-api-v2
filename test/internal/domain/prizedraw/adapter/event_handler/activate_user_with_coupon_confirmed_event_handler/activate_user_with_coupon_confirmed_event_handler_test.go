@@ -15,119 +15,106 @@ func Test_GivenHandler_WhenPayloadParseError_ThenEnsureNeverCallValidadeCoupon(t
 	sut.Handle(fixture.GetInvalidActivateUserWithCouponConfirmedEvent())
 
 	//Assert
-	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(0)
+	verify.Should(t, spies.RepoSpy.CallsCount["GetCouponByCode"]).Be(0)
 }
 
-func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetCacheWithCorrectParameter(t *testing.T) {
+func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetCouponByCodeWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	activationDataKey := "user_activation_fake_activation_code"
-	expectedKey := activationDataKey + "_coupon"
+	expectedCouponCode := "fake-coupon-code"
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent(activationDataKey, 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent(expectedCouponCode, 1))
 
 	//Assert
-	verify.Should(t, spies.CacheSpy.Params["Get:key"]).Be(expectedKey)
+	verify.Should(t, spies.RepoSpy.Params["GetCouponByCode:couponCode"]).Be(expectedCouponCode)
 }
 
-func Test_GivenHandler_WhenGetCacheInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenHandler_WhenGetCouponByCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-
-	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
-
-	//Assert
-	verify.Should(t, spies.CacheSpy.CallsCount["Get"]).Be(1)
-}
-
-func Test_GivenHandler_WhenGetCacheError_ThenEnsureNeverCallEmitWithPayloadAndResponse(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetError()
 
 	// Act
 	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
 
 	//Assert
-	verify.Should(t, spies.ValidateCouponSpy.CallsCount["Execute"]).Be(0)
+	verify.Should(t, spies.RepoSpy.CallsCount["GetCouponByCode"]).Be(1)
 }
 
-func Test_GivenHandler_WhenUnmarshalError_ThenEnsureNeverCallEmitWithPayloadAndResponse(t *testing.T) {
+func Test_GivenHandler_WhenGetCouponByCodeError_ThenEnsureNeverCallEmitWithPayloadAndResponse(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccessWithValue("invalid-serialized-json")
+	spies.RepoSpy.DefineGetCouponByCodeError()
+
+	// Act
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
+
+	//Assert
+	verify.Should(t, spies.ValidatePrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
+}
+
+func Test_GivenHandler_WhenGetCouponByCodeWithNullSuccess_ThenEnsureCallValidateCouponWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
 
 	// Act
 	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
 
 	// Assert
-	verify.Should(t, spies.ValidateCouponSpy.CallsCount["Execute"]).Be(0)
+	verify.Should(t, spies.ValidatePrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
 }
 
-func Test_GivenHandler_WhenInvalidCouponData_ThenEnsureReturn(t *testing.T) {
+func Test_GivenHandler_WhenGetCouponByCodeSuccess_ThenEnsureCallValidateCouponWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetCacheDataWithInvalidCoupon())
-
-	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
-
-	// Assert
-	verify.Should(t, spies.ValidateCouponSpy.CallsCount["Execute"]).Be(0)
-}
-
-func Test_GivenHandler_WhenValidCouponData_ThenEnsureCallValidateCouponWithCorrectParamenter(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetCacheDataWithValidCoupon())
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	expectedInput := fixture.GetValidateCouponInput()
 
 	// Act
 	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
 
 	// Assert
-	verify.Should(t, spies.ValidateCouponSpy.Params["Execute:input"]).Be(expectedInput)
+	verify.Should(t, spies.ValidatePrizeDrawCouponSpy.Params["Execute:input"]).Be(expectedInput)
 }
 
 func Test_GivenHandler_WhenValidateCouponError_ThenEnsureNeverCallApplyCoupon(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetCacheDataWithValidCoupon())
-	spies.ValidateCouponSpy.DefineValidateCouponUsecaseError("")
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseError("")
 
 	// Act
 	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
 
 	// Assert
-	verify.Should(t, spies.ApplyCouponSpy.CallsCount["Execute"]).Be(0)
+	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
 }
 
 func Test_GivenHandler_WhenValidateCouponSuccess_ThenEnsureCallApplyCouponWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetCacheDataWithValidCoupon())
-	spies.ValidateCouponSpy.DefineValidateCouponUsecaseSuccess()
+	validCoupon := fixture.GetValidCoupon()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(validCoupon)
+	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseSuccess()
 	expectedUserId := 3
-	expectedInputApply := fixture.GetApplyCouponInput(*fixture.GetCouponData().CouponData, expectedUserId)
+	expectedInputApply := fixture.GetApplyCouponInput(validCoupon, expectedUserId)
 
 	// Act
 	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", expectedUserId))
 
 	// Assert
-	verify.Should(t, spies.ApplyCouponSpy.Params["Execute:input"]).Be(expectedInputApply)
+	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.Params["Execute:input"]).Be(expectedInputApply)
 }
 
-func Test_GivenHandler_WhenVApplyCouponInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenHandler_WhenApplyCouponInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetCacheDataWithValidCoupon())
-	spies.ValidateCouponSpy.DefineValidateCouponUsecaseSuccess()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseSuccess()
 
 	// Act
 	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
 
 	// Assert
-	verify.Should(t, spies.ApplyCouponSpy.CallsCount["Execute"]).Be(1)
+	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.CallsCount["Execute"]).Be(1)
 }

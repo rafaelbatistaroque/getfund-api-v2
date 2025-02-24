@@ -73,8 +73,8 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 
 	if userData.CouponCode != "" {
 		payloadCoupon := &payload.ActivateUserWithCouponConfirmedPayload{
-			UserId:            userSaved.Id,
-			ActivationDataKey: input.ActivationDataKey,
+			UserId:     userSaved.Id,
+			CouponCode: userData.CouponCode,
 		}
 
 		a.bus.EmitWithPayload(&activate_user.ActivateUserWithCouponConfirmedEvent{}, payloadCoupon)

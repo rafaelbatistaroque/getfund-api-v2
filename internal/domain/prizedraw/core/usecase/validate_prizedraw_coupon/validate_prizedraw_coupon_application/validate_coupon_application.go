@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	coupon_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_payload"
+	"getfund-api-v2/internal/domain/prizedraw/core/prizedraw_contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/app_constant"
@@ -33,12 +33,12 @@ const (
 var _NOW = time.Now().Unix()
 
 type validateCouponApplication struct {
-	repository coupon_contract.Repository
+	repository prizedraw_contract.Repository
 	bus        bus.EventBus
 	settings   settings.ApplicationSettings
 }
 
-func New(repository coupon_contract.Repository, bus bus.EventBus, settings settings.ApplicationSettings) validate_prizedraw_coupon.UseCase {
+func New(repository prizedraw_contract.Repository, bus bus.EventBus, settings settings.ApplicationSettings) validate_prizedraw_coupon.UseCase {
 	return &validateCouponApplication{
 		repository: repository,
 		bus:        bus,
@@ -77,6 +77,7 @@ func (v *validateCouponApplication) Execute(input *validate_prizedraw_coupon.Inp
 		return nil, err
 	}
 
+	//ensure retur a validation code
 	return &validate_prizedraw_coupon.Output{
 		Message: "coupon is valid",
 	}, nil

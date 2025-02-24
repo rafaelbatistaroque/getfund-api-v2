@@ -6,22 +6,22 @@ import (
 	"getfund-api-v2/internal/shared/result_app"
 )
 
-type ValidateCouponApplicationSpy struct {
+type ValidatePrizeDrawCouponApplicationSpy struct {
 	Params        map[string]*validate_prizedraw_coupon.Input
 	CallsCount    map[string]int
 	ErrorResult   map[string]*result_app.ApplicationError
 	SuccessResult map[string]*validate_prizedraw_coupon.Output
 }
 
-func NewValidateCoupon() *ValidateCouponApplicationSpy {
-	return &ValidateCouponApplicationSpy{
+func NewValidatePrizeDrawCoupon() *ValidatePrizeDrawCouponApplicationSpy {
+	return &ValidatePrizeDrawCouponApplicationSpy{
 		Params:        make(map[string]*validate_prizedraw_coupon.Input),
 		CallsCount:    make(map[string]int),
 		ErrorResult:   make(map[string]*result_app.ApplicationError),
 		SuccessResult: make(map[string]*validate_prizedraw_coupon.Output)}
 }
 
-func (uc *ValidateCouponApplicationSpy) Execute(input *validate_prizedraw_coupon.Input) (*validate_prizedraw_coupon.Output, *result_app.ApplicationError) {
+func (uc *ValidatePrizeDrawCouponApplicationSpy) Execute(input *validate_prizedraw_coupon.Input) (*validate_prizedraw_coupon.Output, *result_app.ApplicationError) {
 	uc.Params["Execute:input"] = input
 
 	uc.CallsCount["Execute"]++
@@ -29,11 +29,11 @@ func (uc *ValidateCouponApplicationSpy) Execute(input *validate_prizedraw_coupon
 	return uc.SuccessResult["Execute"], uc.ErrorResult["Execute"]
 }
 
-func (uc *ValidateCouponApplicationSpy) DefineValidateCouponUsecaseError(withMessage string) {
+func (uc *ValidatePrizeDrawCouponApplicationSpy) DefineValidateCouponUsecaseError(withMessage string) {
 	uc.ErrorResult["Execute"] = &result_app.ApplicationError{Message: errors.New(withMessage)}
 }
 
-func (uc *ValidateCouponApplicationSpy) DefineValidateCouponUsecaseSuccess() {
+func (uc *ValidatePrizeDrawCouponApplicationSpy) DefineValidateCouponUsecaseSuccess() {
 	uc.SuccessResult["Execute"] = &validate_prizedraw_coupon.Output{}
 }
 
@@ -41,8 +41,8 @@ func GetValidateCouponInput() *validate_prizedraw_coupon.Input {
 
 	return &validate_prizedraw_coupon.Input{
 		CouponCode:          "fake-coupon-code",
-		SelectedProductId:   1,
-		SelectedPrizeDrawId: 1,
+		SelectedProductId:   10,
+		SelectedPrizeDrawId: 5,
 		UserId:              1,
 	}
 }

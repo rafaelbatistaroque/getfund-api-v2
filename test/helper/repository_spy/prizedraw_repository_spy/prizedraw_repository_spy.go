@@ -1,4 +1,4 @@
-package coupon_repository_spy
+package prizedraw_repository_spy
 
 import (
 	"errors"

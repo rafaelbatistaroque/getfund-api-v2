@@ -6,19 +6,19 @@ import (
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	validate_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/validate_prizedraw_coupon_application"
 	"getfund-api-v2/test/helper/eventbus_spy"
-	"getfund-api-v2/test/helper/repository_spy/coupon_repository_spy"
+	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
 	"getfund-api-v2/test/helper/settings_spy"
 	"time"
 )
 
 type ValidateCouponFixture struct {
-	RepoSpy     *coupon_repository_spy.CouponRepositorySpy
+	RepoSpy     *prizedraw_repository_spy.CouponRepositorySpy
 	BusSpy      *eventbus_spy.EventBusSpy
 	SettingsSpy *settings_spy.ApplicationSettingsSpy
 }
 
 func NewSut() (validate_prizedraw_coupon.UseCase, *ValidateCouponFixture) {
-	repoSpy := coupon_repository_spy.New()
+	repoSpy := prizedraw_repository_spy.New()
 	busSpy := eventbus_spy.New()
 	settingsSpy := settings_spy.New()
 

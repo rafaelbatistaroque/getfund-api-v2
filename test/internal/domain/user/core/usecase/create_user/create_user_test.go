@@ -373,37 +373,6 @@ func Test_GivenCreateUserExecute_WhenEmitWithPayloadInvoked_ThenEnsureCallsOnce(
 	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(1)
 }
 
-func Test_GivenCreateUserExecute_WhenHasCouponCode_ThenEnsureCallEmitWithPayloadWithCorrectParameter(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	validInput := fixture.GetInput()
-	spies.HasherSpy.DefineGetRandomCodeSuccess()
-	activationCode := spies.HasherSpy.SuccessResult["GetRandomCode"].(string)
-	activationCodeDataKey := "user_activation_" + activationCode
-	payload := &payload.CreateUserProcessWithCouponPayload{
-		CouponCode:        validInput.CouponCode,
-		ActivationDataKey: activationCodeDataKey,
-	}
-
-	// Act
-	sut.Execute(validInput)
-
-	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][1]).Be(&create_user.CreateUserProcessWithCouponStartedEvent{})
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][1]).Be(payload)
-}
-
-func Test_GivenCreateUserExecute_WhenHasCouponCodeAndEmitWithPayloadInvoked_ThenEnsureCallsTwice(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-
-	// Act
-	sut.Execute(fixture.GetInput())
-
-	// Assert
-	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayload"]).Be(2)
-}
-
 func Test_GivenCreateUserExecute_WhenSuccess_ThenEnsureReturnSuccessWithAppropiateMessage(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()

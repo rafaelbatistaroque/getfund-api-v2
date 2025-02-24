@@ -2,6 +2,7 @@ package activate_user_fixture
 
 import (
 	"encoding/json"
+	"getfund-api-v2/internal/domain/user/core/dto/user_dto"
 	"getfund-api-v2/internal/domain/user/core/entity/user_entity"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/user/core/usecase/activate_user/application"
@@ -112,4 +113,18 @@ func GetResponseSession() ([]byte, *activate_user.Output) {
 		return nil, nil
 	}
 	return responseSerialized, response
+}
+
+func GetUserDataWithCoupon() *user_dto.ActivationUserData {
+	var user = &user_dto.ActivationUserData{}
+	json.Unmarshal([]byte(GetUserDataWithCouponSerialized()), user)
+
+	return user
+}
+
+func (s *ActivateUserFixture) GetActivationUserData() *user_dto.ActivationUserData {
+	var user = user_dto.ActivationUserData{}
+	json.Unmarshal([]byte(s.CacheSpy.SuccessResult["Get"].(string)), &user)
+
+	return &user
 }

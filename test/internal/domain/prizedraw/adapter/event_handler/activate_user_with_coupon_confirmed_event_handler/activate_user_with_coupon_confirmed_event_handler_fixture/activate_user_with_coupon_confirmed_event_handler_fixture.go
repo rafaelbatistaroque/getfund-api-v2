@@ -4,27 +4,33 @@ import (
 	"encoding/json"
 	coupon_common "getfund-api-v2/internal/domain/prizedraw/adapter/common"
 	event_handler "getfund-api-v2/internal/domain/prizedraw/adapter/event_handler/activate_user_with_coupon_confirmed_event_handler"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
 	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/pkg/bus"
 	"getfund-api-v2/test/helper/cache_spy"
+	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
+	"time"
 )
 
 type ActivateUserWithCouponConfirmedEventHandlerFixture struct {
-	CacheSpy          *cache_spy.RedisCacheSpy
-	ValidateCouponSpy *ValidateCouponApplicationSpy
-	ApplyCouponSpy    *ApplyCouponApplicationSpy
+	RepoSpy                    *prizedraw_repository_spy.CouponRepositorySpy
+	CacheSpy                   *cache_spy.RedisCacheSpy
+	ValidatePrizeDrawCouponSpy *ValidatePrizeDrawCouponApplicationSpy
+	ApplyPrizeDrawCouponSpy    *ApplyPrizeDrawCouponApplicationSpy
 }
 
 func NewSut() (bus.Handler, *ActivateUserWithCouponConfirmedEventHandlerFixture) {
+	repoSpy := prizedraw_repository_spy.New()
 	cacheSpy := cache_spy.New()
-	validateCouponSpy := NewValidateCoupon()
-	applyCouponSpy := NewApplyCoupon()
+	validatePrizeDrawCouponSpy := NewValidatePrizeDrawCoupon()
+	applyPrizeDrawCouponSpy := NewApplyPrizeDrawCoupon()
 
-	return event_handler.New(validateCouponSpy, applyCouponSpy, cacheSpy),
+	return event_handler.New(repoSpy, validatePrizeDrawCouponSpy, applyPrizeDrawCouponSpy, cacheSpy),
 		&ActivateUserWithCouponConfirmedEventHandlerFixture{
-			CacheSpy:          cacheSpy,
-			ValidateCouponSpy: validateCouponSpy,
-			ApplyCouponSpy:    applyCouponSpy,
+			RepoSpy:                    repoSpy,
+			CacheSpy:                   cacheSpy,
+			ValidatePrizeDrawCouponSpy: validatePrizeDrawCouponSpy,
+			ApplyPrizeDrawCouponSpy:    applyPrizeDrawCouponSpy,
 		}
 }
 
@@ -32,10 +38,10 @@ func GetInvalidActivateUserWithCouponConfirmedEvent() *activate_user.ActivateUse
 	return &activate_user.ActivateUserWithCouponConfirmedEvent{}
 }
 
-func GetValidActivateUserWithCouponConfirmedEvent(activationDataKey string, userId int) *activate_user.ActivateUserWithCouponConfirmedEvent {
+func GetValidActivateUserWithCouponConfirmedEvent(couponCode string, userId int) *activate_user.ActivateUserWithCouponConfirmedEvent {
 	payload, _ := json.Marshal(map[string]any{
-		"user_id":             userId,
-		"activation_data_key": activationDataKey,
+		"user_id":     userId,
+		"coupon_code": couponCode,
 	})
 
 	event := &activate_user.ActivateUserWithCouponConfirmedEvent{}
@@ -58,4 +64,32 @@ func GetCouponData() coupon_common.CacheCouponData {
 	json.Unmarshal([]byte(GetCacheDataWithValidCoupon()), &couponData)
 
 	return couponData
+}
+
+func (v *ActivateUserWithCouponConfirmedEventHandlerFixture) GetCouponDataFromSuccessDB() *coupon_common.CouponData {
+	couponFromDb := v.RepoSpy.SuccessResult["GetCouponByCode"].(*prizedraw_dto.CouponDto)
+
+	return &coupon_common.CouponData{
+		Id:          couponFromDb.Id,
+		Code:        couponFromDb.Code,
+		PrizeDrawId: couponFromDb.PrizeDrawId,
+		ProductId:   couponFromDb.ProductId,
+		StartAt:     couponFromDb.StartAt,
+		EndAt:       couponFromDb.EndAt,
+		Discount:    couponFromDb.Discount,
+	}
+}
+
+func GetValidCoupon() *prizedraw_dto.CouponDto {
+	minus72Hours := time.Now().Add(-24 * time.Hour).Unix()
+	minus24Hours := time.Now().Add(24 * time.Hour).Unix()
+	return &prizedraw_dto.CouponDto{
+		Id:          1,
+		Code:        "fake-coupon-code",
+		PrizeDrawId: 5,
+		ProductId:   10,
+		StartAt:     minus72Hours,
+		EndAt:       &minus24Hours,
+		Discount:    200,
+	}
 }

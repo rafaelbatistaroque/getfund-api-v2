@@ -56,10 +56,6 @@ func (c *createUserApplication) Execute(input *create_user.Input) (*create_user.
 
 	emitCreateUserProcessStartedEvent(c.bus, c.settings, activationCode)
 
-	if input.CouponCode != "" {
-		emitCreateUserProcessWithCouponStartedEvent(c.bus, input, activationCode)
-	}
-
 	return &create_user.Output{Message: "user creation started"}, nil
 }
 
@@ -93,13 +89,4 @@ func emitCreateUserProcessStartedEvent(bus bus.EventBus, settings settings.Appli
 	}
 
 	bus.EmitWithPayload(&create_user.CreateUserProcessStartedEvent{}, payload)
-}
-
-func emitCreateUserProcessWithCouponStartedEvent(bus bus.EventBus, input *create_user.Input, activationCode string) {
-	payload := &payload.CreateUserProcessWithCouponPayload{
-		ActivationDataKey: KEY_CACHE_PREFIX + activationCode,
-		CouponCode:        input.CouponCode,
-	}
-
-	bus.EmitWithPayload(&create_user.CreateUserProcessWithCouponStartedEvent{}, payload)
 }

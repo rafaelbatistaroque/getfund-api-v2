@@ -2,7 +2,7 @@ package activate_user_with_coupon_confirmed_event_handler
 
 import (
 	"encoding/json"
-	coupon_common "getfund-api-v2/internal/domain/prizedraw/adapter/common"
+	"getfund-api-v2/internal/domain/prizedraw/core/prizedraw_contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	"getfund-api-v2/internal/shared/result_app"
@@ -12,24 +12,27 @@ import (
 )
 
 type activateUserWithCouponConfirmedEventHandler struct {
-	validateCoupon validate_prizedraw_coupon.UseCase
-	applyCoupon    apply_prizedraw_coupon.UseCase
-	cache          cache_service.Cache
-	logger         logger.Logger
+	repository              prizedraw_contract.Repository
+	validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase
+	applyPrizeDrawCoupon    apply_prizedraw_coupon.UseCase
+	cache                   cache_service.Cache
+	logger                  logger.Logger
 }
 
-func New(validateCoupon validate_prizedraw_coupon.UseCase, applyCoupon apply_prizedraw_coupon.UseCase, cache cache_service.Cache) bus.Handler {
+func New(repository prizedraw_contract.Repository, validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase, applyPrizeDrawCoupon apply_prizedraw_coupon.UseCase, cache cache_service.Cache) bus.Handler {
 	return &activateUserWithCouponConfirmedEventHandler{
-		logger:         *logger.New("activateUserWithCouponConfirmedEventHandler"),
-		cache:          cache,
-		validateCoupon: validateCoupon,
-		applyCoupon:    applyCoupon,
+		logger:                  *logger.New("activateUserWithCouponConfirmedEventHandler"),
+		repository:              repository,
+		cache:                   cache,
+		validatePrizeDrawCoupon: validatePrizeDrawCoupon,
+		applyPrizeDrawCoupon:    applyPrizeDrawCoupon,
 	}
 }
 
 var payload struct {
 	UserId            int    `json:"user_id"`
 	ActivationDataKey string `json:"activation_data_key"`
+	CouponCode        string `json:"coupon_code"`
 }
 
 func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
@@ -39,28 +42,22 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	var cacheData string
-	if cacheData, err = h.cache.Get(payload.ActivationDataKey + "_coupon"); err != nil {
-		h.logger.Error("IsOk: False | get cache failed")
+	coupon, err := h.repository.GetCouponByCode(payload.CouponCode)
+	if err != nil {
+		h.logger.Errorf("IsOk: False | Coupon Repository | error: %s", err)
 		return
 	}
 
-	var couponData = coupon_common.CacheCouponData{}
-	if err = json.Unmarshal([]byte(cacheData), &couponData); err != nil {
-		h.logger.Errorf("IsOk: False | %v", err)
-		return
-	}
-
-	if !couponData.IsValid {
-		h.logger.Errorf("IsOk: False | Invalid coupon code | code: %s | message: %s", couponData.Error.Code, couponData.Error.Message)
+	if coupon == nil {
+		h.logger.Error("IsOk: False | Coupon Repository | coupon null")
 		return
 	}
 
 	var erroUsecase = &result_app.ApplicationError{}
-	_, erroUsecase = h.validateCoupon.Execute(&validate_prizedraw_coupon.Input{
-		CouponCode:          couponData.CouponData.Code,
-		SelectedProductId:   couponData.CouponData.ProductId,
-		SelectedPrizeDrawId: couponData.CouponData.PrizeDrawId,
+	_, erroUsecase = h.validatePrizeDrawCoupon.Execute(&validate_prizedraw_coupon.Input{
+		CouponCode:          coupon.Code,
+		SelectedProductId:   coupon.ProductId,
+		SelectedPrizeDrawId: coupon.PrizeDrawId,
 		UserId:              payload.UserId,
 	})
 
@@ -69,15 +66,16 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	_, erroUsecase = h.applyCoupon.Execute(&apply_prizedraw_coupon.Input{
-		Id:          couponData.CouponData.Id,
-		Code:        couponData.CouponData.Code,
-		PrizeDrawId: couponData.CouponData.PrizeDrawId,
-		ProductId:   couponData.CouponData.ProductId,
-		StartAt:     couponData.CouponData.StartAt,
-		EndAt:       couponData.CouponData.EndAt,
-		Discount:    couponData.CouponData.Discount,
+	_, erroUsecase = h.applyPrizeDrawCoupon.Execute(&apply_prizedraw_coupon.Input{
+		Id:          coupon.Id,
+		Code:        coupon.Code,
+		PrizeDrawId: coupon.PrizeDrawId,
+		ProductId:   coupon.ProductId,
+		StartAt:     coupon.StartAt,
+		EndAt:       coupon.EndAt,
+		Discount:    coupon.Discount,
 		UserId:      payload.UserId,
+		//ensure pass a validation code from validatePrizeDrawCoupon
 	})
 
 	if erroUsecase != nil {
