@@ -238,7 +238,7 @@ func Test_GivenExecute_WhenGetPrizeDrawByIdSuccessDifferentFromSelectedPrizeDraw
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
-	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(&prizedraw_dto.PrizeDrawDto{Id: 5})
+	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(&prizedraw_dto.PrizeDrawDto{Id: 8})
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
@@ -418,8 +418,10 @@ func Test_GivenExecute_WhenCouponProductDifferentFromSelectedProduct_ThenEnsureR
 func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	validCoupon := fixture.GetValidCoupon()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(validCoupon)
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
+	productData := fixture.GetProductData()
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
 	resultChannel := make(chan *validate_prizedraw_coupon.Output, 1)
 
@@ -436,4 +438,8 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	resultUnwrapped := <-resultChannel
 	defer close(resultChannel)
 	verify.Should(t, resultUnwrapped.Message).Be("coupon is valid")
+	verify.Should(t, resultUnwrapped.CouponId).Be(validCoupon.Id)
+	verify.Should(t, resultUnwrapped.PrizeDrawId).Be(validCoupon.PrizeDrawId)
+	verify.Should(t, resultUnwrapped.ProductId).Be(validCoupon.ProductId)
+	verify.Should(t, resultUnwrapped.ProductEntrance).Be(productData.EntranceQuantity)
 }

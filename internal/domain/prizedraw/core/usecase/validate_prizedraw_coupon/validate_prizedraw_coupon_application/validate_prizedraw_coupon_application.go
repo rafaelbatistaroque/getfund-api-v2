@@ -72,7 +72,7 @@ func (v *validateCouponApplication) Execute(input *validate_prizedraw_coupon.Inp
 
 	//Handle PrizeDraw validation
 	var prizeDrawDtoFound *prizedraw_dto.PrizeDrawDto
-	if prizeDrawDtoFound, applicationError = v.getPrizeDraw(couponDtoFound.PrizeDrawId); applicationError != nil {
+	if prizeDrawDtoFound, applicationError = v.getPrizeDrawFromDb(coupon.GetPrizeDrawId()); applicationError != nil {
 		return nil, applicationError
 	}
 	prizeDraw := entity.PrizeDrawFill(prizeDrawDtoFound.Id, prizeDrawDtoFound.WinnerEntranceId)
@@ -82,22 +82,29 @@ func (v *validateCouponApplication) Execute(input *validate_prizedraw_coupon.Inp
 
 	//Handle Product validation
 	responseChannel := make(chan []byte, 1)
-	v.emitValidateCouponStartedEvent(couponDtoFound, responseChannel)
+	v.emitValidateCouponStartedEvent(coupon.GetProductId(), responseChannel)
 
-	var validationCouponData *prizedraw_dto.ValidationCouponData
-	if validationCouponData, applicationError = v.getValidationCouponFromResponse(responseChannel); applicationError != nil {
-		return nil, applicationError
-	}
-	if applicationError := v.isProductValid(validationCouponData.Product, input.SelectedProductId); applicationError != nil {
+	var validationData *prizedraw_dto.ValidationData
+	if validationData, applicationError = v.getValidationCouponFromResponse(responseChannel); applicationError != nil {
 		return nil, applicationError
 	}
 
+	product := entity.ProductFill(validationData.Product.Id, validationData.Product.IsActive, validationData.Product.EntranceQuantity)
+	if applicationError := v.isProductValid(product, input.SelectedProductId); applicationError != nil {
+		return nil, applicationError
+	}
+
+	//return ValidationCouponData?
 	return &validate_prizedraw_coupon.Output{
-		Message: "coupon is valid",
+		Message:         "coupon is valid",
+		CouponId:        coupon.GetId(),
+		PrizeDrawId:     prizeDraw.GetId(),
+		ProductId:       product.GetId(),
+		ProductEntrance: product.GetEntranceQuantity(),
 	}, nil
 }
 
-func (v *validateCouponApplication) getPrizeDraw(prizeDrawId int) (*prizedraw_dto.PrizeDrawDto, *result_app.ApplicationError) {
+func (v *validateCouponApplication) getPrizeDrawFromDb(prizeDrawId int) (*prizedraw_dto.PrizeDrawDto, *result_app.ApplicationError) {
 	prizeDrawFound, err := v.repository.GetPrizeDrawById(prizeDrawId)
 	if err != nil {
 		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New(_PRIZE_DRAW_NOT_FOUND))
@@ -131,11 +138,11 @@ func (v *validateCouponApplication) getCouponEntityFilled(couponDtoFound *prized
 	}
 
 	return entity.CouponFill(
+		couponDtoFound.Id,
 		couponDtoFound.Code,
 		couponDtoFound.TypeApplicability,
 		couponDtoFound.PrizeDrawId,
 		couponDtoFound.ProductId,
-		couponDtoFound.Discount,
 		couponDtoFound.LimitApplication,
 		time.Unix(couponDtoFound.StartAt, 0),
 		endAt,
@@ -171,16 +178,16 @@ func (*validateCouponApplication) isCouponValid(coupon *entity.Coupon, userCoupo
 	return nil
 }
 
-func (v *validateCouponApplication) emitValidateCouponStartedEvent(couponFound *prizedraw_dto.CouponDto, responseChannel chan []byte) {
+func (v *validateCouponApplication) emitValidateCouponStartedEvent(productId int, responseChannel chan []byte) {
 	payload := &prizedraw_payload.ValidateCouponStartedPayload{
-		ProductId: couponFound.ProductId,
+		ProductId: productId,
 	}
 
 	v.bus.EmitWithPayloadAndResponse(&validate_prizedraw_coupon.ValidateCouponStartedEvent{}, payload, responseChannel)
 }
 
-func (v *validateCouponApplication) getValidationCouponFromResponse(responseChannel chan []byte) (*prizedraw_dto.ValidationCouponData, *result_app.ApplicationError) {
-	var validationCouponData = &prizedraw_dto.ValidationCouponData{}
+func (v *validateCouponApplication) getValidationCouponFromResponse(responseChannel chan []byte) (*prizedraw_dto.ValidationData, *result_app.ApplicationError) {
+	var validationCouponData = &prizedraw_dto.ValidationData{}
 
 	select {
 	case response := <-responseChannel:
@@ -199,17 +206,16 @@ func (v *validateCouponApplication) getValidationCouponFromResponse(responseChan
 	return validationCouponData, nil
 }
 
-// passar para dominio product e receber apenas a entradas caso válido
-func (*validateCouponApplication) isProductValid(productData *prizedraw_dto.ProductData, selectedProductId int) *result_app.ApplicationError {
-	if productData == nil {
+func (*validateCouponApplication) isProductValid(product *entity.Product, selectedProductId int) *result_app.ApplicationError {
+	if product == nil {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRODUCT))
 	}
 
-	if !productData.IsActive {
+	if !product.IsActive() {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INACTIVE_PRODUCT))
 	}
 
-	if productData.Id != selectedProductId {
+	if product.GetId() != selectedProductId {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_INVALID_FOR_PRODUCT))
 	}
 

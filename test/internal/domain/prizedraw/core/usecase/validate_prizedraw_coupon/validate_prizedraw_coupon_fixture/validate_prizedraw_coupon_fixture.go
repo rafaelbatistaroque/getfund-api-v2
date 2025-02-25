@@ -36,8 +36,8 @@ type Option func(*validate_prizedraw_coupon.Input)
 func GetInput(options ...Option) *validate_prizedraw_coupon.Input {
 	input := &validate_prizedraw_coupon.Input{
 		CouponCode:          "FAKE_CPN",
-		SelectedProductId:   1,
-		SelectedPrizeDrawId: 1,
+		SelectedProductId:   10,
+		SelectedPrizeDrawId: 5,
 		UserId:              1,
 	}
 
@@ -80,6 +80,7 @@ func GetValidCoupon() *prizedraw_dto.CouponDto {
 		EndAt:       &minus24Hours,
 		ProductId:   10,
 		PrizeDrawId: 5,
+		Id:          1,
 	}
 }
 
@@ -110,15 +111,15 @@ func GetValidCouponWithApplicationReached(limit, couponType int) *prizedraw_dto.
 }
 
 func GetValidPrizeDraw() *prizedraw_dto.PrizeDrawDto {
-	return &prizedraw_dto.PrizeDrawDto{Id: 1}
+	return &prizedraw_dto.PrizeDrawDto{Id: 5}
 }
 
 func GetProductResponse() []byte {
-	return []byte(`{"product": {"id":1, "total_price": 100, "is_active": true, "entrance_qty": 1}}`)
+	return []byte(`{"product": {"id":10, "total_price": 100, "is_active": true, "entrance_qty": 1}}`)
 }
 
 func GetInactiveProductResponse() []byte {
-	return []byte(`{"product": {"id":1, "total_price": 100, "is_active": false, "entrance_qty": 1}}`)
+	return []byte(`{"product": {"id":10, "total_price": 100, "is_active": false, "entrance_qty": 1}}`)
 }
 
 func GetNullResponse() []byte {
@@ -126,7 +127,7 @@ func GetNullResponse() []byte {
 }
 
 func GetProductData() *prizedraw_dto.ProductData {
-	var product = &prizedraw_dto.ValidationCouponData{}
+	var product = &prizedraw_dto.ValidationData{}
 	json.Unmarshal(GetProductResponse(), product)
 
 	return product.Product
