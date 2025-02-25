@@ -2,7 +2,7 @@ package activate_user_with_coupon_confirmed_event_handler
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/prizedraw/core/prizedraw_contract"
+	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	"getfund-api-v2/internal/shared/result_app"
@@ -75,7 +75,6 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		EndAt:       coupon.EndAt,
 		Discount:    coupon.Discount,
 		UserId:      payload.UserId,
-		//ensure pass a validation code from validatePrizeDrawCoupon
 	})
 
 	if erroUsecase != nil {

@@ -1,8 +1,8 @@
 package prizedraw_dto
 
-type CouponValidationData struct {
-	Product   *ProductData   `json:"product"`
-	PrizeDraw *PrizeDrawData `json:"prize_draw"`
+type ValidationCouponData struct {
+	Product    *ProductData `json:"product"`
+	CouponDara *CouponData  `json:"coupon_data"`
 }
 
 type ProductData struct {
@@ -12,7 +12,12 @@ type ProductData struct {
 	EntranceQuantity int  `json:"entrance_qty"`
 }
 
-type PrizeDrawData struct {
-	Id               int  `json:"id"`
-	WinnerEntranceId *int `json:"winner_entrance_id"`
+type CouponData struct {
+	Id          int    `json:"id"`
+	Code        string `json:"code"`
+	PrizeDrawId int    `json:"prize_draw_id"`
+	ProductId   int    `json:"product_id"`
+	StartAt     int64  `json:"start_at"`
+	EndAt       *int64 `json:"end_at"`
+	Discount    int    `json:"discount"`
 }

@@ -46,3 +46,29 @@ func (r *CouponRepositorySpy) DefineGetCouponByCodeSuccess(coupon *prizedraw_dto
 
 	r.SuccessResult["GetCouponByCode"] = &prizedraw_dto.CouponDto{}
 }
+
+func (r *CouponRepositorySpy) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDrawDto, error) {
+	r.Params["GetPrizeDrawById:id"] = id
+
+	r.CallsCount["GetPrizeDrawById"]++
+
+	sucess := r.SuccessResult["GetPrizeDrawById"]
+	if sucess != nil {
+		return sucess.(*prizedraw_dto.PrizeDrawDto), nil
+	}
+
+	return nil, r.ErrorResult["GetPrizeDrawById"]
+}
+
+func (r *CouponRepositorySpy) DefineGetPrizeDrawByIdError() {
+	r.ErrorResult["GetPrizeDrawById"] = errors.New("fake-error")
+}
+
+func (r *CouponRepositorySpy) DefineGetPrizeDrawByIdSuccess(prizeDraw *prizedraw_dto.PrizeDrawDto) {
+	if prizeDraw != nil {
+		r.SuccessResult["GetPrizeDrawById"] = prizeDraw
+		return
+	}
+
+	r.SuccessResult["GetPrizeDrawById"] = &prizedraw_dto.PrizeDrawDto{}
+}
