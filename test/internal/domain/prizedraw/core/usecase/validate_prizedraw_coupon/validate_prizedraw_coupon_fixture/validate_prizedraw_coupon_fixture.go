@@ -1,7 +1,6 @@
 package validate_prizedraw_coupon_fixture
 
 import (
-	"encoding/json"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	validate_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/validate_prizedraw_coupon_application"
@@ -39,6 +38,7 @@ func GetInput(options ...Option) *validate_prizedraw_coupon.Input {
 		SelectedProductId:   10,
 		SelectedPrizeDrawId: 5,
 		UserId:              1,
+		Email:               "fake@email.com",
 	}
 
 	for _, opt := range options {
@@ -57,6 +57,18 @@ func WithEmptyCouponCode() Option {
 func WithInvalidCouponCode() Option {
 	return func(params *validate_prizedraw_coupon.Input) {
 		params.CouponCode = "fake" //less than 8 characters
+	}
+}
+
+func WithEmptyEmail() Option {
+	return func(params *validate_prizedraw_coupon.Input) {
+		params.Email = ""
+	}
+}
+
+func WithInvalidEmail() Option {
+	return func(params *validate_prizedraw_coupon.Input) {
+		params.Email = "fake" //not mail
 	}
 }
 
@@ -81,16 +93,22 @@ func GetValidCoupon() *prizedraw_dto.CouponDto {
 		ProductId:   10,
 		PrizeDrawId: 5,
 		Id:          1,
+		LinkedEmail: "fake@mail.com",
 	}
 }
 
 func GetValidCouponWithApplication(userId, couponType int) *prizedraw_dto.CouponDto {
 	validCoupon := GetValidCoupon()
-	validCoupon.TypeApplicability = couponType
-	validCoupon.UserCouponApplies = make([]prizedraw_dto.UserCouponApply, 1)
-	validCoupon.UserCouponApplies[0] = prizedraw_dto.UserCouponApply{
-		UserId: userId,
-	}
+	validCoupon.CouponType = prizedraw_dto.CouponTypeDto{Code: uint(couponType)}
+	validCoupon.UserCouponApplies = addUserApplies(2, userId)
+
+	return validCoupon
+}
+
+func GetValidCouponWithEmailLinked() *prizedraw_dto.CouponDto {
+	validCoupon := GetValidCoupon()
+	validCoupon.CouponType = prizedraw_dto.CouponTypeDto{Code: 1}
+	validCoupon.UserCouponApplies = addUserApplies(1, 1)
 
 	return validCoupon
 }
@@ -98,16 +116,27 @@ func GetValidCouponWithApplication(userId, couponType int) *prizedraw_dto.Coupon
 func GetValidCouponWithApplicationReached(limit, couponType int) *prizedraw_dto.CouponDto {
 	validCoupon := GetValidCoupon()
 	validCoupon.LimitApplication = &limit
-	validCoupon.TypeApplicability = couponType
-	validCoupon.UserCouponApplies = make([]prizedraw_dto.UserCouponApply, limit)
+	validCoupon.CouponType = prizedraw_dto.CouponTypeDto{Code: uint(couponType)}
+	validCoupon.UserCouponApplies = addUserApplies(limit, 0)
+
+	return validCoupon
+}
+
+func addUserApplies(limit, userId int) []prizedraw_dto.UserCouponApply {
+	userApplies := make([]prizedraw_dto.UserCouponApply, limit)
+	if userId != 0 {
+		userApplies[0] = prizedraw_dto.UserCouponApply{
+			UserId: userId,
+		}
+	}
+
 	for id := range limit {
-		validCoupon.UserCouponApplies[id] = prizedraw_dto.UserCouponApply{
+		userApplies[id] = prizedraw_dto.UserCouponApply{
 			UserId: id,
 		}
 
 	}
-
-	return validCoupon
+	return userApplies
 }
 
 func GetValidPrizeDraw() *prizedraw_dto.PrizeDrawDto {
@@ -124,11 +153,4 @@ func GetInactiveProductResponse() []byte {
 
 func GetNullResponse() []byte {
 	return []byte(`{}`)
-}
-
-func GetProductData() *prizedraw_dto.ProductData {
-	var product = &prizedraw_dto.ValidationData{}
-	json.Unmarshal(GetProductResponse(), product)
-
-	return product.Product
 }

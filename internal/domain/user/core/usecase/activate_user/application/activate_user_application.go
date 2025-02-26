@@ -75,6 +75,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		payloadCoupon := &payload.ActivateUserWithCouponConfirmedPayload{
 			UserId:     userSaved.Id,
 			CouponCode: userData.CouponCode,
+			Email:      userData.Email,
 		}
 
 		a.bus.EmitWithPayload(&activate_user.ActivateUserWithCouponConfirmedEvent{}, payloadCoupon)

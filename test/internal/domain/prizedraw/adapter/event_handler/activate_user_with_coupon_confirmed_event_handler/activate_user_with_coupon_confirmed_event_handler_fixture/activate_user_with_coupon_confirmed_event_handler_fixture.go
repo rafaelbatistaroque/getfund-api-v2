@@ -38,10 +38,11 @@ func GetInvalidActivateUserWithCouponConfirmedEvent() *activate_user.ActivateUse
 	return &activate_user.ActivateUserWithCouponConfirmedEvent{}
 }
 
-func GetValidActivateUserWithCouponConfirmedEvent(couponCode string, userId int) *activate_user.ActivateUserWithCouponConfirmedEvent {
+func GetValidActivateUserWithCouponConfirmedEvent(couponCode, email string, userId int) *activate_user.ActivateUserWithCouponConfirmedEvent {
 	payload, _ := json.Marshal(map[string]any{
 		"user_id":     userId,
 		"coupon_code": couponCode,
+		"email":       email,
 	})
 
 	event := &activate_user.ActivateUserWithCouponConfirmedEvent{}
@@ -85,7 +86,7 @@ func GetValidCoupon() *prizedraw_dto.CouponDto {
 	minus24Hours := time.Now().Add(24 * time.Hour).Unix()
 	return &prizedraw_dto.CouponDto{
 		Id:          1,
-		Code:        "fake-coupon-code",
+		Code:        "fake-coupon",
 		PrizeDrawId: 5,
 		ProductId:   10,
 		StartAt:     minus72Hours,

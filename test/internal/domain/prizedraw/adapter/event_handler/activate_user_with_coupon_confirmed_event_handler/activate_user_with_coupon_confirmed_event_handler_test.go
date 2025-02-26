@@ -24,7 +24,7 @@ func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetCouponByCodeWith
 	expectedCouponCode := "fake-coupon-code"
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent(expectedCouponCode, 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent(expectedCouponCode, "", 1))
 
 	//Assert
 	verify.Should(t, spies.RepoSpy.Params["GetCouponByCode:couponCode"]).Be(expectedCouponCode)
@@ -35,7 +35,7 @@ func Test_GivenHandler_WhenGetCouponByCodeInvoked_ThenEnsureCallsOnce(t *testing
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", "", 1))
 
 	//Assert
 	verify.Should(t, spies.RepoSpy.CallsCount["GetCouponByCode"]).Be(1)
@@ -47,7 +47,7 @@ func Test_GivenHandler_WhenGetCouponByCodeError_ThenEnsureNeverCallEmitWithPaylo
 	spies.RepoSpy.DefineGetCouponByCodeError()
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", "", 1))
 
 	//Assert
 	verify.Should(t, spies.ValidatePrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
@@ -58,7 +58,7 @@ func Test_GivenHandler_WhenGetCouponByCodeWithNullSuccess_ThenEnsureCallValidate
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", "", 1))
 
 	// Assert
 	verify.Should(t, spies.ValidatePrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
@@ -71,7 +71,7 @@ func Test_GivenHandler_WhenGetCouponByCodeSuccess_ThenEnsureCallValidateCouponWi
 	expectedInput := fixture.GetValidateCouponInput()
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("fake-coupon-code", "fake-email", 1))
 
 	// Assert
 	verify.Should(t, spies.ValidatePrizeDrawCouponSpy.Params["Execute:input"]).Be(expectedInput)
@@ -84,7 +84,7 @@ func Test_GivenHandler_WhenValidateCouponError_ThenEnsureNeverCallApplyCoupon(t 
 	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseError("")
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", "", 1))
 
 	// Assert
 	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
@@ -100,7 +100,7 @@ func Test_GivenHandler_WhenValidateCouponSuccess_ThenEnsureCallApplyCouponWithCo
 	expectedInputApply := fixture.GetApplyCouponInput(validCoupon, expectedUserId)
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", expectedUserId))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", "", expectedUserId))
 
 	// Assert
 	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.Params["Execute:input"]).Be(expectedInputApply)
@@ -113,7 +113,7 @@ func Test_GivenHandler_WhenApplyCouponInvoked_ThenEnsureCallsOnce(t *testing.T) 
 	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseSuccess()
 
 	// Act
-	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", 1))
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", "", 1))
 
 	// Assert
 	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.CallsCount["Execute"]).Be(1)

@@ -44,5 +44,6 @@ func GetValidateCouponInput() *validate_prizedraw_coupon.Input {
 		SelectedProductId:   10,
 		SelectedPrizeDrawId: 5,
 		UserId:              1,
+		Email:               "fake-email",
 	}
 }

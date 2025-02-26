@@ -1,81 +1,91 @@
 <body style="background: #f6f9fc; width: 100%;">
-    <div style="background: #ffffff; border-radius: 16px; margin: 20px auto; padding-bottom: 20px; width: 660px; min-width: 600px; height: auto;">
+  <div style="background: #ffffff; border-radius: 16px; margin: 20px auto; padding-bottom: 20px; width: 660px; min-width: 600px; height: auto;">
 
-      <!-- Header with blue background and logo -->
-      <div style="background: #2458db; height: 120px; text-align: center; padding-top: 20px; border-top-left-radius: 16px; border-top-right-radius: 16px;">
-        <div style="text-align: center; cursor: pointer;">
-          <a href="https://app.getfund.io" target="_blank">
-            <img alt="" src="https://getfund.io/wp-content/uploads/2024/04/GetFund.io-Logo-400-x-150.png"
-                 style="margin: 0 auto; display: block; max-width: 260px; min-width: 100px;">
-          </a>
-        </div>
+    <!-- Header with blue background and logo -->
+    <div style="background: #2458db; height: 120px; text-align: center; padding-top: 20px; border-top-left-radius: 16px; border-top-right-radius: 16px;">
+      <div style="text-align: center; cursor: pointer;">
+        <a href="https://app.getfund.io" target="_blank">
+          <img alt="" src="https://getfund.io/wp-content/uploads/2024/04/GetFund.io-Logo-400-x-150.png" style="margin: 0 auto; display: block; max-width: 260px; min-width: 100px;">
+        </a>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div style="max-width: 600px; margin: 0 auto;">
+      <h1 style="color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 28px; text-align: center; margin: 10px 0;">
+        Account Activation
+      </h1>
+
+      <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+        Hi {{first_name}},<br />Welcome to GetFund.io!
+      </p>
+
+      <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+        You're almost ready to start earning.<br />Please click the following link to verify your free account:
+      </p>
+
+      <!-- Activation Button -->
+      <div style="text-align: center; margin: 20px;">
+        <a href="{{activation_link}}" style="background: #2458db; color: #ffffff; text-decoration: none; font-size: 16px; padding: 12px 24px; border-radius: 8px; display: inline-block; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+          Activate Your Account
+        </a>
       </div>
 
-      <!-- Main Content Area -->
-      <div style="max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; font-size: 28px; text-align: center; margin: 10px 0;">
-          Account Activation
-        </h1>
-
-        <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
-          Hi {{first_name}},<br/>Welcome to GetFund.io!
-        </p>
-
-        <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
-          You're almost ready to start earning.<br/>Please click the following link to verify your free account:
-        </p>
-
-        <!-- Activation Button -->
-        <div style="text-align: center; margin: 20px;">
-          <a href="{{activation_link}}" style="background: #2458db; color: #ffffff; text-decoration: none; font-size: 16px; padding: 12px 24px; border-radius: 8px; display: inline-block; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
-            Activate Your Account
-          </a>
-        </div>
-
-        <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
-          Once you've verified your account, log in and explore our two exciting cooperative rounds opportunities:
-        </p>
-
-        <!-- Opportunities Blocks -->
-        <ul style="list-style-type: disc; text-align: left; margin: 20px 0; padding-left: 40px;">
-            <li style="margin-bottom: 20px;">
-              <h3 style="color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; margin-bottom: 5px;">
-                Free Reward Rounds
-              </h3>
-              <p style="font-size: 16px; line-height: 22px; color: #8898aa; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
-                Simple tasks for earning monthly small rewards. A great way to get started, free of charge! Start small and build your path to success!
-              </p>
-            </li>
-            <li style="margin-bottom: 20px;">
-              <h3 style="color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; margin-bottom: 5px;">
-                Funding Rounds
-              </h3>
-              <p style="font-size: 16px; line-height: 22px; color: #8898aa; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
-                Enter for less than $2 for a chance to win larger funding amounts, such as $1,000 or more. Our encrypted system ensures fair selection of members!
-              </p>
-            </li>
-          </ul>
-
-        <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
-          We're excited to have you on board!
-        </p>
-
-        <!-- Citation Block with Light Gray Background -->
-        <blockquote style="background: #f0f0f0; margin: 20px auto; padding: 20px; border-radius: 8px; font-style: italic; color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; text-align: center;">
-          When we don’t have many opportunities, we create our own!<br/>
-          The <a href="https://GetFund.io" style="color: #2458db; text-decoration: none;">GetFund.io</a> Team
-        </blockquote>
+      <div style="text-align: center; margin: 20px; ">
+        <span style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+          Can’t click the button?<br />Click the link below or paste it into your browser to activate your account.</span><br />
+        <a href="{{activation_link}}" style="font-size: 16px; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+          {{activation_link}}
+        </a>
       </div>
 
       <!-- Separator Line -->
       <div style="border-bottom: 1px solid #e1e1e1; width: 60%; margin: 30px auto;"></div>
 
-      <!-- Footer -->
-      <div style="margin: 0 40px;">
-        <p style="font-size: 16px; line-height: 22px; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; text-align: center; color: #8898aa;">
-          Need help? Contact our support team anytime at <a href="mailto:info@getfund.io" style="color: #2458db; text-decoration: none;">info@getfund.io</a>
-        </p>
-      </div>
+      <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+        Once you've verified your account, log in and explore our two exciting cooperative rounds opportunities:
+      </p>
 
+      <!-- Opportunities Blocks -->
+      <ul style="list-style-type: disc; text-align: left; margin: 20px 0; padding-left: 40px;">
+        <li style="margin-bottom: 20px;">
+          <h3 style="color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; margin-bottom: 5px;">
+            Free Cash Reward Rounds
+          </h3>
+          <p style="font-size: 16px; line-height: 22px; color: #8898aa; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+            Simple tasks for earning monthly small rewards. A great way to get started, free of charge! Start small and build your path to success!
+          </p>
+        </li>
+        <li style="margin-bottom: 20px;">
+          <h3 style="color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; margin-bottom: 5px;">
+            Funding Rounds
+          </h3>
+          <p style="font-size: 16px; line-height: 22px; color: #8898aa; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+            Enter for less than $2 for a chance to win larger funding amounts, such as $1,000 or more. Our encrypted system ensures fair selection of members!
+          </p>
+        </li>
+      </ul>
+
+      <p style="font-size: 18px; line-height: 24px; color: #32325d; text-align: center; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;">
+        We're excited to have you on board!
+      </p>
+
+      <!-- Citation Block with Light Gray Background -->
+      <blockquote style="background: #f0f0f0; margin: 20px auto; padding: 20px; border-radius: 8px; font-style: italic; color: #32325d; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; text-align: center;">
+        When we don’t have many opportunities, we create our own!<br />
+        The <a href="https://GetFund.io" style="color: #2458db; text-decoration: none;">GetFund.io</a> Team
+      </blockquote>
     </div>
-  </body>
+
+    <!-- Separator Line -->
+    <div style="border-bottom: 1px solid #e1e1e1; width: 60%; margin: 30px auto;"></div>
+
+    <!-- Footer -->
+    <div style="margin: 0 40px;">
+      <p style="font-size: 16px; line-height: 22px; font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; text-align: center; color: #8898aa;">
+        Need help? Contact our support team anytime at <a href="mailto:info@getfund.io" style="color: #2458db; text-decoration: none;">info@getfund.io</a>
+      </p>
+    </div>
+
+  </div>
+</body>

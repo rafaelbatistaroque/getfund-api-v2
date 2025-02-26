@@ -1,22 +1,16 @@
 package entity
 
 type Product struct {
-	id               int
-	isActive         bool
-	entranceQuantity int
+	id       int
+	isActive bool
 }
 
-func ProductFill(id int, isActive bool, entranceQuantity int) *Product {
+func ProductFill(id int, isActive bool) *Product {
 	return &Product{
-		id:               id,
-		isActive:         isActive,
-		entranceQuantity: entranceQuantity,
+		id:       id,
+		isActive: isActive,
 	}
 }
 func (p *Product) GetId() int { return p.id }
 
-func (p *Product) GetEntranceQuantity() int { return p.entranceQuantity }
-
-func (p *Product) IsActive() bool {
-	return p.isActive
-}
+func (p *Product) IsActive() bool { return p.isActive }

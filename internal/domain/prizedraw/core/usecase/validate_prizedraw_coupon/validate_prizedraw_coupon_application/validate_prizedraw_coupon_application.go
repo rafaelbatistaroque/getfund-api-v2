@@ -9,6 +9,7 @@ import (
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_payload"
 	"getfund-api-v2/internal/domain/prizedraw/core/entity"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
+	vo "getfund-api-v2/internal/domain/prizedraw/core/value_object"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/app_constant"
 	"getfund-api-v2/internal/shared/result_app"
@@ -30,12 +31,10 @@ const (
 	_EXPIRED_COUPON               = "coupon expired"
 	_HAS_NOT_START                = "coupon validity has not start yet"
 	_COUPON_APPLIED_BY_USER       = "coupon already applied by user"
+	_COUPON_NOT_APPLICABLE_EMAIL  = "coupon not applicable to this email"
 	_COUPON_ALREADY_APPLIED       = "coupon already applied"
+	_COUPON_LIMIT_REACHED         = "coupon application limit reached"
 	_FOUND_NULL                   = "coupon null"
-
-	UNIQUE_APPLICATION_TYPE = 1
-	LIMIT_APPLICATION_TYPE  = 2
-	EXPIRATION_TYPE         = 3
 )
 
 type validateCouponApplication struct {
@@ -66,7 +65,7 @@ func (v *validateCouponApplication) Execute(input *validate_prizedraw_coupon.Inp
 		return nil, applicationError
 	}
 	coupon := v.getCouponEntityFilled(couponDtoFound)
-	if err := v.isCouponValid(coupon, couponDtoFound.UserCouponApplies, input.UserId); err != nil {
+	if err := v.isCouponValid(coupon, input); err != nil {
 		return nil, err
 	}
 
@@ -89,18 +88,16 @@ func (v *validateCouponApplication) Execute(input *validate_prizedraw_coupon.Inp
 		return nil, applicationError
 	}
 
-	product := entity.ProductFill(validationData.Product.Id, validationData.Product.IsActive, validationData.Product.EntranceQuantity)
+	product := entity.ProductFill(validationData.Product.Id, validationData.Product.IsActive)
 	if applicationError := v.isProductValid(product, input.SelectedProductId); applicationError != nil {
 		return nil, applicationError
 	}
 
-	//return ValidationCouponData?
 	return &validate_prizedraw_coupon.Output{
-		Message:         "coupon is valid",
-		CouponId:        coupon.GetId(),
-		PrizeDrawId:     prizeDraw.GetId(),
-		ProductId:       product.GetId(),
-		ProductEntrance: product.GetEntranceQuantity(),
+		Message:     "coupon is valid",
+		CouponId:    coupon.GetId(),
+		PrizeDrawId: prizeDraw.GetId(),
+		ProductId:   product.GetId(),
 	}, nil
 }
 
@@ -137,10 +134,21 @@ func (v *validateCouponApplication) getCouponEntityFilled(couponDtoFound *prized
 		endAt = &endAtTime
 	}
 
+	couponType := vo.NewCouponType(couponDtoFound.CouponType.Id,
+		couponDtoFound.CouponType.Code,
+		couponDtoFound.CouponType.Description)
+
+	userCoupnApplies := make([]vo.UserCouponApply, len(couponDtoFound.UserCouponApplies))
+	for i, userCouponApply := range couponDtoFound.UserCouponApplies {
+		userCoupnApplies[i] = vo.NewUserCouponApply(userCouponApply.UserId)
+	}
+
 	return entity.CouponFill(
 		couponDtoFound.Id,
 		couponDtoFound.Code,
-		couponDtoFound.TypeApplicability,
+		couponDtoFound.LinkedEmail,
+		userCoupnApplies,
+		couponType,
 		couponDtoFound.PrizeDrawId,
 		couponDtoFound.ProductId,
 		couponDtoFound.LimitApplication,
@@ -149,30 +157,33 @@ func (v *validateCouponApplication) getCouponEntityFilled(couponDtoFound *prized
 	)
 }
 
-func (*validateCouponApplication) isCouponValid(coupon *entity.Coupon, userCouponApplies []prizedraw_dto.UserCouponApply, userId int) *result_app.ApplicationError {
+func (*validateCouponApplication) isCouponValid(coupon *entity.Coupon, input *validate_prizedraw_coupon.Input) *result_app.ApplicationError {
 	if coupon.NotStartYet() {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_HAS_NOT_START))
 	}
 
-	switch coupon.GetTypeApplicability() {
-	case UNIQUE_APPLICATION_TYPE:
-		if len(userCouponApplies) == 1 {
+	switch coupon.GetCouponType() {
+	case entity.UNIQUE_APPLICATION_BY_EMAIL_TYPE:
+		if coupon.IsNotSameLinkedEmail(input.Email) {
+			return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_NOT_APPLICABLE_EMAIL))
+		}
+	case entity.UNIQUE_APPLICATION_TYPE:
+		if coupon.CountApplies() >= 1 {
 			return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_ALREADY_APPLIED))
 		}
-	case LIMIT_APPLICATION_TYPE:
-		if coupon.ReachedApplicationLimit(len(userCouponApplies)) {
-			return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_ALREADY_APPLIED))
+	case entity.LIMIT_APPLICATION_TYPE:
+		if coupon.ReachedApplicationLimit() {
+			return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_LIMIT_REACHED))
 		}
-	case EXPIRATION_TYPE:
+	case entity.EXPIRATION_TYPE:
 		if coupon.IsExpired() {
 			return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_EXPIRED_COUPON))
 		}
 	}
 
-	for _, application := range userCouponApplies {
-		if application.UserId == userId {
-			return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_APPLIED_BY_USER))
-		}
+	//validate if user already applied coupon
+	if coupon.CouponAlreadyAppliedByUser(input.UserId) {
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_APPLIED_BY_USER))
 	}
 
 	return nil
@@ -199,6 +210,10 @@ func (v *validateCouponApplication) getValidationCouponFromResponse(responseChan
 			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_RESPONSE))
 		}
 
+		if validationCouponData.Product == nil {
+			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRODUCT))
+		}
+
 	case <-time.After(time.Duration(v.settings.GetTimeoutResponseEvent()) * time.Second):
 		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_TIME_OUT))
 	}
@@ -207,10 +222,6 @@ func (v *validateCouponApplication) getValidationCouponFromResponse(responseChan
 }
 
 func (*validateCouponApplication) isProductValid(product *entity.Product, selectedProductId int) *result_app.ApplicationError {
-	if product == nil {
-		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRODUCT))
-	}
-
 	if !product.IsActive() {
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INACTIVE_PRODUCT))
 	}

@@ -54,11 +54,11 @@ func (t *TemplateFileSpy) GetActivationAccountTemplate() (string, error) {
 }
 
 func (t *TemplateFileSpy) DefineGetActivationAccountTemplateSuccess() {
-	t.SuccessResult["GetActivationAccountTemplate"] = "<div>{{first_name}}</div><div>{{activation_link}}</div>"
+	t.SuccessResult["GetActivationAccountTemplate"] = "<div>{{first_name}}</div><div>{{activation_link}}</div><div>{{activation_link}}</div>"
 }
 
 func (t *TemplateFileSpy) GetGetActivationAccountTemplateReplaced(firstName, activationLink string) string {
-	return "<div>" + firstName + "</div><div>" + activationLink + "</div>"
+	return "<div>" + firstName + "</div><div>" + activationLink + "</div>" + "<div>" + activationLink + "</div>"
 }
 
 func (t *TemplateFileSpy) DefineGetActivationAccountTemplateError() {

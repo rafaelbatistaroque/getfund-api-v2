@@ -5,7 +5,6 @@ type ValidationData struct {
 }
 
 type ProductData struct {
-	Id               int  `json:"id"`
-	IsActive         bool `json:"is_active"`
-	EntranceQuantity int  `json:"entrance_qty"`
+	Id       int  `json:"id"`
+	IsActive bool `json:"is_active"`
 }

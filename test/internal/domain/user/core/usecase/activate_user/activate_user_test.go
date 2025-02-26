@@ -279,9 +279,11 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.RepoSpy.DefineCreateUserSuccess()
+	userData := fixture.GetUserDataWithCoupon()
 	expectedPaylod := &payload.ActivateUserWithCouponConfirmedPayload{
 		UserId:     spies.RepoSpy.SuccessResult["CreateUser"].(*user_dto.UserDto).Id,
-		CouponCode: fixture.GetUserDataWithCoupon().CouponCode,
+		CouponCode: userData.CouponCode,
+		Email:      userData.Email,
 	}
 
 	// Act

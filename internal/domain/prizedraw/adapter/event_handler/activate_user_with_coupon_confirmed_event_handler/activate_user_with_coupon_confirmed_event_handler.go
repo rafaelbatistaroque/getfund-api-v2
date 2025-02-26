@@ -30,9 +30,9 @@ func New(repository prizedraw_contract.Repository, validatePrizeDrawCoupon valid
 }
 
 var payload struct {
-	UserId            int    `json:"user_id"`
-	ActivationDataKey string `json:"activation_data_key"`
-	CouponCode        string `json:"coupon_code"`
+	UserId     int    `json:"user_id"`
+	Email      string `json:"email"`
+	CouponCode string `json:"coupon_code"`
 }
 
 func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
@@ -55,10 +55,11 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 
 	var erroUsecase = &result_app.ApplicationError{}
 	_, erroUsecase = h.validatePrizeDrawCoupon.Execute(&validate_prizedraw_coupon.Input{
-		CouponCode:          coupon.Code,
 		SelectedProductId:   coupon.ProductId,
 		SelectedPrizeDrawId: coupon.PrizeDrawId,
+		CouponCode:          payload.CouponCode,
 		UserId:              payload.UserId,
+		Email:               payload.Email,
 	})
 
 	if erroUsecase != nil {

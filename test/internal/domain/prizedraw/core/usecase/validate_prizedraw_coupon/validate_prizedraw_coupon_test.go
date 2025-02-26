@@ -40,6 +40,32 @@ func Test_GivenExecute_WhenCouponCodeInvalid_ThenEnsureReturnError(t *testing.T)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "CouponCode", 8))
 }
 
+func Test_GivenExecute_WhenEmailEmpty_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithEmptyEmail())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Email"))
+}
+
+func Test_GivenExecute_WhenEmailInvalid_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithInvalidEmail())
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_EMAIL_INVALID.Error(), "Email"))
+}
+
 func Test_GivenExecute_WhenInputValid_ThenEnsureCallGetCouponByCodeWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
@@ -102,11 +128,26 @@ func Test_GivenExecute_WhenCouponFoundValidityNotStartYet_ThenEnsureApropriateEr
 	verify.Should(t, err.Message.Error()).Be("coupon validity has not start yet")
 }
 
+func Test_GivenExecute_WhenCouponTypeIsUniqueApplicationByEmail_ThenEnsureApropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	validInput := fixture.GetInput()
+	couponAppliedByUser := fixture.GetValidCouponWithEmailLinked()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(couponAppliedByUser)
+
+	// Act
+	_, err := sut.Execute(validInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Message.Error()).Be("coupon not applicable to this email")
+}
+
 func Test_GivenExecute_WhenCouponTypeIsUniqueApplicationApplied_ThenEnsureApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput()
-	couponAppliedByUser := fixture.GetValidCouponWithApplication(validInput.UserId, 1)
+	couponAppliedByUser := fixture.GetValidCouponWithApplication(validInput.UserId, 2)
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(couponAppliedByUser)
 
 	// Act
@@ -121,7 +162,7 @@ func Test_GivenExecute_WhenCouponTypeIsByApplicationLimitReached_ThenEnsureAprop
 	// Arrange
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetInput()
-	couponAppliedByUser := fixture.GetValidCouponWithApplicationReached(5, 2)
+	couponAppliedByUser := fixture.GetValidCouponWithApplicationReached(5, 3)
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(couponAppliedByUser)
 
 	// Act
@@ -129,7 +170,7 @@ func Test_GivenExecute_WhenCouponTypeIsByApplicationLimitReached_ThenEnsureAprop
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, err.Message.Error()).Be("coupon already applied")
+	verify.Should(t, err.Message.Error()).Be("coupon application limit reached")
 }
 
 func Test_GivenExecute_WhenCouponAlreadyAppliedByUser_ThenEnsureApropriateError(t *testing.T) {
@@ -153,9 +194,9 @@ func Test_GivenExecute_WhenCouponFoundValidityHasEndAtLessThanNow_ThenEnsureApro
 	minus72Hours := time.Now().Add(-72 * time.Hour).Unix()
 	minus24Hours := time.Now().Add(-24 * time.Hour).Unix()
 	expectedCouponFound := &prizedraw_dto.CouponDto{
-		StartAt:           minus72Hours,
-		EndAt:             &minus24Hours,
-		TypeApplicability: 3,
+		StartAt:    minus72Hours,
+		EndAt:      &minus24Hours,
+		CouponType: prizedraw_dto.CouponTypeDto{Code: 4},
 	}
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(expectedCouponFound)
 
@@ -421,7 +462,6 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	validCoupon := fixture.GetValidCoupon()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(validCoupon)
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	productData := fixture.GetProductData()
 	spies.SettingsSpy.SetTimeoutResponseEvent(2)
 	resultChannel := make(chan *validate_prizedraw_coupon.Output, 1)
 
@@ -441,5 +481,4 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	verify.Should(t, resultUnwrapped.CouponId).Be(validCoupon.Id)
 	verify.Should(t, resultUnwrapped.PrizeDrawId).Be(validCoupon.PrizeDrawId)
 	verify.Should(t, resultUnwrapped.ProductId).Be(validCoupon.ProductId)
-	verify.Should(t, resultUnwrapped.ProductEntrance).Be(productData.EntranceQuantity)
 }
