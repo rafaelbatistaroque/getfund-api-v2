@@ -31,13 +31,9 @@ func (a *ApplyPrizeDrawCouponApplicationSpy) Execute(input *apply_prizedraw_coup
 
 func GetApplyCouponInput(from *prizedraw_dto.CouponDto, userId int) *apply_prizedraw_coupon.Input {
 	return &apply_prizedraw_coupon.Input{
-		Id:          from.Id,
-		Code:        from.Code,
+		CouponId:    from.Id,
 		PrizeDrawId: from.PrizeDrawId,
 		ProductId:   from.ProductId,
-		StartAt:     from.StartAt,
-		EndAt:       from.EndAt,
-		Discount:    from.Discount,
 		UserId:      userId,
 	}
 }

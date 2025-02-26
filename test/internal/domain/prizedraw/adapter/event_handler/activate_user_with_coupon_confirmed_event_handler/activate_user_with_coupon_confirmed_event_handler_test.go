@@ -1,6 +1,7 @@
 package activate_user_with_coupon_confirmed_event_handler_test
 
 import (
+	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	fixture "getfund-api-v2/test/internal/domain/prizedraw/adapter/event_handler/activate_user_with_coupon_confirmed_event_handler/activate_user_with_coupon_confirmed_event_handler_fixture"
 	"testing"
 
@@ -95,8 +96,12 @@ func Test_GivenHandler_WhenValidateCouponSuccess_ThenEnsureCallApplyCouponWithCo
 	sut, spies := fixture.NewSut()
 	validCoupon := fixture.GetValidCoupon()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(validCoupon)
-	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseSuccess()
 	expectedUserId := 3
+	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseSuccessWithOutput(&validate_prizedraw_coupon.Output{
+		CouponId:    validCoupon.Id,
+		PrizeDrawId: validCoupon.PrizeDrawId,
+		ProductId:   validCoupon.ProductId,
+	})
 	expectedInputApply := fixture.GetApplyCouponInput(validCoupon, expectedUserId)
 
 	// Act

@@ -37,6 +37,10 @@ func (uc *ValidatePrizeDrawCouponApplicationSpy) DefineValidateCouponUsecaseSucc
 	uc.SuccessResult["Execute"] = &validate_prizedraw_coupon.Output{}
 }
 
+func (uc *ValidatePrizeDrawCouponApplicationSpy) DefineValidateCouponUsecaseSuccessWithOutput(output *validate_prizedraw_coupon.Output) {
+	uc.SuccessResult["Execute"] = output
+}
+
 func GetValidateCouponInput() *validate_prizedraw_coupon.Input {
 
 	return &validate_prizedraw_coupon.Input{

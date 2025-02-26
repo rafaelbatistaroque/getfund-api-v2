@@ -129,31 +129,32 @@ func (v *validateCouponApplication) getCouponFromDb(couponCode string) (*prizedr
 
 func (v *validateCouponApplication) getCouponEntityFilled(couponDtoFound *prizedraw_dto.CouponDto) *entity.Coupon {
 	var endAt *time.Time
-	if couponDtoFound.EndAt != nil {
-		endAtTime := time.Unix(*couponDtoFound.EndAt, 0)
+	if couponDtoFound.CouponTypeApplicability.EndAt != nil {
+		endAtTime := time.Unix(*couponDtoFound.CouponTypeApplicability.EndAt, 0)
 		endAt = &endAtTime
 	}
 
-	couponType := vo.NewCouponType(couponDtoFound.CouponType.Id,
-		couponDtoFound.CouponType.Code,
-		couponDtoFound.CouponType.Description)
-
-	userCoupnApplies := make([]vo.UserCouponApply, len(couponDtoFound.UserCouponApplies))
+	userCoupnApplies := make([]vo.CouponUserApply, len(couponDtoFound.UserCouponApplies))
 	for i, userCouponApply := range couponDtoFound.UserCouponApplies {
 		userCoupnApplies[i] = vo.NewUserCouponApply(userCouponApply.UserId)
 	}
 
+	couponApplicability := vo.NewCouponTypeApplicability(
+		couponDtoFound.CouponTypeApplicability.Id,
+		couponDtoFound.CouponTypeApplicability.CouponTypeCode,
+		couponDtoFound.CouponTypeApplicability.LinkedEmail,
+		time.Unix(couponDtoFound.CouponTypeApplicability.StartAt, 0),
+		endAt,
+		couponDtoFound.CouponTypeApplicability.LimitApplication,
+	)
+
 	return entity.CouponFill(
 		couponDtoFound.Id,
 		couponDtoFound.Code,
-		couponDtoFound.LinkedEmail,
-		userCoupnApplies,
-		couponType,
 		couponDtoFound.PrizeDrawId,
 		couponDtoFound.ProductId,
-		couponDtoFound.LimitApplication,
-		time.Unix(couponDtoFound.StartAt, 0),
-		endAt,
+		userCoupnApplies,
+		couponApplicability,
 	)
 }
 
@@ -162,7 +163,7 @@ func (*validateCouponApplication) isCouponValid(coupon *entity.Coupon, input *va
 		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_HAS_NOT_START))
 	}
 
-	switch coupon.GetCouponType() {
+	switch coupon.GetCouponTypeCode() {
 	case entity.UNIQUE_APPLICATION_BY_EMAIL_TYPE:
 		if coupon.IsNotSameLinkedEmail(input.Email) {
 			return result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_NOT_APPLICABLE_EMAIL))

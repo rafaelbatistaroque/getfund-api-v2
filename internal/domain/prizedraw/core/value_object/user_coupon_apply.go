@@ -1,19 +1,19 @@
 package value_object
 
-type UserCouponApply struct {
+type CouponUserApply struct {
 	userId int
 }
 
-func NewUserCouponApply(userId int) UserCouponApply {
-	return UserCouponApply{
+func NewUserCouponApply(userId int) CouponUserApply {
+	return CouponUserApply{
 		userId: userId,
 	}
 }
 
-func (u UserCouponApply) GetUserId() int {
+func (u CouponUserApply) GetUserId() int {
 	return u.userId
 }
 
-func (u UserCouponApply) IsEqual(userId int) bool {
+func (u CouponUserApply) IsEqual(userId int) bool {
 	return u.userId == userId
 }

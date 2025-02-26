@@ -33,12 +33,13 @@ func New(appSettings settings.ApplicationSettings) *gorm.DB {
 		&schema.Country{},
 		&schema.User{},
 		&schema.Product{},
+		&schema.CouponTypeApplicability{},
 		&schema.CouponType{},
 		&schema.Entrance{},
 		&schema.PrizeDraw{},
 		&schema.Coupon{},
 		&schema.Purchase{},
-		&schema.UserCoupon{},
+		&schema.UserCouponApply{},
 		&schema.FreeFundingUserEntrances{},
 	)
 
@@ -47,15 +48,7 @@ func New(appSettings settings.ApplicationSettings) *gorm.DB {
 		return nil
 	}
 
-	Seed(db)
-	// errMigration = db.Exec(`
-	// 	ALTER TABLE entrance
-	// 	ADD CONSTRAINT fk_entrance_prize_draw
-	// 	FOREIGN KEY (prize_draw_id) REFERENCES prize_draw(id) ON DELETE CASCADE;
-	// `).Error
-	// if errMigration != nil {
-	// 	log.Fatalf("Erro ao adicionar a constraint fk_entrance_prize_draw: %v", err)
-	// }
+	//Seed(db)
 
 	logger.Info("Database connected")
 	return db

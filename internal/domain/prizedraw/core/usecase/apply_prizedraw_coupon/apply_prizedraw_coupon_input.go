@@ -7,14 +7,10 @@ import (
 type Input = applyCouponInput
 
 type applyCouponInput struct {
-	Id          int    `json:"id"`
-	Code        string `json:"code"`
-	PrizeDrawId int    `json:"prize_draw_id"`
-	ProductId   int    `json:"product_id"`
-	StartAt     int64  `json:"start_at"`
-	EndAt       *int64 `json:"end_at"`
-	Discount    int    `json:"discount"`
-	UserId      int    `json:"user_id"`
+	CouponId    int `json:"coupon_id"`
+	PrizeDrawId int `json:"prize_draw_id"`
+	ProductId   int `json:"product_id"`
+	UserId      int `json:"user_id"`
 
 	rules validation.Rule
 }

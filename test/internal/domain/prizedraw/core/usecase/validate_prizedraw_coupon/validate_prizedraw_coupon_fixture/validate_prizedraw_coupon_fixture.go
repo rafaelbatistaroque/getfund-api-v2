@@ -2,8 +2,9 @@ package validate_prizedraw_coupon_fixture
 
 import (
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/entity"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
-	validate_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/validate_prizedraw_coupon_application"
+	validate_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/application"
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
 	"getfund-api-v2/test/helper/settings_spy"
@@ -85,21 +86,31 @@ func WithSelectedPrizeDrawId(id int) Option {
 }
 
 func GetValidCoupon() *prizedraw_dto.CouponDto {
-	minus72Hours := time.Now().Add(-24 * time.Hour).Unix()
-	minus24Hours := time.Now().Add(24 * time.Hour).Unix()
+	less72Hours := time.Now().Add(-24 * time.Hour).Unix()
+	more24Hours := time.Now().Add(24 * time.Hour).Unix()
+	email := "fake@mail.com"
 	return &prizedraw_dto.CouponDto{
-		StartAt:     minus72Hours,
-		EndAt:       &minus24Hours,
 		ProductId:   10,
 		PrizeDrawId: 5,
 		Id:          1,
-		LinkedEmail: "fake@mail.com",
+		CouponTypeApplicability: &prizedraw_dto.CouponTypeApplicabilityDto{
+			StartAt:     less72Hours,
+			EndAt:       &more24Hours,
+			LinkedEmail: &email,
+		},
 	}
 }
 
-func GetValidCouponWithApplication(userId, couponType int) *prizedraw_dto.CouponDto {
+func GetCouponNotStartYet(startAt time.Duration) *prizedraw_dto.CouponDto {
 	validCoupon := GetValidCoupon()
-	validCoupon.CouponType = prizedraw_dto.CouponTypeDto{Code: uint(couponType)}
+	validCoupon.CouponTypeApplicability.StartAt = int64(startAt)
+
+	return validCoupon
+}
+
+func GetValidCouponWithApplication(userId int, couponTypeCode string) *prizedraw_dto.CouponDto {
+	validCoupon := GetValidCoupon()
+	validCoupon.CouponTypeApplicability.CouponTypeCode = couponTypeCode
 	validCoupon.UserCouponApplies = addUserApplies(2, userId)
 
 	return validCoupon
@@ -107,31 +118,42 @@ func GetValidCouponWithApplication(userId, couponType int) *prizedraw_dto.Coupon
 
 func GetValidCouponWithEmailLinked() *prizedraw_dto.CouponDto {
 	validCoupon := GetValidCoupon()
-	validCoupon.CouponType = prizedraw_dto.CouponTypeDto{Code: 1}
+	validCoupon.CouponTypeApplicability.CouponTypeCode = entity.UNIQUE_APPLICATION_BY_EMAIL_TYPE
 	validCoupon.UserCouponApplies = addUserApplies(1, 1)
 
 	return validCoupon
 }
 
-func GetValidCouponWithApplicationReached(limit, couponType int) *prizedraw_dto.CouponDto {
+func GetValidCouponWithApplicationReached(limit int, couponTypeCode string) *prizedraw_dto.CouponDto {
 	validCoupon := GetValidCoupon()
-	validCoupon.LimitApplication = &limit
-	validCoupon.CouponType = prizedraw_dto.CouponTypeDto{Code: uint(couponType)}
+	validCoupon.CouponTypeApplicability.LimitApplication = &limit
+	validCoupon.CouponTypeApplicability.CouponTypeCode = couponTypeCode
 	validCoupon.UserCouponApplies = addUserApplies(limit, 0)
 
 	return validCoupon
 }
 
-func addUserApplies(limit, userId int) []prizedraw_dto.UserCouponApply {
-	userApplies := make([]prizedraw_dto.UserCouponApply, limit)
+func GetExpiredCoupon() *prizedraw_dto.CouponDto {
+	minus72Hours := time.Now().Add(-72 * time.Hour).Unix()
+	minus24Hours := time.Now().Add(-24 * time.Hour).Unix()
+	validCoupon := GetValidCoupon()
+	validCoupon.CouponTypeApplicability.StartAt = minus72Hours
+	validCoupon.CouponTypeApplicability.EndAt = &minus24Hours
+	validCoupon.CouponTypeApplicability.CouponTypeCode = entity.EXPIRATION_TYPE
+
+	return validCoupon
+}
+
+func addUserApplies(limit, userId int) []prizedraw_dto.UserCouponApplyDto {
+	userApplies := make([]prizedraw_dto.UserCouponApplyDto, limit)
 	if userId != 0 {
-		userApplies[0] = prizedraw_dto.UserCouponApply{
+		userApplies[0] = prizedraw_dto.UserCouponApplyDto{
 			UserId: userId,
 		}
 	}
 
 	for id := range limit {
-		userApplies[id] = prizedraw_dto.UserCouponApply{
+		userApplies[id] = prizedraw_dto.UserCouponApplyDto{
 			UserId: id,
 		}
 
