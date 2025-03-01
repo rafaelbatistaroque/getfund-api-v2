@@ -1,6 +1,7 @@
 package prizedraw_repository
 
 import (
+	"errors"
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
 	"getfund-api-v2/pkg/db/schema"
@@ -20,8 +21,13 @@ func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto
 	var coupon = &schema.Coupon{}
 
 	result := p.db.
-		Select("").
-		Find(coupon)
+		Select("id").
+		Where("code=?", couponCode).
+		First(coupon)
+
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, errors.New("coupon not found")
+	}
 
 	if result.Error != nil {
 		return nil, result.Error
