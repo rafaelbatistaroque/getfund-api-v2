@@ -10,7 +10,11 @@ import (
 )
 
 func NewSUT() (prizedraw_contract.Repository, *gorm.DB) {
-	db := db_fixture.NewMemoryDB(&schema.Coupon{})
+	db := db_fixture.NewMemoryDB(
+		&schema.Coupon{},
+		&schema.CouponTypeApplicability{},
+		&schema.UserCouponApply{},
+	)
 
 	return prizedraw_repository.New(db), db
 }
