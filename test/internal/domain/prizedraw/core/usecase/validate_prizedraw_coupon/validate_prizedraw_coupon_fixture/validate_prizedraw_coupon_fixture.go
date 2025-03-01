@@ -101,6 +101,13 @@ func GetValidCoupon() *prizedraw_dto.CouponDto {
 	}
 }
 
+func GetCouponWithoutPrizeDrawLinked(id int) *prizedraw_dto.CouponDto {
+	validCoupon := GetValidCoupon()
+	validCoupon.PrizeDrawId = id
+
+	return validCoupon
+}
+
 func GetCouponNotStartYet(startAt time.Duration) *prizedraw_dto.CouponDto {
 	validCoupon := GetValidCoupon()
 	validCoupon.CouponTypeApplicability.StartAt = int64(startAt)

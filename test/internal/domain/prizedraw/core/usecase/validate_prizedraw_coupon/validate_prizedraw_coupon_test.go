@@ -203,6 +203,19 @@ func Test_GivenExecute_WhenCouponAlreadyAppliedByUser_ThenEnsureApropriateError(
 	verify.Should(t, err.Message.Error()).Be("coupon already applied by user")
 }
 
+func Test_GivenExecute_WhenCouponValidityIsValidWithoutPrizeDrawLinked_ThenEnsureCallGetPrizeDrawByIdWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetCouponWithoutPrizeDrawLinked(0))
+	expectedPrizedDrawId := 40
+
+	// Act
+	sut.Execute(fixture.GetInput(fixture.WithSelectedPrizeDrawId(expectedPrizedDrawId)))
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.Params["GetPrizeDrawById:id"]).Be(expectedPrizedDrawId)
+}
+
 func Test_GivenExecute_WhenCouponValidityIsValid_ThenEnsureCallGetPrizeDrawByIdWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
