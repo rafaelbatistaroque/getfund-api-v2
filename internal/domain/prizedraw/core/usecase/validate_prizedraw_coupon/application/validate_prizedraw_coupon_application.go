@@ -35,6 +35,8 @@ const (
 	_COUPON_ALREADY_APPLIED       = "coupon already applied"
 	_COUPON_LIMIT_REACHED         = "coupon application limit reached"
 	_FOUND_NULL                   = "coupon null"
+
+	_NO = 0
 )
 
 type validateCouponApplication struct {
@@ -67,6 +69,11 @@ func (v *validateCouponApplication) Execute(input *validate_prizedraw_coupon.Inp
 	coupon := v.getCouponEntityFilled(couponDtoFound)
 	if err := v.isCouponValid(coupon, input); err != nil {
 		return nil, err
+	}
+
+	//has prizeDraw linked
+	if coupon.GetPrizeDrawId() == _NO {
+		coupon.SetPrazeDrawId(input.SelectedPrizeDrawId)
 	}
 
 	//Handle PrizeDraw validation

@@ -64,3 +64,7 @@ func (c *Coupon) CouponAlreadyAppliedByUser(userId int) bool {
 	}
 	return false
 }
+
+func (c *Coupon) SetPrazeDrawId(prizeDrawId int) {
+	c.prizeDrawId = prizeDrawId
+}
