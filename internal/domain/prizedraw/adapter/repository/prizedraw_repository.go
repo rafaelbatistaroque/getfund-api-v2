@@ -21,7 +21,9 @@ func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto
 	var coupon = &schema.Coupon{}
 
 	result := p.db.
-		Select("id").
+		Preload("CouponTypeApplicability").
+		Preload("UserCouponApply").
+		Select("id, code, product_id, prize_draw_id, cupon_type_applicability_id").
 		Where("code=?", couponCode).
 		First(coupon)
 
@@ -33,7 +35,29 @@ func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto
 		return nil, result.Error
 	}
 
-	return nil, nil
+	userApply := make([]prizedraw_dto.UserCouponApplyDto, len(coupon.UserCouponApply))
+	for i, apply := range coupon.UserCouponApply {
+		userApply[i] = prizedraw_dto.UserCouponApplyDto{
+			UserId:   apply.UserID,
+			CouponId: apply.CouponID,
+		}
+	}
+
+	return &prizedraw_dto.CouponDto{
+		Id:                int(coupon.ID),
+		Code:              coupon.Code,
+		PrizeDrawId:       coupon.PrizeDrawID,
+		ProductId:         coupon.ProductID,
+		UserCouponApplies: userApply,
+		CouponTypeApplicability: &prizedraw_dto.CouponTypeApplicabilityDto{
+			Id:               coupon.CouponTypeApplicability.ID,
+			CouponTypeCode:   coupon.CouponTypeApplicability.CouponTypeCode,
+			LimitApplication: coupon.CouponTypeApplicability.LimitApplication,
+			LinkedEmail:      coupon.CouponTypeApplicability.LinkedEmail,
+			StartAt:          coupon.CouponTypeApplicability.StartAt,
+			EndAt:            coupon.CouponTypeApplicability.EndAt,
+		},
+	}, nil
 }
 
 func (p *prizedrawRepository) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDrawDto, error) {
