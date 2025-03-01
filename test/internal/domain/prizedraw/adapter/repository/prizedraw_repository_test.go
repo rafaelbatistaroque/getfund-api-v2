@@ -19,3 +19,14 @@ func Test_GivenGetCouponByCode_WhenQueryError_ThenEnsureReturnError(t *testing.T
 	// Assert
 	verify.Should(t, err).NotNil()
 }
+
+func Test_GivenGetCouponByCode_WhenNotFound_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSUT()
+
+	// Act
+	_, err := sut.GetCouponByCode("non-existent-username")
+
+	// Assert
+	verify.Should(t, err.Error()).Be("coupon not found")
+}
