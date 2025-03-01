@@ -23,7 +23,7 @@ func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto
 	result := p.db.
 		Preload("CouponTypeApplicability").
 		Preload("UserCouponApply").
-		Select("id, code, product_id, prize_draw_id, cupon_type_applicability_id").
+		Select("id, code, product_id, prize_draw_id, coupon_type_applicability_id").
 		Where("code=?", couponCode).
 		First(coupon)
 
