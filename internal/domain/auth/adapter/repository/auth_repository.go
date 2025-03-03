@@ -13,7 +13,7 @@ type authRepository struct {
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) auth_contract.AuthRepository {
+func New(db *gorm.DB) auth_contract.Repository {
 	return &authRepository{db: db}
 }
 
@@ -51,4 +51,47 @@ func (r *authRepository) UpdatePassword(id int, value string) error {
 	}
 
 	return nil
+}
+
+func (u *authRepository) CreateUser(dto *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+	var user = schema.User{
+		FirstName: dto.FirstName,
+		LastName:  dto.LastName,
+		Username:  dto.Username,
+		Password:  dto.Password,
+		IsAdmin:   dto.IsAdmin,
+		IsActive:  dto.IsActive,
+		CreatedAt: dto.CreatedAt,
+		UpdatedAt: dto.UpdatedAt,
+	}
+
+	result := u.db.Create(&user)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &auth_dto.UserDto{
+		Id: int(user.ID),
+	}, nil
+}
+
+func (u *authRepository) UserExists(username string) (*auth_dto.UserDto, error) {
+	var user = schema.User{}
+	result := u.db.
+		Select("id").
+		Where("username = ?", username).
+		First(&user)
+
+	if result.Error == gorm.ErrRecordNotFound {
+		return nil, nil
+	}
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &auth_dto.UserDto{
+		Id: int(user.ID),
+	}, nil
 }

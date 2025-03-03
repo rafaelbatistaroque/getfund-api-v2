@@ -54,7 +54,7 @@ func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.R
 }
 
 func GetSigninInput() *signin.Input {
-	return &signin.Input{UserName: "fake-username", Password: "fake-password"}
+	return &signin.Input{Username: "fake-username", Password: "fake-password"}
 }
 
 func GetSigninInputSerialized() string {

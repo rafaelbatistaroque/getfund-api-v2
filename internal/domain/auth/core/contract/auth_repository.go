@@ -1,8 +1,12 @@
 package auth_contract
 
-import model "getfund-api-v2/internal/domain/auth/core/auth_dto"
+import (
+	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+)
 
-type AuthRepository interface {
-	GetAuthenticatedUserByUsername(username string) (*model.AuthenticatedUserDto, error)
+type Repository interface {
+	GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error)
 	UpdatePassword(id int, value string) error
+	CreateUser(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error)
+	UserExists(username string) (*auth_dto.UserDto, error)
 }

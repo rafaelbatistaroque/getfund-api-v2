@@ -8,7 +8,7 @@ type Input = sendActivationAccountMailInput
 
 type sendActivationAccountMailInput struct {
 	FirstName      string `json:"first_name"`
-	Email          string `json:"email"`
+	Email          string `json:"username"`
 	ActivationLink string `json:"activation_link"`
 
 	rules validation.Rule

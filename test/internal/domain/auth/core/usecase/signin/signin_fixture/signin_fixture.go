@@ -32,15 +32,15 @@ func NewSut() (signin.UseCase, *SigninFixture) {
 }
 
 func GetValidInput() *signin.Input {
-	return &signin.Input{Password: "fake-password", UserName: "fake-username"}
+	return &signin.Input{Password: "fake-password", Username: "fake-username"}
 }
 
 func GetInputWithUserNameInvalid() (*signin.Input, *result_app.ApplicationError) {
-	return &signin.Input{UserName: "", Password: "fake-password"},
+	return &signin.Input{Username: "", Password: "fake-password"},
 		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "UserName"))
 }
 
 func GetInputWithPasswordInvalid() (*signin.Input, *result_app.ApplicationError) {
-	return &signin.Input{Password: "", UserName: "fake-username"},
+	return &signin.Input{Password: "", Username: "fake-username"},
 		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
 }

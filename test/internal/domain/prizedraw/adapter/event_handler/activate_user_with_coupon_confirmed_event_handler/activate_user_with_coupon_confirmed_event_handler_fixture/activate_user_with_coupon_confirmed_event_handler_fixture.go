@@ -2,9 +2,9 @@ package activate_user_with_coupon_confirmed_event_handler_fixture
 
 import (
 	"encoding/json"
+	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
 	event_handler "getfund-api-v2/internal/domain/prizedraw/adapter/event_handler/activate_user_with_coupon_confirmed_event_handler"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
-	"getfund-api-v2/internal/domain/user/core/usecase/activate_user"
 	"getfund-api-v2/pkg/bus"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
@@ -57,31 +57,6 @@ func GetCacheDataWithInvalidCoupon() string {
 func GetCacheDataWithValidCoupon() string {
 	return `{"is_valid": true, "coupon_data": {"id": 1, "code": "fake-coupon-code", "prize_draw_id": 1, "product_id": 1, "start_at": 1709596800, "end_at": 1709596800, "discount": 200}}`
 }
-
-// func GetCouponData() coupon_common.CacheCouponData {
-// 	var couponData = coupon_common.CacheCouponData{}
-
-// 	json.Unmarshal([]byte(GetCacheDataWithValidCoupon()), &couponData)
-
-// 	return couponData
-// }
-
-// func (v *ActivateUserWithCouponConfirmedEventHandlerFixture) GetCouponDataFromSuccessDB() *coupon_common.CouponData {
-// 	couponFromDb := v.RepoSpy.SuccessResult["GetCouponByCode"].(*prizedraw_dto.CouponDto)
-
-// 	couponTypeApplicability := &prizedraw_dto.CouponTypeApplicabilityDto{
-// 		StartAt: couponFromDb.CouponTypeApplicability.StartAt,
-// 		EndAt:   couponFromDb.CouponTypeApplicability.EndAt,
-// 	}
-
-// 	return &coupon_common.CouponData{
-// 		Id:          couponFromDb.Id,
-// 		Code:        couponFromDb.Code,
-// 		PrizeDrawId: couponFromDb.PrizeDrawId,
-// 		ProductId:   couponFromDb.ProductId,
-
-// 	}
-// }
 
 func GetValidCoupon() *prizedraw_dto.CouponDto {
 	minus72Hours := time.Now().Add(-24 * time.Hour).Unix()

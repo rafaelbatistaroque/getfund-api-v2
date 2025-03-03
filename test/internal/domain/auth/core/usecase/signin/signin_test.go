@@ -45,7 +45,7 @@ func Test_GivenSigninExecute_WhenAuthenticateInvoke_ThenEnsureCallsWithCorrectPa
 
 	// Assert
 	verify.Should(t, spies.AuthServiceSpy.Params["password"]).Be(correctParam.Password)
-	verify.Should(t, spies.AuthServiceSpy.Params["username"]).Be(correctParam.UserName)
+	verify.Should(t, spies.AuthServiceSpy.Params["username"]).Be(correctParam.Username)
 	verify.Should(t, spies.AuthServiceSpy.Params).Len(2)
 }
 

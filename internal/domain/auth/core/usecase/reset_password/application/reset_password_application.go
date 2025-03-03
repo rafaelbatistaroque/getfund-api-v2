@@ -12,10 +12,10 @@ import (
 
 type resetPasswordApplication struct {
 	cacheService   cache_service.Cache
-	authRepository auth_contract.AuthRepository
+	authRepository auth_contract.Repository
 }
 
-func New(cacheService cache_service.Cache, authRepository auth_contract.AuthRepository) *resetPasswordApplication {
+func New(cacheService cache_service.Cache, authRepository auth_contract.Repository) *resetPasswordApplication {
 	return &resetPasswordApplication{
 		cacheService:   cacheService,
 		authRepository: authRepository,

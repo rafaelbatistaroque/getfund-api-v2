@@ -2,9 +2,9 @@ package create_user_process_started_event_handler_fixture
 
 import (
 	"encoding/json"
+	"getfund-api-v2/internal/domain/auth/core/usecase/create_user"
 	notification_payload "getfund-api-v2/internal/domain/notification/adapter/event_handler/create_user_process_started_event_handler"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_activation_account_mail"
-	"getfund-api-v2/internal/domain/user/core/usecase/create_user"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus"
 	"getfund-api-v2/test/helper/cache_spy"

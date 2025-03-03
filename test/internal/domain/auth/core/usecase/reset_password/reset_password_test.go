@@ -169,8 +169,9 @@ func Test_GivenExecute_WhenGetCacheError_ThenEnsureReturnNotFoundWithErrorFrom(t
 func Test_GivenExecute_WhenExecuteFinished_ThenEnsureDeleteCacheInOrderWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	validInput := fixture.GetInput()
 	spies.CacheSpy.DefineCacheGetSuccess("")
+	validInput := fixture.GetInput()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Execute(validInput)
@@ -185,6 +186,7 @@ func Test_GivenExecute_WhenExecuteFinished_ThenEnsureCallDeleteCacheOnce(t *test
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -210,90 +212,92 @@ func Test_GivenExecute_WhenGetCacheSuccess_ThenEnsureCallGetAuthenticatedUserByU
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(`{"username":"fake-username"}`)
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	expectedParam := fixture.GetForgetPasswordFromGetSuccessCache(spies.CacheSpy)
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.AuthRepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedParam.Username)
+	verify.Should(t, spies.RepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedParam.Username)
 }
 
 func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.AuthRepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
 }
 
 func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnNotFoundError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameError()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
-	verify.Should(t, err.Message).Be(spies.AuthRepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
 func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallUpdatePasswordWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	expectedParamPassword := fixture.GetInput()
 
 	// Act
 	sut.Execute(expectedParamPassword)
 
 	// Assert
-	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
-	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:id"]).Be(authenticatedUser.Id)
-	verify.Should(t, spies.AuthRepoSpy.Params["UpdatePassword:value"]).Be(expectedParamPassword.Password)
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	verify.Should(t, spies.RepoSpy.Params["UpdatePassword:id"]).Be(authenticatedUser.Id)
+	verify.Should(t, spies.RepoSpy.Params["UpdatePassword:value"]).Be(expectedParamPassword.Password)
 }
 
 func Test_GivenExecute_WhenUpdatePasswordInvoke_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.AuthRepoSpy.CallsCount["UpdatePassword"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["UpdatePassword"]).Be(1)
 }
 
 func Test_GivenExecute_WhenUpdatePasswordError_ThenEnsureReturnServerError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
-	spies.AuthRepoSpy.DefineUpdatePasswordError()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+	spies.RepoSpy.DefineUpdatePasswordError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.AuthRepoSpy.ErrorResult["UpdatePassword"])
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["UpdatePassword"])
 }
 
 func Test_GivenExecute_WhenResetPasswordSuccess_ThenEnsureReturnAppropriateSuccessMessage(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess("")
-	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	result, err := sut.Execute(fixture.GetInput())

@@ -15,8 +15,8 @@ import (
 
 func Test_GivenRecoverPasswordExecute_WhenInputTokenInvalid_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
-	invalidInput, expectedError := fixture.GetInvalidInputWithError()
 	sut, _ := fixture.NewSut()
+	invalidInput, expectedError := fixture.GetInvalidInputWithError()
 
 	// Act
 	_, err := sut.Execute(invalidInput)
@@ -29,43 +29,46 @@ func Test_GivenRecoverPasswordExecute_WhenInputTokenInvalid_ThenEnsureReturnErro
 
 func Test_GivenRecoverPasswordExecute_WhenValidInput_ThenEnsureCallGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
-	expectedInput := fixture.GetValidInput()
 	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+	expectedInput := fixture.GetValidInput()
 
 	// Act
 	sut.Execute(expectedInput)
 
 	// Assert
-	verify.Should(t, spies.AuthRepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedInput.Username)
+	verify.Should(t, spies.RepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedInput.Username)
 }
 
 func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.AuthRepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
 }
 
 func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameError()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
-	verify.Should(t, err.Message).Be(spies.AuthRepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
 func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameSuccess_ThenEnsureCallGetRandomCodeWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Execute(fixture.GetValidInput())
@@ -77,6 +80,7 @@ func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameSuccess_
 func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.Execute(fixture.GetValidInput())
@@ -101,6 +105,7 @@ func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeError_ThenEnsureReturnErr
 func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeSuccess_ThenEnsureCallsHashWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 
 	// Act
@@ -128,12 +133,12 @@ func Test_GivenRecoverPasswordExecute_WhenHashSuccess_ThenEnsureCallCacheSetWith
 	// Arrange
 	sut, spies := fixture.NewSut()
 	validInput := fixture.GetValidInput()
-	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineDecryptMergedSuccess("fake-first-name")
 	spies.HasherSpy.DefineHashSuccess()
 	hashCode := spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data
 	expectedKey := "recovery_password_" + hashCode
-	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
 	expectedValue := auth_dto.ForgetPasswordDto{
 		Username:     validInput.Username,
 		FirstName:    authenticatedUser.FirstName,
@@ -152,6 +157,7 @@ func Test_GivenRecoverPasswordExecute_WhenHashSuccess_ThenEnsureCallCacheSetWith
 func Test_GivenRecoverPasswordExecute_WhenCacheSetError_ThenEnsureReturnErrorFromWithServerErrorCode(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.CacheSpy.DefineCacheSetError()
 
 	// Act
@@ -165,6 +171,7 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetError_ThenEnsureReturnErrorFro
 func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallPublishWithPayloadWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineHashSuccess()
 	expectedPaylod := "recovery_password_" + spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data
 
@@ -178,7 +185,8 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallPublishW
 
 func Test_GivenRecoverPasswordExecute_WhenPublishWithPayload_ThenEnsureReturnOutput(t *testing.T) {
 	// Arrange
-	sut, _ := fixture.NewSut()
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	result, _ := sut.Execute(fixture.GetValidInput())

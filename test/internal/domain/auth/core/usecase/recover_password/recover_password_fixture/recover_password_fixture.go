@@ -17,7 +17,7 @@ import (
 type RecoverPasswordFixture struct {
 	HasherSpy   *security_spy.HasherSpy
 	SettingsSpy *settings_spy.ApplicationSettingsSpy
-	AuthRepoSpy *auth_repository_spy.AuthRepositorySpy
+	RepoSpy     *auth_repository_spy.AuthRepositorySpy
 	CacheSpy    *cache_spy.RedisCacheSpy
 	EventBusSpy *eventbus_spy.EventBusSpy
 }
@@ -33,7 +33,7 @@ func NewSut() (recover_password.UseCase, *RecoverPasswordFixture) {
 		&RecoverPasswordFixture{
 			HasherSpy:   hasherSpy,
 			SettingsSpy: settingsSpy,
-			AuthRepoSpy: AuthRepoSpy,
+			RepoSpy:     AuthRepoSpy,
 			CacheSpy:    cacheSpy,
 			EventBusSpy: eventBusSpy,
 		}

@@ -19,7 +19,7 @@ const (
 type recoverPasswordApplication struct {
 	hasher         security.Hasher
 	settings       settings.ApplicationSettings
-	authRepository auth_contract.AuthRepository
+	authRepository auth_contract.Repository
 	cacheService   cache_service.Cache
 	bus            bus.EventBus
 }
@@ -27,7 +27,7 @@ type recoverPasswordApplication struct {
 func New(
 	hasher security.Hasher,
 	settings settings.ApplicationSettings,
-	authRepository auth_contract.AuthRepository,
+	authRepository auth_contract.Repository,
 	cacheService cache_service.Cache,
 	bus bus.EventBus) recover_password.UseCase {
 

@@ -16,13 +16,13 @@ type AuthService interface {
 
 type authService struct {
 	settings       settings.ApplicationSettings
-	authRepository auth_contract.AuthRepository
+	authRepository auth_contract.Repository
 	hasher         security.Hasher
 	mapper         signin_mapper.SigninMapper
 }
 
 func New(
-	authRepository auth_contract.AuthRepository,
+	authRepository auth_contract.Repository,
 	settings settings.ApplicationSettings,
 	hasher security.Hasher,
 	mapper signin_mapper.SigninMapper) AuthService {

@@ -10,17 +10,17 @@ import (
 )
 
 type ResetPasswordFixture struct {
-	CacheSpy    *cache_spy.RedisCacheSpy
-	AuthRepoSpy *auth_repository_spy.AuthRepositorySpy
+	CacheSpy *cache_spy.RedisCacheSpy
+	RepoSpy  *auth_repository_spy.AuthRepositorySpy
 }
 
 func NewSut() (reset_password.UseCase, *ResetPasswordFixture) {
 	cacheSpy := cache_spy.New()
-	AuthRepoSpy := auth_repository_spy.New()
+	repoSpy := auth_repository_spy.New()
 
-	return sut.New(cacheSpy, AuthRepoSpy), &ResetPasswordFixture{
-		CacheSpy:    cacheSpy,
-		AuthRepoSpy: AuthRepoSpy,
+	return sut.New(cacheSpy, repoSpy), &ResetPasswordFixture{
+		CacheSpy: cacheSpy,
+		RepoSpy:  repoSpy,
 	}
 }
 
