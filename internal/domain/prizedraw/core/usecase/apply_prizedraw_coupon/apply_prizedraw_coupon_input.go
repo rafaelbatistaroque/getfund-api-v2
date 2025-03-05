@@ -1,6 +1,8 @@
 package apply_prizedraw_coupon
 
 import (
+	"fmt"
+
 	validation "github.com/rafaelbatistaroque/validation"
 )
 
@@ -16,5 +18,9 @@ type applyCouponInput struct {
 }
 
 func (i *applyCouponInput) Validate() validation.Validatable {
+	if i.CouponId <= 0 {
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "CouponId"))
+	}
+
 	return i.rules.GetResult()
 }

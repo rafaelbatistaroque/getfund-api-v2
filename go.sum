@@ -41,8 +41,8 @@ github.com/ncruces/go-strftime v0.1.9 h1:bY0MQC28UADQmHmaF5dgpLmImcShSi2kHU9XLdh
 github.com/ncruces/go-strftime v0.1.9/go.mod h1:Fwc5htZGVVkseilnfgOVb9mKy6w1naJmn9CehxcKcls=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/rafaelbatistaroque/validation v1.4.3 h1:4CCgYU0rvnqizsoml+mWRA582S7KyanXnRRwosou2yY=
-github.com/rafaelbatistaroque/validation v1.4.3/go.mod h1:Xnek1l4OKOmP5PD7DEG2ny9sGVXu9ZVrMY1AayaEfK0=
+github.com/rafaelbatistaroque/validation v1.4.5 h1:HpgJ5NU0fnFSsygRSwJPiXy80JK5nFHCSd70NuyrsD0=
+github.com/rafaelbatistaroque/validation v1.4.5/go.mod h1:Xnek1l4OKOmP5PD7DEG2ny9sGVXu9ZVrMY1AayaEfK0=
 github.com/rafaelbatistaroque/verify v1.1.0 h1:IEFpHBpqgaDI4XG50UzXTUdmW8OmAiUFqXC+ewXZ08c=
 github.com/rafaelbatistaroque/verify v1.1.0/go.mod h1:4DvKZiY5FMyQRdF5Z9iTgwYWlNQ8IvW29B8tq41TlyU=
 github.com/redis/go-redis/v9 v9.7.0 h1:HhLSs+B6O021gwzl+locl0zEDnyNkxMtf/Z3NNBMa9E=
