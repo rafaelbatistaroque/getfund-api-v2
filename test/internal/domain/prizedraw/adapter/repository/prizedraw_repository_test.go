@@ -56,3 +56,16 @@ func Test_GivenGetCouponByCode_WhenFound_ThenEnsureReturnSuccess(t *testing.T) {
 	verify.Should(t, len(couponFound.UserCouponApplies)).Be(1)
 	verify.Should(t, couponFound.UserCouponApplies[0].CouponId).Be(int(coupon.ID))
 }
+
+func Test_GivenGetPrizeDrawById_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	currentDb, _ := db.DB()
+	currentDb.Close()
+
+	// Act
+	_, err := sut.GetPrizeDrawById(0)
+
+	// Assert
+	verify.Should(t, err).NotNil()
+}
