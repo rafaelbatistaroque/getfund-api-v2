@@ -4,6 +4,7 @@ import (
 	"getfund-api-v2/pkg/db/schema"
 	fixture "getfund-api-v2/test/internal/domain/prizedraw/adapter/repository/prizedraw_repository_fixture"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/rafaelbatistaroque/verify"
@@ -79,4 +80,28 @@ func Test_GivenGetPrizeDrawById_WhenNotFound_ThenEnsureReturnError(t *testing.T)
 
 	// Assert
 	verify.Should(t, err.Error()).Be("prize draw not found")
+}
+
+func Test_GivenGetPrizeDrawById_WhenFound_ThenEnsureReturnSuccess(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	fakeWinner := 450
+	prizeDraw := &schema.PrizeDraw{
+		Name:                "fake-name",
+		DetailedDescription: "fake-description",
+		PrizeDescription:    "fake-prizedraw-description",
+		ExpectedAmount:      200,
+		StartAt:             int(time.Now().Unix()),
+		WinnerEntranceID:    &fakeWinner,
+	}
+	db.Create(prizeDraw)
+
+	// Act
+	prizeDrawFound, err := sut.GetPrizeDrawById(int(prizeDraw.ID))
+
+	// Assert
+	verify.Should(t, err).Nil()
+	verify.Should(t, prizeDrawFound).NotNil()
+	verify.Should(t, prizeDrawFound.Id).Be(int(prizeDraw.ID))
+	verify.Should(t, prizeDrawFound.WinnerEntranceId).Be(prizeDraw.WinnerEntranceID)
 }
