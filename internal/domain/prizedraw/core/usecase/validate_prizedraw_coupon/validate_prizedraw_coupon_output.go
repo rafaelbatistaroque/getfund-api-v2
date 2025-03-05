@@ -1,8 +1,8 @@
 package validate_prizedraw_coupon
 
-type Output = validateCouponOutput
+type Output = validatePrizeDrawCouponOutput
 
-type validateCouponOutput struct {
+type validatePrizeDrawCouponOutput struct {
 	Message     string `json:"message"`
 	CouponId    int    `json:"coupon_id"`
 	PrizeDrawId int    `json:"prize_draw_id"`

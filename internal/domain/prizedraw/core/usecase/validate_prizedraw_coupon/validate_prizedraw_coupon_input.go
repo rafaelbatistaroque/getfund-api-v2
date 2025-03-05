@@ -4,9 +4,9 @@ import (
 	validation "github.com/rafaelbatistaroque/validation"
 )
 
-type Input = validateCouponInput
+type Input = validatePrizeDrawCouponInput
 
-type validateCouponInput struct {
+type validatePrizeDrawCouponInput struct {
 	CouponCode          string `json:"coupon_code"`
 	Email               string `json:"email"`
 	SelectedProductId   int    `json:"selected_product_id"`
@@ -16,7 +16,7 @@ type validateCouponInput struct {
 	rules validation.Rule
 }
 
-func (i *validateCouponInput) Validate() validation.Validatable {
+func (i *validatePrizeDrawCouponInput) Validate() validation.Validatable {
 	i.rules.
 		ApplyRules(i.CouponCode, "CouponCode",
 			&validation.RequiredRule{},

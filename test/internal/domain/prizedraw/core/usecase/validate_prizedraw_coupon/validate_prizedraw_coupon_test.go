@@ -303,7 +303,7 @@ func Test_GivenExecute_WhenPrizeDrawIsValid_ThenEnsureCallPublishWithPayloadWith
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
 	coupon := spies.RepoSpy.SuccessResult["GetCouponByCode"].(*prizedraw_dto.CouponDto)
-	expectedPayload := &prizedraw_payload.ValidateCouponStartedPayload{
+	expectedPayload := &prizedraw_payload.ValidatePrizeDrawCouponStartedPayload{
 		ProductId: coupon.ProductId,
 	}
 
@@ -313,7 +313,7 @@ func Test_GivenExecute_WhenPrizeDrawIsValid_ThenEnsureCallPublishWithPayloadWith
 	// Assert
 	_, isChannelType := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
 	verify.Should(t, isChannelType).BeTrue()
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayloadAndResponse:event"][0]).Be(&validate_prizedraw_coupon.ValidateCouponStartedEvent{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayloadAndResponse:event"][0]).Be(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayloadAndResponse:payload"][0]).Be(expectedPayload)
 }
 
