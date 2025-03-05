@@ -2,6 +2,7 @@ package apply_prizedraw_coupon_application
 
 import (
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_payload"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/result_app"
@@ -27,6 +28,15 @@ func (a *applyPrizeDrawCouponApplication) Execute(input *apply_prizedraw_coupon.
 	if validatable.IsInvalid() {
 		return nil, result_app.New(result_app.UNPROCESSABLE_CONTENT_CODE, validatable.GetErrors())
 	}
+	channelResponse := make(chan []byte, 1)
+	payload := &prizedraw_payload.ApplyPrizeDrawCouponStartedPayload{
+		UserId:       input.UserId,
+		ProductId:    input.ProductId,
+		PrizeDrawId:  input.PrizeDrawId,
+		CouponId:     input.CouponId,
+		ItemQuantity: 1,
+	}
+	a.bus.EmitWithPayloadAndResponse(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, payload, channelResponse)
 
 	return nil, nil
 }
