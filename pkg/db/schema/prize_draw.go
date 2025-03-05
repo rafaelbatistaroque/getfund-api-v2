@@ -9,7 +9,7 @@ type PrizeDraw struct {
 	StartAt             int    `gorm:"not null;index:idx_prize_draw_list;column:start_at"`
 	EndAt               *int   `gorm:"column:end_at"`
 	PrizeDrawAt         *int   `gorm:"column:prize_draw_at"`
-	WinnerEntranceID    *uint  `gorm:"index:idx_prize_draw_winner;column:winner_entrance_id"`
+	WinnerEntranceID    *int   `gorm:"index:idx_prize_draw_winner;column:winner_entrance_id"`
 	IsActive            *bool  `gorm:"column:is_active"`
 	RetentionRate       *int   `gorm:"column:retention_rate"`
 	FreeFunding         *int   `gorm:"column:free_funding"`

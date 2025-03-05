@@ -76,5 +76,8 @@ func (p *prizedrawRepository) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDraw
 		return nil, result.Error
 	}
 
-	return nil, nil
+	return &prizedraw_dto.PrizeDrawDto{
+		Id:               int(prizeDraw.ID),
+		WinnerEntranceId: prizeDraw.WinnerEntranceID,
+	}, nil
 }
