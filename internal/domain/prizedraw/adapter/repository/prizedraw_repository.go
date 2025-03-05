@@ -68,6 +68,10 @@ func (p *prizedrawRepository) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDraw
 		Where("id=?", id).
 		First(prizeDraw)
 
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, errors.New("prize draw not found")
+	}
+
 	if result.Error != nil {
 		return nil, result.Error
 	}
