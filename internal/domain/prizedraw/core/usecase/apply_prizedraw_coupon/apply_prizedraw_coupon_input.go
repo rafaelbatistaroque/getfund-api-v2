@@ -22,5 +22,9 @@ func (i *applyCouponInput) Validate() validation.Validatable {
 		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "CouponId"))
 	}
 
+	if i.PrizeDrawId <= 0 {
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "PrizeDrawId"))
+	}
+
 	return i.rules.GetResult()
 }
