@@ -6,9 +6,9 @@ import (
 	validation "github.com/rafaelbatistaroque/validation"
 )
 
-type Input = applyCouponInput
+type Input = applyPrizeDrawCouponInput
 
-type applyCouponInput struct {
+type applyPrizeDrawCouponInput struct {
 	CouponId    int `json:"coupon_id"`
 	PrizeDrawId int `json:"prize_draw_id"`
 	ProductId   int `json:"product_id"`
@@ -17,7 +17,7 @@ type applyCouponInput struct {
 	rules validation.Rule
 }
 
-func (i *applyCouponInput) Validate() validation.Validatable {
+func (i *applyPrizeDrawCouponInput) Validate() validation.Validatable {
 	if i.CouponId <= 0 {
 		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "CouponId"))
 	}

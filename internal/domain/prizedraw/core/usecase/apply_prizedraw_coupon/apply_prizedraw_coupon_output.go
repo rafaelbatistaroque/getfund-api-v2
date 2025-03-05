@@ -1,6 +1,6 @@
 package apply_prizedraw_coupon
 
-type Output = applyCouponOutput
+type Output = applyPrizeDrawCouponOutput
 
-type applyCouponOutput struct {
+type applyPrizeDrawCouponOutput struct {
 }
