@@ -61,5 +61,16 @@ func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto
 }
 
 func (p *prizedrawRepository) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDrawDto, error) {
+	var prizeDraw = &schema.PrizeDraw{}
+
+	result := p.db.
+		Select("id, winner_entrance_id").
+		Where("id=?", id).
+		First(prizeDraw)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
 	return nil, nil
 }
