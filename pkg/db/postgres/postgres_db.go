@@ -36,10 +36,10 @@ func New(appSettings settings.ApplicationSettings) *gorm.DB {
 		&schema.Product{},
 		&schema.CouponTypeApplicability{},
 		&schema.CouponType{},
-		&schema.Entrance{},
 		&schema.PrizeDraw{},
 		&schema.Coupon{},
 		&schema.Purchase{},
+		&schema.Entrance{},
 		&schema.UserCouponApply{},
 		&schema.FreeFundingUserEntrances{},
 	)
