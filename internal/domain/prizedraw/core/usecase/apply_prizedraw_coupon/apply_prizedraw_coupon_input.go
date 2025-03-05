@@ -19,15 +19,19 @@ type applyCouponInput struct {
 
 func (i *applyCouponInput) Validate() validation.Validatable {
 	if i.CouponId <= 0 {
-		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "CouponId"))
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "CouponId"))
 	}
 
 	if i.PrizeDrawId <= 0 {
-		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "PrizeDrawId"))
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "PrizeDrawId"))
 	}
 
 	if i.ProductId <= 0 {
-		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ProductId"))
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "ProductId"))
+	}
+
+	if i.UserId <= 0 {
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "UserId"))
 	}
 
 	return i.rules.GetResult()
