@@ -62,3 +62,9 @@ func WithProductId(productId int) Option {
 		input.ProductId = productId
 	}
 }
+
+func WithUserId(userId int) Option {
+	return func(input *apply_prizedraw_coupon.Input) {
+		input.UserId = userId
+	}
+}
