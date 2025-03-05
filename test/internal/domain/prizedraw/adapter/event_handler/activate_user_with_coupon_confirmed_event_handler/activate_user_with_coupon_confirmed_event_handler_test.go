@@ -91,6 +91,19 @@ func Test_GivenHandler_WhenValidateCouponError_ThenEnsureNeverCallApplyCoupon(t 
 	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
 }
 
+func Test_GivenHandler_WhenValidateCouponOutputNull_ThenEnsureNeverCallApplyCoupon(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
+	spies.ValidatePrizeDrawCouponSpy.DefineValidateCouponUsecaseSuccessNull()
+
+	// Act
+	sut.Handle(fixture.GetValidActivateUserWithCouponConfirmedEvent("", "", 1))
+
+	// Assert
+	verify.Should(t, spies.ApplyPrizeDrawCouponSpy.CallsCount["Execute"]).Be(0)
+}
+
 func Test_GivenHandler_WhenValidateCouponSuccess_ThenEnsureCallApplyCouponWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()

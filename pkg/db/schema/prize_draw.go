@@ -15,8 +15,6 @@ type PrizeDraw struct {
 	FreeFunding         *int   `gorm:"column:free_funding"`
 	CreatedAt           int64  `gorm:"column:created_at"`
 	UpdatedAt           int64  `gorm:"column:updated_at"`
-
-	WinnerEntrance *Entrance `gorm:"foreignKey:WinnerEntranceID;references:ID;constraint:OnDelete:SET NULL"`
 }
 
 func (PrizeDraw) TableName() string {

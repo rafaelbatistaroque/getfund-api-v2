@@ -54,7 +54,8 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 	}
 
 	var erroUsecase = &result_app.ApplicationError{}
-	_, erroUsecase = h.validatePrizeDrawCoupon.Execute(&validate_prizedraw_coupon.Input{
+	var output = &validate_prizedraw_coupon.Output{}
+	output, erroUsecase = h.validatePrizeDrawCoupon.Execute(&validate_prizedraw_coupon.Input{
 		SelectedProductId:   couponDto.ProductId,
 		SelectedPrizeDrawId: couponDto.PrizeDrawId,
 		CouponCode:          payload.CouponCode,
@@ -67,10 +68,15 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
+	if output == nil {
+		h.logger.Error("IsOk: False | output null")
+		return
+	}
+
 	_, erroUsecase = h.applyPrizeDrawCoupon.Execute(&apply_prizedraw_coupon.Input{
-		CouponId:    couponDto.Id,
-		PrizeDrawId: couponDto.PrizeDrawId,
-		ProductId:   couponDto.ProductId,
+		CouponId:    output.CouponId,
+		PrizeDrawId: output.PrizeDrawId,
+		ProductId:   output.ProductId,
 		UserId:      payload.UserId,
 	})
 

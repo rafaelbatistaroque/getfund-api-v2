@@ -36,7 +36,7 @@ const (
 	_COUPON_LIMIT_REACHED         = "coupon application limit reached"
 	_FOUND_NULL                   = "coupon null"
 
-	_NO = 0
+	_NO_PRIZEDRAW_LINKED = 0
 )
 
 type validateCouponApplication struct {
@@ -72,7 +72,7 @@ func (v *validateCouponApplication) Execute(input *validate_prizedraw_coupon.Inp
 	}
 
 	//has prizeDraw linked
-	if coupon.GetPrizeDrawId() == _NO {
+	if coupon.GetPrizeDrawId() == _NO_PRIZEDRAW_LINKED {
 		coupon.SetPrazeDrawId(input.SelectedPrizeDrawId)
 	}
 

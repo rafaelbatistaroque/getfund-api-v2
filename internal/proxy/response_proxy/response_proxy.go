@@ -20,7 +20,7 @@ var httpCodeMap = map[int]int{
 	result_app.SUCCESS_CREATED_CODE:       http.StatusCreated,             // 201
 }
 
-type handleFunc func(http.ResponseWriter, *http.Request) (interface{}, int, error)
+type handleFunc func(http.ResponseWriter, *http.Request) (any, int, error)
 
 type ResponseBody struct {
 	Code int `json:"code"`
@@ -47,14 +47,16 @@ func SetError(w http.ResponseWriter, code int, err error) {
 	w.WriteHeader(getHTTPCode(code))
 	json.NewEncoder(w).Encode(ResponseBody{
 		Code: code,
-		Data: err.Error()})
+		Data: err.Error(),
+	})
 }
 
 func SetSuccess(w http.ResponseWriter, code int, data any) {
 	w.WriteHeader(getHTTPCode(code))
 	json.NewEncoder(w).Encode(ResponseBody{
 		Code: code,
-		Data: data})
+		Data: data,
+	})
 }
 
 func getHTTPCode(appCode int) int {
