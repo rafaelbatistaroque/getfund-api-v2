@@ -11,19 +11,19 @@ import (
 	"time"
 )
 
-type ValidateCouponFixture struct {
+type ValidatePrizeDrawCouponFixture struct {
 	RepoSpy     *prizedraw_repository_spy.CouponRepositorySpy
 	BusSpy      *eventbus_spy.EventBusSpy
 	SettingsSpy *settings_spy.ApplicationSettingsSpy
 }
 
-func NewSut() (validate_prizedraw_coupon.UseCase, *ValidateCouponFixture) {
+func NewSut() (validate_prizedraw_coupon.UseCase, *ValidatePrizeDrawCouponFixture) {
 	repoSpy := prizedraw_repository_spy.New()
 	busSpy := eventbus_spy.New()
 	settingsSpy := settings_spy.New()
 
 	return validate_coupon_application.New(repoSpy, busSpy, settingsSpy),
-		&ValidateCouponFixture{
+		&ValidatePrizeDrawCouponFixture{
 			RepoSpy:     repoSpy,
 			BusSpy:      busSpy,
 			SettingsSpy: settingsSpy,
