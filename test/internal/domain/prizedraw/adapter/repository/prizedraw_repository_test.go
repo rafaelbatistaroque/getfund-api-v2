@@ -69,3 +69,14 @@ func Test_GivenGetPrizeDrawById_WhenQueryError_ThenEnsureReturnError(t *testing.
 	// Assert
 	verify.Should(t, err).NotNil()
 }
+
+func Test_GivenGetPrizeDrawById_WhenNotFound_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSUT()
+
+	// Act
+	_, err := sut.GetPrizeDrawById(0)
+
+	// Assert
+	verify.Should(t, err.Error()).Be("prize draw not found")
+}
