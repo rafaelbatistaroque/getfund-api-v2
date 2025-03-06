@@ -81,3 +81,7 @@ func (p *prizedrawRepository) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDraw
 		WinnerEntranceId: prizeDraw.WinnerEntranceID,
 	}, nil
 }
+
+func (p *prizedrawRepository) CreateEntrance(entrance *prizedraw_dto.EntranceDto) (*prizedraw_dto.EntranceDto, error) {
+	return nil, nil
+}

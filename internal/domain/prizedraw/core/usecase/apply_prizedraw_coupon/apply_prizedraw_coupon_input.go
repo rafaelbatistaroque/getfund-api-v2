@@ -9,10 +9,11 @@ import (
 type Input = applyPrizeDrawCouponInput
 
 type applyPrizeDrawCouponInput struct {
-	CouponId    int `json:"coupon_id"`
-	PrizeDrawId int `json:"prize_draw_id"`
-	ProductId   int `json:"product_id"`
-	UserId      int `json:"user_id"`
+	CouponId    int  `json:"coupon_id"`
+	PrizeDrawId int  `json:"prize_draw_id"`
+	ProductId   int  `json:"product_id"`
+	UserId      int  `json:"user_id"`
+	IsUserAdmin bool `json:"is_user_admin"`
 
 	rules validation.Rule
 }

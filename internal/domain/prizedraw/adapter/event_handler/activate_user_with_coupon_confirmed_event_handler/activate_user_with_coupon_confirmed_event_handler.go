@@ -78,6 +78,7 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		PrizeDrawId: output.PrizeDrawId,
 		ProductId:   output.ProductId,
 		UserId:      payload.UserId,
+		IsUserAdmin: false,
 	})
 
 	if erroUsecase != nil {
