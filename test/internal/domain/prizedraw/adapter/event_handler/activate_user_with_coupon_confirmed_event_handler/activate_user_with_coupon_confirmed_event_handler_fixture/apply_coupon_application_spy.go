@@ -35,5 +35,6 @@ func GetApplyCouponInput(from *prizedraw_dto.CouponDto, userId int) *apply_prize
 		PrizeDrawId: from.PrizeDrawId,
 		ProductId:   from.ProductId,
 		UserId:      userId,
+		IsUserAdmin: false,
 	}
 }

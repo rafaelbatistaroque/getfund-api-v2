@@ -41,7 +41,7 @@ func (eb *EventBusSpy) EmitWithPayloadAndResponse(event bus.Event, payload any, 
 	eb.CallsCount["EmitWithPayloadAndResponse"]++
 }
 
-func (f *EventBusSpy) RunSutWithEventResponse(sut func(), responses ...[]byte) {
+func (f *EventBusSpy) Run(sut func(), responses ...[]byte) {
 	go sut()
 
 	time.Sleep(100 * time.Millisecond)

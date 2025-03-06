@@ -1,10 +1,12 @@
 package apply_prizedraw_coupon_fixture
 
 import (
+	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	apply_prizedraw_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/application"
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
+	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
 )
 
@@ -12,20 +14,22 @@ type ApplyPrizeDrawCouponFixture struct {
 	RepoSpy     *prizedraw_repository_spy.CouponRepositorySpy
 	BusSpy      *eventbus_spy.EventBusSpy
 	SettingsSpy *settings_spy.ApplicationSettingsSpy
+	HasherSpy   *security_spy.HasherSpy
 }
 
 func NewSut() (apply_prizedraw_coupon.UseCase, *ApplyPrizeDrawCouponFixture) {
 	repoSpy := prizedraw_repository_spy.New()
 	busSpy := eventbus_spy.New()
 	settingsSpy := settings_spy.New()
+	hasherSpy := security_spy.New()
 
-	return apply_prizedraw_coupon_application.New(repoSpy, busSpy, settingsSpy),
+	return apply_prizedraw_coupon_application.New(repoSpy, busSpy, settingsSpy, hasherSpy),
 		&ApplyPrizeDrawCouponFixture{
 			RepoSpy:     repoSpy,
 			BusSpy:      busSpy,
 			SettingsSpy: settingsSpy,
+			HasherSpy:   hasherSpy,
 		}
-
 }
 
 type Option func(*apply_prizedraw_coupon.Input)
@@ -66,5 +70,19 @@ func WithProductId(productId int) Option {
 func WithUserId(userId int) Option {
 	return func(input *apply_prizedraw_coupon.Input) {
 		input.UserId = userId
+	}
+}
+
+func WithValidPurchaseId() []byte {
+	return []byte("1")
+}
+
+func (f *ApplyPrizeDrawCouponFixture) GetEntranceDto() *prizedraw_dto.EntranceDto {
+	return &prizedraw_dto.EntranceDto{
+		LuckyCode:   f.HasherSpy.SuccessResult["GetRandomCode"].(string),
+		UserId:      1,
+		PrizeDrawId: 1,
+		PurchaseId:  1,
+		IsDonation:  false,
 	}
 }

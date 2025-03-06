@@ -72,3 +72,29 @@ func (r *CouponRepositorySpy) DefineGetPrizeDrawByIdSuccess(prizeDraw *prizedraw
 
 	r.SuccessResult["GetPrizeDrawById"] = &prizedraw_dto.PrizeDrawDto{}
 }
+
+func (r *CouponRepositorySpy) CreateEntrance(entrance *prizedraw_dto.EntranceDto) (*prizedraw_dto.EntranceDto, error) {
+	r.Params["CreateEntrance:entrance"] = entrance
+
+	r.CallsCount["CreateEntrance"]++
+
+	sucess := r.SuccessResult["CreateEntrance"]
+	if sucess != nil {
+		return sucess.(*prizedraw_dto.EntranceDto), nil
+	}
+
+	return nil, r.ErrorResult["CreateEntrance"]
+}
+
+func (r *CouponRepositorySpy) DefineCreateEntranceError() {
+	r.ErrorResult["CreateEntrance"] = errors.New("fake-error")
+}
+
+func (r *CouponRepositorySpy) DefineCreateEntranceSuccess(prizeDraw *prizedraw_dto.EntranceDto) {
+	if prizeDraw != nil {
+		r.SuccessResult["CreateEntrance"] = prizeDraw
+		return
+	}
+
+	r.SuccessResult["CreateEntrance"] = &prizedraw_dto.EntranceDto{}
+}

@@ -353,7 +353,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseEmpty_ThenEnsureReturnAprop
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.BusSpy.RunSutWithEventResponse(
+	spies.BusSpy.Run(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -377,7 +377,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApr
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.BusSpy.RunSutWithEventResponse(
+	spies.BusSpy.Run(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -401,7 +401,7 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureR
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.BusSpy.RunSutWithEventResponse(
+	spies.BusSpy.Run(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -425,7 +425,7 @@ func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *te
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.BusSpy.RunSutWithEventResponse(
+	spies.BusSpy.Run(
 		func() {
 			_, err := sut.Execute(fixture.GetInput())
 			errResult <- err
@@ -449,7 +449,7 @@ func Test_GivenExecute_WhenCouponProductDifferentFromSelectedProduct_ThenEnsureR
 	errResult := make(chan *result_app.ApplicationError, 1)
 
 	// Act
-	spies.BusSpy.RunSutWithEventResponse(
+	spies.BusSpy.Run(
 		func() {
 			_, err := sut.Execute(fixture.GetInput(fixture.WithSelectedProductId(2)))
 			errResult <- err
@@ -474,7 +474,7 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	resultChannel := make(chan *validate_prizedraw_coupon.Output, 1)
 
 	// Act
-	spies.BusSpy.RunSutWithEventResponse(
+	spies.BusSpy.Run(
 		func() {
 			result, _ := sut.Execute(fixture.GetInput())
 			resultChannel <- result

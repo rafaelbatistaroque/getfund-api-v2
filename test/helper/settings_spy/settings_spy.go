@@ -37,7 +37,7 @@ func (s *ApplicationSettingsSpy) SetTemplateDir(templateDir string) {
 
 func (s *ApplicationSettingsSpy) SetTimeoutResponseEvent(timeout int) {
 	if timeout == 0 {
-		s.timeoutResposenEvent = 1
+		s.timeoutResposenEvent = 500
 		return
 	}
 
