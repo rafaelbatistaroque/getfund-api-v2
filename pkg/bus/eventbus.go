@@ -2,31 +2,35 @@ package bus
 
 import (
 	"encoding/json"
+	"errors"
 	logger "getfund-api-v2/pkg/log"
+	"strconv"
 	"sync"
+	"time"
 )
-
-type Handler interface {
-	Handle(event Event)
-}
 
 type EventBus interface {
 	Subscribe(eventName string, handler Handler)
 	Emit(event Event)
 	EmitWithPayload(event Event, payload any)
 	EmitWithPayloadAndResponse(event Event, payload any, responseChannel chan []byte)
+	EmitWithPromise(event Event, payload any) *Promise
+	EmitAndWaitPromise(event Event, payload any, result any) *Promise
+	Wait(promise *Promise, result any)
 }
 
 type eventBus struct {
 	logger   *logger.Logger
 	handlers map[string][]Handler // Armazena handlers
 	lock     sync.RWMutex
+	timeout  time.Duration
 }
 
-func New() EventBus {
+func New(timeoutInSecond int) EventBus {
 	return &eventBus{
 		handlers: make(map[string][]Handler),
 		logger:   logger.New("EventBus"),
+		timeout:  time.Duration(timeoutInSecond) * time.Second,
 	}
 }
 
@@ -54,6 +58,58 @@ func (eb *eventBus) Emit(event Event) {
 
 // EmitWithPayload após incluir o payload ao evento dispara para todos os handlers
 func (eb *eventBus) EmitWithPayload(event Event, payload any) {
+	event.SetPayload(toBytes(payload, eb.logger))
+
+	eb.Emit(event)
+}
+
+func (eb *eventBus) EmitWithPayloadAndResponse(event Event, payload any, responseChannel chan []byte) {
+	event.SetChannel(responseChannel)
+
+	eb.EmitWithPayload(event, payload)
+}
+
+func (eb *eventBus) EmitWithPromise(event Event, payload any) *Promise {
+	resultChannel := make(chan []byte, 1)
+	promise := &Promise{}
+	promise.SetChannel(resultChannel)
+
+	eb.EmitWithPayloadAndResponse(event, payload, resultChannel)
+
+	return promise
+}
+
+func (eb *eventBus) EmitAndWaitPromise(event Event, payload any, result any) *Promise {
+	promise := eb.EmitWithPromise(event, payload)
+	eb.Wait(promise, &result)
+
+	return promise
+}
+
+func (eb *eventBus) Wait(promise *Promise, result any) {
+	select {
+	case rawResult := <-promise.GetChannel():
+		if len(rawResult) == 0 {
+			promise.SetError(errors.New("empty response"))
+			return
+		}
+
+		if err := fromByte(rawResult, &result, eb.logger); err != nil {
+			promise.SetError(err)
+			return
+		}
+
+		if result == nil {
+			promise.SetError(errors.New("result null"))
+		}
+
+		result = &rawResult
+	case <-time.After(eb.timeout):
+		promise.SetError(errors.New("timeout waiting for event"))
+	}
+}
+
+func toBytes(payload any, logger *logger.Logger) []byte {
 	var data []byte
 	var err error
 
@@ -63,16 +119,32 @@ func (eb *eventBus) EmitWithPayload(event Event, payload any) {
 	default:
 		data, err = json.Marshal(payload)
 		if err != nil {
-			eb.logger.Errorf("Error on serialize the payload: %v", err)
+			logger.Errorf("Error on serialize the payload: %v", err)
+			return nil
+		}
+	}
+	return data
+}
+
+func fromByte(rawResult []byte, result *any, logger *logger.Logger) error {
+	switch (*result).(type) {
+	case string:
+		*result = string(rawResult)
+	case int:
+		ok, err := strconv.Atoi(string(rawResult))
+		if err != nil {
+			return errors.New("invalid result")
+		}
+		*result = ok
+	default:
+		var tempResult any
+		err := json.Unmarshal(rawResult, &tempResult)
+		*result = tempResult
+		if err != nil {
+			logger.Errorf("Error on deserialize the payload: %v", err)
+			return errors.New("invalid result")
 		}
 	}
 
-	event.SetPayload(data)
-
-	eb.Emit(event)
-}
-
-func (eb *eventBus) EmitWithPayloadAndResponse(event Event, payload any, responseChannel chan []byte) {
-	event.SetChannel(responseChannel)
-	eb.EmitWithPayload(event, payload)
+	return nil
 }

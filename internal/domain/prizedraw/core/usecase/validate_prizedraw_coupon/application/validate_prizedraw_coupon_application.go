@@ -1,8 +1,6 @@
 package validate_prizedraw_coupon_application
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
@@ -11,15 +9,12 @@ import (
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	vo "getfund-api-v2/internal/domain/prizedraw/core/value_object"
 	"getfund-api-v2/internal/settings"
-	"getfund-api-v2/internal/shared/app_constant"
 	"getfund-api-v2/internal/shared/result_app"
 	"getfund-api-v2/pkg/bus"
 	"time"
 )
 
 const (
-	_EMPTY_RESPONSE               = "empty response from coupon validation"
-	_INVALID_RESPONSE             = "invalid response from coupon validation"
 	_INVALID_PRODUCT              = "invalid product data"
 	_COUPON_INVALID_FOR_PRODUCT   = "coupon is not valid for this product"
 	_INACTIVE_PRODUCT             = "inactive product"
@@ -35,6 +30,7 @@ const (
 	_COUPON_ALREADY_APPLIED       = "coupon already applied"
 	_COUPON_LIMIT_REACHED         = "coupon application limit reached"
 	_FOUND_NULL                   = "coupon null"
+	_COUPON_VALIDATE              = "[coupon validate] "
 
 	_NO_PRIZEDRAW_LINKED = 0
 )
@@ -87,11 +83,8 @@ func (v *validatePrizeDrawCouponApplication) Execute(input *validate_prizedraw_c
 	}
 
 	//Handle Product validation
-	responseChannel := make(chan []byte, 1)
-	v.emitValidateCouponStartedEvent(coupon.GetProductId(), responseChannel)
-
-	var validationData *prizedraw_dto.ValidationData
-	if validationData, applicationError = v.getValidationCouponFromResponse(responseChannel); applicationError != nil {
+	var validationData = &prizedraw_dto.ValidationData{}
+	if validationData, applicationError = v.getValidationCouponFromResponse(coupon.GetProductId(), validationData); applicationError != nil {
 		return nil, applicationError
 	}
 
@@ -197,36 +190,20 @@ func (*validatePrizeDrawCouponApplication) isCouponValid(coupon *entity.Coupon, 
 	return nil
 }
 
-func (v *validatePrizeDrawCouponApplication) emitValidateCouponStartedEvent(productId int, responseChannel chan []byte) {
+func (v *validatePrizeDrawCouponApplication) getValidationCouponFromResponse(productId int, validationData *prizedraw_dto.ValidationData) (*prizedraw_dto.ValidationData, *result_app.ApplicationError) {
 	payload := &prizedraw_payload.ValidatePrizeDrawCouponStartedPayload{
 		ProductId: productId,
 	}
-
-	v.bus.EmitWithPayloadAndResponse(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{}, payload, responseChannel)
-}
-
-func (v *validatePrizeDrawCouponApplication) getValidationCouponFromResponse(responseChannel chan []byte) (*prizedraw_dto.ValidationData, *result_app.ApplicationError) {
-	var validationCouponData = &prizedraw_dto.ValidationData{}
-
-	select {
-	case response := <-responseChannel:
-		if bytes.Equal(response, app_constant.EMPTYB) {
-			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_EMPTY_RESPONSE))
-		}
-
-		if err := json.Unmarshal(response, &validationCouponData); err != nil {
-			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_RESPONSE))
-		}
-
-		if validationCouponData.Product == nil {
-			return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_INVALID_PRODUCT))
-		}
-
-	case <-time.After(time.Duration(v.settings.GetTimeoutResponseEvent()) * time.Second):
-		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_TIME_OUT))
+	promise := v.bus.EmitAndWaitPromise(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{}, payload, &validationData)
+	if !promise.IsErrorNil() {
+		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_VALIDATE+promise.GetError().Error()))
 	}
 
-	return validationCouponData, nil
+	if validationData.Product == nil {
+		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_VALIDATE+_INVALID_PRODUCT))
+	}
+
+	return validationData, nil
 }
 
 func (*validatePrizeDrawCouponApplication) isProductValid(product *entity.Product, selectedProductId int) *result_app.ApplicationError {

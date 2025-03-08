@@ -7,6 +7,7 @@ import (
 	"getfund-api-v2/internal/domain/prizedraw/core/entity"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/pkg/bus"
 	fixture "getfund-api-v2/test/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/validate_prizedraw_coupon_fixture"
 	"testing"
 	"time"
@@ -297,9 +298,10 @@ func Test_GivenExecute_WhenGetPrizeDrawByIdSuccessDifferentFromSelectedPrizeDraw
 	verify.Should(t, err.Message.Error()).Be("prizedraw is not valid for this coupon")
 }
 
-func Test_GivenExecute_WhenPrizeDrawIsValid_ThenEnsureCallPublishWithPayloadWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenPrizeDrawIsValid_ThenEnsureCallEmitAndWaitPromiseWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.BusSpy.DefineEmitAndWaitPromiseError()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
 	coupon := spies.RepoSpy.SuccessResult["GetCouponByCode"].(*prizedraw_dto.CouponDto)
@@ -311,15 +313,15 @@ func Test_GivenExecute_WhenPrizeDrawIsValid_ThenEnsureCallPublishWithPayloadWith
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	_, isChannelType := spies.BusSpy.Params["EmitWithPayloadAndResponse:responseChannel"][0].(chan []byte)
-	verify.Should(t, isChannelType).BeTrue()
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayloadAndResponse:event"][0]).Be(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{})
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayloadAndResponse:payload"][0]).Be(expectedPayload)
+	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:event"][0]).Be(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{})
+	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:payload"][0]).Be(expectedPayload)
+	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:result"][0]).NotNil()
 }
 
-func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenExecute_WhenEmitAndWaitPromiseInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.BusSpy.DefineEmitAndWaitPromiseError()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
 
@@ -327,93 +329,38 @@ func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvoked_ThenEnsureCallsOnce
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.BusSpy.CallsCount["EmitWithPayloadAndResponse"]).Be(1)
+	verify.Should(t, spies.BusSpy.CallsCount["EmitAndWaitPromise"]).Be(1)
 }
 
-func Test_GivenExecute_WhenEmitWithPayloadAndResponseTimeout_ThenEnsureReturnApropriateError(t *testing.T) {
+func Test_GivenExecute_WhenEmitAndWaitPromiseError_ThenEnsureReturnApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
+	spies.BusSpy.DefineEmitAndWaitPromiseError()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
+	expectedError := "[coupon validate] " + spies.BusSpy.SuccessResult["EmitAndWaitPromise"].(*bus.Promise).ErrorToString()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, err.Message.Error()).Be("timeout waiting for coupon validation")
+	verify.Should(t, err.Message.Error()).Be(expectedError)
 }
 
-func Test_GivenExecute_WhenEmitWithPayloadAndResponseEmpty_ThenEnsureReturnApropriateError(t *testing.T) {
+func Test_GivenExecute_WhenEmitAndWaitPromiseWithNullProduct_ThenEnsureReturnApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	errResult := make(chan *result_app.ApplicationError, 1)
+	spies.BusSpy.DefineEmitAndWaitPromiseErrorNull()
 
 	// Act
-	spies.BusSpy.Run(
-		func() {
-			_, err := sut.Execute(fixture.GetInput())
-			errResult <- err
-		},
-		[]byte(""),
-	)
+	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	errUnwrapped := <-errResult
-	defer close(errResult)
-	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("empty response from coupon validation")
-}
-
-func Test_GivenExecute_WhenEmitWithPayloadAndResponseInvalid_ThenEnsureReturnApropriateError(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
-	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	errResult := make(chan *result_app.ApplicationError, 1)
-
-	// Act
-	spies.BusSpy.Run(
-		func() {
-			_, err := sut.Execute(fixture.GetInput())
-			errResult <- err
-		},
-		[]byte("invalid-value"),
-	)
-
-	// Assert
-	errUnwrapped := <-errResult
-	defer close(errResult)
-	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("invalid response from coupon validation")
-}
-
-func Test_GivenExecute_WhenEmitWithPayloadAndResponseWithNullProduct_ThenEnsureReturnApropriateError(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
-	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	errResult := make(chan *result_app.ApplicationError, 1)
-
-	// Act
-	spies.BusSpy.Run(
-		func() {
-			_, err := sut.Execute(fixture.GetInput())
-			errResult <- err
-		},
-		fixture.GetNullResponse(),
-	)
-
-	// Assert
-	errUnwrapped := <-errResult
-	defer close(errResult)
-	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("invalid product data")
+	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Message.Error()).Be("[coupon validate] invalid product data")
 }
 
 func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -421,23 +368,15 @@ func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *te
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	errResult := make(chan *result_app.ApplicationError, 1)
+	spies.BusSpy.DefineResult(fixture.GetInactiveProductResponse())
 
 	// Act
-	spies.BusSpy.Run(
-		func() {
-			_, err := sut.Execute(fixture.GetInput())
-			errResult <- err
-		},
-		fixture.GetInactiveProductResponse(),
-	)
+	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	errUnwrapped := <-errResult
-	defer close(errResult)
-	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("inactive product")
+
+	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Message.Error()).Be("inactive product")
 }
 
 func Test_GivenExecute_WhenCouponProductDifferentFromSelectedProduct_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -445,23 +384,14 @@ func Test_GivenExecute_WhenCouponProductDifferentFromSelectedProduct_ThenEnsureR
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	errResult := make(chan *result_app.ApplicationError, 1)
+	spies.BusSpy.DefineResult(fixture.GetProductWithDiferentIdResponse())
 
 	// Act
-	spies.BusSpy.Run(
-		func() {
-			_, err := sut.Execute(fixture.GetInput(fixture.WithSelectedProductId(2)))
-			errResult <- err
-		},
-		fixture.GetProductResponse(),
-	)
+	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	errUnwrapped := <-errResult
-	defer close(errResult)
-	verify.Should(t, errUnwrapped.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, errUnwrapped.Message.Error()).Be("coupon is not valid for this product")
+	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Message.Error()).Be("coupon is not valid for this product")
 }
 
 func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testing.T) {
@@ -470,23 +400,15 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	validCoupon := fixture.GetValidCoupon()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(validCoupon)
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.SettingsSpy.SetTimeoutResponseEvent(2)
-	resultChannel := make(chan *validate_prizedraw_coupon.Output, 1)
+	spies.BusSpy.DefineResult(fixture.GetProductResponse())
 
 	// Act
-	spies.BusSpy.Run(
-		func() {
-			result, _ := sut.Execute(fixture.GetInput())
-			resultChannel <- result
-		},
-		fixture.GetProductResponse(),
-	)
+	result, _ := sut.Execute(fixture.GetInput())
 
 	// Assert
-	resultUnwrapped := <-resultChannel
-	defer close(resultChannel)
-	verify.Should(t, resultUnwrapped.Message).Be("coupon is valid")
-	verify.Should(t, resultUnwrapped.CouponId).Be(validCoupon.Id)
-	verify.Should(t, resultUnwrapped.PrizeDrawId).Be(validCoupon.PrizeDrawId)
-	verify.Should(t, resultUnwrapped.ProductId).Be(validCoupon.ProductId)
+
+	verify.Should(t, result.Message).Be("coupon is valid")
+	verify.Should(t, result.CouponId).Be(validCoupon.Id)
+	verify.Should(t, result.PrizeDrawId).Be(validCoupon.PrizeDrawId)
+	verify.Should(t, result.ProductId).Be(validCoupon.ProductId)
 }

@@ -2,7 +2,6 @@ package signin_mapper
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	model "getfund-api-v2/internal/domain/auth/core/auth_dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
 
@@ -19,7 +18,7 @@ func New() SigninMapper {
 	return &signinMapper{}
 }
 
-func (m *signinMapper) ToOutput(token string, session *model.SessionDto) *signin.Output {
+func (m *signinMapper) ToOutput(token string, session *auth_dto.SessionDto) *signin.Output {
 	return &signin.SigninOutput{
 		Token: token,
 		Session: signin.SessionOutput{
@@ -30,8 +29,8 @@ func (m *signinMapper) ToOutput(token string, session *model.SessionDto) *signin
 	}
 }
 
-func (m *signinMapper) ToSessionModel(authenticatedUser *model.AuthenticatedUserDto) *model.SessionDto {
-	return &model.SessionDto{
+func (m *signinMapper) ToSessionModel(authenticatedUser *auth_dto.AuthenticatedUserDto) *auth_dto.SessionDto {
+	return &auth_dto.SessionDto{
 		ID:        authenticatedUser.Id,
 		FirstName: authenticatedUser.FirstName,
 		IsAdmin:   authenticatedUser.IsAdmin,

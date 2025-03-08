@@ -7,7 +7,7 @@ type Event interface {
 	SetPayload(payload []byte)
 
 	SetChannel(channel chan []byte)
-	DefineResponse(response []byte)
+	ResolvePromise(result []byte)
 }
 
 type EventBase struct {
@@ -27,12 +27,12 @@ func (e *EventBase) SetChannel(channel chan []byte) {
 	e.channel = channel
 }
 
-func (e *EventBase) DefineResponse(response []byte) {
+func (e *EventBase) ResolvePromise(result []byte) {
 	if e.channel == nil {
 		return
 	}
 
-	e.channel <- response
+	e.channel <- result
 
 	if len(e.channel) == cap(e.channel)-1 {
 		close(e.channel)

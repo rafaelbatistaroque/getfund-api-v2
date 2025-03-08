@@ -16,9 +16,9 @@ import (
 
 func main() {
 	//general dependences
-	eventBus := bus.New()
 	ctx := context.Background()
 	appSettings := settings.Load()
+	eventBus := bus.New(appSettings.GetTimeoutResponseEvent())
 	db := postgresdb.New(appSettings)
 	redis := redisconfig.New(ctx, appSettings)
 

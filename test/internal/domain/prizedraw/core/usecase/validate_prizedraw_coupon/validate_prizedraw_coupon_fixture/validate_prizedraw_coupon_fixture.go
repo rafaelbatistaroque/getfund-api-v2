@@ -172,14 +172,14 @@ func GetValidPrizeDraw() *prizedraw_dto.PrizeDrawDto {
 	return &prizedraw_dto.PrizeDrawDto{Id: 5}
 }
 
-func GetProductResponse() []byte {
-	return []byte(`{"product": {"id":10, "total_price": 100, "is_active": true, "entrance_qty": 1}}`)
+func GetProductWithDiferentIdResponse() *prizedraw_dto.ValidationData {
+	return &prizedraw_dto.ValidationData{Product: &prizedraw_dto.ProductData{IsActive: true, Id: 3}}
 }
 
-func GetInactiveProductResponse() []byte {
-	return []byte(`{"product": {"id":10, "total_price": 100, "is_active": false, "entrance_qty": 1}}`)
+func GetProductResponse() *prizedraw_dto.ValidationData {
+	return &prizedraw_dto.ValidationData{Product: &prizedraw_dto.ProductData{IsActive: true, Id: 10}}
 }
 
-func GetNullResponse() []byte {
-	return []byte(`{}`)
+func GetInactiveProductResponse() *prizedraw_dto.ValidationData {
+	return &prizedraw_dto.ValidationData{Product: &prizedraw_dto.ProductData{IsActive: false}}
 }

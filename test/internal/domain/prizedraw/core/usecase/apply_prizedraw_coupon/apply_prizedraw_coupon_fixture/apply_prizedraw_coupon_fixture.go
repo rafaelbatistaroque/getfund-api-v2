@@ -20,15 +20,13 @@ type ApplyPrizeDrawCouponFixture struct {
 func NewSut() (apply_prizedraw_coupon.UseCase, *ApplyPrizeDrawCouponFixture) {
 	repoSpy := prizedraw_repository_spy.New()
 	busSpy := eventbus_spy.New()
-	settingsSpy := settings_spy.New()
 	hasherSpy := security_spy.New()
 
-	return apply_prizedraw_coupon_application.New(repoSpy, busSpy, settingsSpy, hasherSpy),
+	return apply_prizedraw_coupon_application.New(repoSpy, busSpy, hasherSpy),
 		&ApplyPrizeDrawCouponFixture{
-			RepoSpy:     repoSpy,
-			BusSpy:      busSpy,
-			SettingsSpy: settingsSpy,
-			HasherSpy:   hasherSpy,
+			RepoSpy:   repoSpy,
+			BusSpy:    busSpy,
+			HasherSpy: hasherSpy,
 		}
 }
 
@@ -71,10 +69,6 @@ func WithUserId(userId int) Option {
 	return func(input *apply_prizedraw_coupon.Input) {
 		input.UserId = userId
 	}
-}
-
-func WithValidPurchaseId() []byte {
-	return []byte("1")
 }
 
 func (f *ApplyPrizeDrawCouponFixture) GetEntranceDto() *prizedraw_dto.EntranceDto {
