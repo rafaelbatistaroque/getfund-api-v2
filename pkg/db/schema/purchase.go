@@ -12,7 +12,7 @@ type Purchase struct {
 	ProcessCodeType string `gorm:"column:code_type"` //payment, free, coupon
 	Status          string `gorm:"column:status"`    //pending, success, fail
 	Message         string `gorm:"column:message"`
-	CreatedAt       int64  `gorm:"column:created_at"`
+	CreatedAt       int64  `gorm:"column:created_at;<-:create"`
 	UpdatedAt       int64  `gorm:"column:updated_at"`
 
 	// Relacionamentos

@@ -1,0 +1,1 @@
+package validate_prizedraw_coupon_started_event_handler_fixture

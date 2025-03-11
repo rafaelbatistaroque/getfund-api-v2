@@ -7,7 +7,7 @@ type Product struct {
 	EntranceQty   int     `gorm:"not null;column:entrance_qty"`
 	TotalPrice    int     `gorm:"not null;column:total_price"`
 	IsActive      bool    `gorm:"not null;index:idx_product_active;column:is_active"`
-	CreatedAt     int64   `gorm:"column:created_at"`
+	CreatedAt     int64   `gorm:"column:created_at;<-:create"`
 	UpdatedAt     int64   `gorm:"column:updated_at"`
 }
 

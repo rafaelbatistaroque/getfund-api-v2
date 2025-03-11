@@ -34,6 +34,19 @@ func (r *CouponRepositorySpy) GetCouponByCode(couponCode string) (*prizedraw_dto
 	return nil, r.ErrorResult["GetCouponByCode"]
 }
 
+func (r *CouponRepositorySpy) GetCouponById(couponId int) (*prizedraw_dto.CouponDto, error) {
+	r.Params["GetCouponById:couponId"] = couponId
+
+	r.CallsCount["GetCouponById"]++
+
+	sucess := r.SuccessResult["GetCouponById"]
+	if sucess != nil {
+		return sucess.(*prizedraw_dto.CouponDto), nil
+	}
+
+	return nil, r.ErrorResult["GetCouponById"]
+}
+
 func (r *CouponRepositorySpy) DefineGetCouponByCodeError() {
 	r.ErrorResult["GetCouponByCode"] = errors.New("fake-error")
 }
@@ -45,6 +58,19 @@ func (r *CouponRepositorySpy) DefineGetCouponByCodeSuccess(coupon *prizedraw_dto
 	}
 
 	r.SuccessResult["GetCouponByCode"] = &prizedraw_dto.CouponDto{}
+}
+
+func (r *CouponRepositorySpy) DefineGetCouponByIdError() {
+	r.ErrorResult["GetCouponById"] = errors.New("fake-error")
+}
+
+func (r *CouponRepositorySpy) DefineGetCouponByIdSuccess(coupon *prizedraw_dto.CouponDto) {
+	if coupon != nil {
+		r.SuccessResult["GetCouponById"] = coupon
+		return
+	}
+
+	r.SuccessResult["GetCouponById"] = &prizedraw_dto.CouponDto{}
 }
 
 func (r *CouponRepositorySpy) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDrawDto, error) {
@@ -73,28 +99,19 @@ func (r *CouponRepositorySpy) DefineGetPrizeDrawByIdSuccess(prizeDraw *prizedraw
 	r.SuccessResult["GetPrizeDrawById"] = &prizedraw_dto.PrizeDrawDto{}
 }
 
-func (r *CouponRepositorySpy) CreateEntrance(entrance *prizedraw_dto.EntranceDto) (*prizedraw_dto.EntranceDto, error) {
-	r.Params["CreateEntrance:entrance"] = entrance
+func (r *CouponRepositorySpy) SaveEntranceWithCouponApplied(entrance *prizedraw_dto.EntranceDto, coupon *prizedraw_dto.CouponDto) error {
+	r.Params["SaveEntranceWithCouponApplied:entrance"] = entrance
+	r.Params["SaveEntranceWithCouponApplied:coupon"] = coupon
 
-	r.CallsCount["CreateEntrance"]++
+	r.CallsCount["SaveEntranceWithCouponApplied"]++
 
-	sucess := r.SuccessResult["CreateEntrance"]
-	if sucess != nil {
-		return sucess.(*prizedraw_dto.EntranceDto), nil
-	}
-
-	return nil, r.ErrorResult["CreateEntrance"]
+	return r.ErrorResult["SaveEntranceWithCouponApplied"]
 }
 
-func (r *CouponRepositorySpy) DefineCreateEntranceError() {
-	r.ErrorResult["CreateEntrance"] = errors.New("fake-error")
+func (r *CouponRepositorySpy) DefineSaveEntranceWithCouponAppliedError() {
+	r.ErrorResult["SaveEntranceWithCouponApplied"] = errors.New("fake-error")
 }
 
-func (r *CouponRepositorySpy) DefineCreateEntranceSuccess(prizeDraw *prizedraw_dto.EntranceDto) {
-	if prizeDraw != nil {
-		r.SuccessResult["CreateEntrance"] = prizeDraw
-		return
-	}
-
-	r.SuccessResult["CreateEntrance"] = &prizedraw_dto.EntranceDto{}
+func (r *CouponRepositorySpy) DefineSaveEntranceWithCouponAppliedSuccess() {
+	r.ErrorResult["SaveEntranceWithCouponApplied"] = nil
 }

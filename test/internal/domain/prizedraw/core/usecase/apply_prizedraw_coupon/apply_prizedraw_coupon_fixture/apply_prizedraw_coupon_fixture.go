@@ -8,6 +8,7 @@ import (
 	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
+	"time"
 )
 
 type ApplyPrizeDrawCouponFixture struct {
@@ -72,11 +73,36 @@ func WithUserId(userId int) Option {
 }
 
 func (f *ApplyPrizeDrawCouponFixture) GetEntranceDto() *prizedraw_dto.EntranceDto {
+	event := &apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}
 	return &prizedraw_dto.EntranceDto{
 		LuckyCode:   f.HasherSpy.SuccessResult["GetRandomCode"].(string),
 		UserId:      1,
 		PrizeDrawId: 1,
-		PurchaseId:  1,
+		PurchaseId:  f.BusSpy.ReferenceResult["EmitAndWaitPromise"+event.GetName()].(int),
 		IsDonation:  false,
 	}
+}
+
+func GetValidCoupon() *prizedraw_dto.CouponDto {
+	less72Hours := time.Now().Add(-24 * time.Hour).Unix()
+	more24Hours := time.Now().Add(24 * time.Hour).Unix()
+	email := "fake@mail.com"
+	return &prizedraw_dto.CouponDto{
+		ProductId:   10,
+		PrizeDrawId: 5,
+		Id:          1,
+		CouponTypeApplicability: &prizedraw_dto.CouponTypeApplicabilityDto{
+			StartAt:     less72Hours,
+			EndAt:       &more24Hours,
+			LinkedEmail: &email,
+		},
+	}
+}
+
+func ApplyCoupon(dto *prizedraw_dto.CouponDto, userId, couponId int) {
+	dto.UserCouponApplies = make([]*prizedraw_dto.UserCouponApplyDto, 0)
+	dto.UserCouponApplies = append(dto.UserCouponApplies, &prizedraw_dto.UserCouponApplyDto{
+		CouponId: couponId,
+		UserId:   userId,
+	})
 }

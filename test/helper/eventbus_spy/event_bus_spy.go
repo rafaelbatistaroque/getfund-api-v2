@@ -122,8 +122,9 @@ func (eb *EventBusSpy) EmitAndWaitPromise(event bus.Event, payload any, result a
 
 	eb.CallsCount["EmitAndWaitPromise"]++
 
-	if eb.ReferenceResult["EmitAndWaitPromise"] != nil {
-		reflect.ValueOf(result).Elem().Set(reflect.ValueOf(eb.ReferenceResult["EmitAndWaitPromise"]))
+	if eb.ReferenceResult["EmitAndWaitPromise"+event.GetName()] != nil {
+		newValue := eb.ReferenceResult["EmitAndWaitPromise"+event.GetName()]
+		reflect.ValueOf(result).Elem().Set(reflect.ValueOf(newValue))
 	}
 
 	success := eb.SuccessResult["EmitAndWaitPromise"]
@@ -145,7 +146,7 @@ func (eb *EventBusSpy) DefineEmitAndWaitPromiseErrorNull() {
 	eb.SuccessResult["EmitAndWaitPromise"] = &bus.Promise{}
 }
 
-func (eb *EventBusSpy) DefineResult(result any) {
+func (eb *EventBusSpy) DefinePromiseResult(event bus.Event, result any) {
 	eb.SuccessResult["EmitAndWaitPromise"] = &bus.Promise{}
-	eb.ReferenceResult["EmitAndWaitPromise"] = result
+	eb.ReferenceResult["EmitAndWaitPromise"+event.GetName()] = result
 }

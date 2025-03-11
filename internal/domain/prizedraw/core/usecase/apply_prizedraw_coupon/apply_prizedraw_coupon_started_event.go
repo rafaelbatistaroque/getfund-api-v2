@@ -7,5 +7,5 @@ type ApplyPrizeDrawCouponStartedEvent struct {
 }
 
 func (e *ApplyPrizeDrawCouponStartedEvent) GetName() string {
-	return "ApplyCouponStartedEvent"
+	return "ApplyPrizeDrawCouponStartedEvent"
 }

@@ -8,7 +8,7 @@ type User struct {
 	Password  string `gorm:"not null;column:password"`
 	IsAdmin   bool   `gorm:"not null;column:is_admin"`
 	IsActive  bool   `gorm:"not null;column:is_active"`
-	CreatedAt int64  `gorm:"column:created_at"`
+	CreatedAt int64  `gorm:"column:created_at;<-:create"`
 	UpdatedAt int64  `gorm:"column:updated_at"`
 }
 

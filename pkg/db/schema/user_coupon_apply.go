@@ -4,7 +4,8 @@ type UserCouponApply struct {
 	ID        uint  `gorm:"primaryKey;autoIncrement;column:id"`
 	CouponID  int   `gorm:"not null;index;column:coupon_id"`
 	UserID    int   `gorm:"not null;index;column:user_id"`
-	CreatedAt int64 `gorm:"column:created_at"`
+	CreatedAt int64 `gorm:"column:created_at;<-:create"`
+	UpdatedAt int64 `gorm:"column:updated_at"`
 }
 
 func (UserCouponApply) TableName() string {

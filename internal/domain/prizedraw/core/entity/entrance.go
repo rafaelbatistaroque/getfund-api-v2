@@ -15,14 +15,15 @@ type Entrance struct {
 }
 
 func NewEntrance(luckyCode string, userId int, prizeDrawId int, purchaseId int, isDonation bool) *Entrance {
+	now := time.Now()
 	return &Entrance{
-		luckyCode:   getValidValue(luckyCode),
+		luckyCode:   getValidLuckCode(luckyCode),
 		userId:      getValidId(userId),
 		prizeDrawId: getValidId(prizeDrawId),
 		purchaseId:  getValidId(purchaseId),
 		isDonation:  isDonation,
-		createdAt:   time.Now(),
-		updatedAt:   time.Now(),
+		createdAt:   now,
+		updatedAt:   now,
 	}
 }
 
@@ -36,8 +37,8 @@ func (e *Entrance) GetCreatedAt() time.Time      { return e.createdAt }
 func (e *Entrance) GetUpdatedAt() time.Time      { return e.updatedAt }
 func (e *Entrance) SetUpdatedAt(value time.Time) { e.updatedAt = value }
 
-func getValidValue(value string) string {
-	if value == "" {
+func getValidLuckCode(value string) string {
+	if len(value) != 8 {
 		panic("error on create entrance entity")
 	}
 

@@ -32,11 +32,38 @@ func New(repository prizedraw_contract.Repository, bus bus.EventBus, hasher secu
 }
 
 func (a *applyPrizeDrawCouponApplication) Execute(input *apply_prizedraw_coupon.Input) (*apply_prizedraw_coupon.Output, *result_app.ApplicationError) {
-	validatable := input.Validate()
-	if validatable.IsInvalid() {
+	if validatable := input.Validate(); validatable.IsInvalid() {
 		return nil, result_app.New(result_app.UNPROCESSABLE_CONTENT_CODE, validatable.GetErrors())
 	}
 
+	purchaseIdReceived, err := a.emitAndAwaitPurchaseId(input)
+	if err != nil {
+		return nil, err
+	}
+
+	luckyCode, err := a.generateLuckyCode()
+	if err != nil {
+		return nil, err
+	}
+
+	coupon, err := a.getCoupon(input.CouponId)
+	if err != nil {
+		return nil, err
+	}
+
+	entrance := entity.NewEntrance(luckyCode, input.UserId, input.PrizeDrawId, purchaseIdReceived, false)
+	coupon.ApplyCoupon(input.UserId)
+	if err := a.saveEntranceAndCoupon(entrance, coupon); err != nil {
+		a.emitFailureEvent(purchaseIdReceived)
+		return nil, err
+	}
+
+	return &apply_prizedraw_coupon.Output{
+		Message: "coupon successfully applied",
+	}, nil
+}
+
+func (a *applyPrizeDrawCouponApplication) emitAndAwaitPurchaseId(input *apply_prizedraw_coupon.Input) (int, *result_app.ApplicationError) {
 	payload := &prizedraw_payload.ApplyPrizeDrawCouponStartedPayload{
 		UserId:       input.UserId,
 		ProductId:    input.ProductId,
@@ -45,38 +72,47 @@ func (a *applyPrizeDrawCouponApplication) Execute(input *apply_prizedraw_coupon.
 		ItemQuantity: 1,
 	}
 
-	var purchaseId int
-	promise := a.bus.EmitAndWaitPromise(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, payload, &purchaseId)
-	if !promise.IsErrorNil() {
-		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_APPLY+promise.ErrorToString()))
+	var purchaseIdReceived int
+	promise := a.bus.EmitAndWaitPromise(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, payload, &purchaseIdReceived)
+
+	if promise.HasError() {
+		return 0, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_APPLY+promise.ErrorToString()))
 	}
 
-	if purchaseId == 0 {
-		return nil, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_APPLY+_INVALID_PURCHASE))
+	if purchaseIdReceived == 0 {
+		return 0, result_app.New(result_app.UNAVAILABLE_CODE, errors.New(_COUPON_APPLY+_INVALID_PURCHASE))
 	}
 
-	luckyCode, errRandom := a.hasher.GetRandomCode(8)
-	if errRandom != nil || luckyCode == "" {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("erro on build lucky number"))
+	return purchaseIdReceived, nil
+}
+
+func (a *applyPrizeDrawCouponApplication) generateLuckyCode() (string, *result_app.ApplicationError) {
+	luckyCode, err := a.hasher.GetRandomCode(8)
+	if err != nil || luckyCode == "" {
+		return "", result_app.New(result_app.SERVER_ERROR_CODE, errors.New("erro on build lucky number"))
+	}
+	return luckyCode, nil
+}
+
+func (a *applyPrizeDrawCouponApplication) getCoupon(couponId int) (*entity.Coupon, *result_app.ApplicationError) {
+	couponDto, err := a.repository.GetCouponById(couponId)
+	if err != nil || couponDto == nil {
+		return nil, result_app.New(result_app.UNAVAILABLE_CODE, err)
 	}
 
-	entrance := entity.NewEntrance(luckyCode, input.UserId, input.PrizeDrawId, 1, false)
-	entrance_dto := &prizedraw_dto.EntranceDto{
-		LuckyCode:   entrance.GetLuckyCode(),
-		UserId:      entrance.GetUserId(),
-		PrizeDrawId: entrance.GetPrizeDrawId(),
-		PurchaseId:  entrance.GetPurchaseId(),
-		IsDonation:  entrance.GetIsDonation(),
-		CreatedAt:   entrance.GetCreatedAt().Unix(),
-		UpdatedAt:   entrance.GetUpdatedAt().Unix(),
-	}
+	return couponDto.ToEntity(), nil
+}
 
-	_, errEntrance := a.repository.CreateEntrance(entrance_dto)
-	if errEntrance != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("erro on create entrance"))
+func (a *applyPrizeDrawCouponApplication) saveEntranceAndCoupon(entrance *entity.Entrance, coupon *entity.Coupon) *result_app.ApplicationError {
+	if err := a.repository.SaveEntranceWithCouponApplied(prizedraw_dto.ToEntranceDto(entrance), prizedraw_dto.ToCouponDto(coupon)); err != nil {
+		return result_app.New(result_app.UNAVAILABLE_CODE, errors.New("erro on apply coupon"))
 	}
+	return nil
+}
 
-	//salvar entrance em cache com chave prize_draw_coupon_applied_key_entrance
-	//evento para enviar email com entranceId
-	return nil, nil
+func (a *applyPrizeDrawCouponApplication) emitFailureEvent(purchaseIdReceived int) {
+	var promiseResolvedWithSuccess bool
+	a.bus.EmitAndWaitPromise(&apply_prizedraw_coupon.ApplyPrizeDrawCouponFailedEvent{}, &prizedraw_payload.ApplyPrizeDrawCouponFailedPayload{
+		PurchaseId: purchaseIdReceived,
+	}, &promiseResolvedWithSuccess)
 }

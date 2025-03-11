@@ -264,7 +264,7 @@ func (h *hasher) GetRandomCode(length int) (string, error) {
 	var code strings.Builder
 	mathrand.NewSource(time.Now().UnixNano())
 
-	for i := 0; i < length; i++ {
+	for range length {
 		randomIndex := mathrand.Intn(len(ENTRANCE_CODE))
 		code.WriteByte(ENTRANCE_CODE[randomIndex])
 	}

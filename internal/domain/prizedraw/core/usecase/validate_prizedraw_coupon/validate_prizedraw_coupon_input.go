@@ -1,6 +1,8 @@
 package validate_prizedraw_coupon
 
 import (
+	"fmt"
+
 	validation "github.com/rafaelbatistaroque/validation"
 )
 
@@ -26,6 +28,18 @@ func (i *validatePrizeDrawCouponInput) Validate() validation.Validatable {
 			&validation.RequiredRule{},
 			&validation.EmailRule{},
 		)
+
+	if i.SelectedProductId <= 0 {
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "SelectedProductId"))
+	}
+
+	if i.SelectedPrizeDrawId <= 0 {
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "SelectedPrizeDrawId"))
+	}
+
+	if i.UserId <= 0 {
+		i.rules.AddError(fmt.Errorf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "UserId"))
+	}
 
 	return i.rules.GetResult()
 }

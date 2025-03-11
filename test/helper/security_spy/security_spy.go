@@ -163,7 +163,7 @@ func (h *HasherSpy) DefineDecryptMergedSuccess(result string) {
 }
 
 func (h *HasherSpy) DefineGetRandomCodeSuccess() {
-	h.SuccessResult["GetRandomCode"] = "FAKE_RANDOM_CODE"
+	h.SuccessResult["GetRandomCode"] = "FAKECODE"
 }
 
 func (h *HasherSpy) DefineGetRandomCodeError() {

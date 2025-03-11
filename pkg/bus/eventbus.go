@@ -4,10 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	logger "getfund-api-v2/pkg/log"
+	"reflect"
 	"strconv"
 	"sync"
 	"time"
 )
+
+var instance *eventBus
+var once sync.Once
 
 type EventBus interface {
 	Subscribe(eventName string, handler Handler)
@@ -27,11 +31,15 @@ type eventBus struct {
 }
 
 func New(timeoutInSecond int) EventBus {
-	return &eventBus{
-		handlers: make(map[string][]Handler),
-		logger:   logger.New("EventBus"),
-		timeout:  time.Duration(timeoutInSecond) * time.Second,
-	}
+	once.Do(func() {
+		instance = &eventBus{
+			handlers: make(map[string][]Handler),
+			logger:   logger.New("EventBus"),
+			timeout:  time.Duration(timeoutInSecond) * time.Second,
+		}
+	})
+
+	return instance
 }
 
 // Subscribe adiciona um handler para um tipo específico de evento
@@ -87,6 +95,11 @@ func (eb *eventBus) EmitAndWaitPromise(event Event, payload any, result any) *Pr
 }
 
 func (eb *eventBus) Wait(promise *Promise, result any) {
+	rs := reflect.ValueOf(result)
+	if rs.Kind() != reflect.Pointer || rs.IsNil() {
+		panic(errors.New("result must be a pointer"))
+	}
+
 	select {
 	case rawResult := <-promise.GetChannel():
 		if len(rawResult) == 0 {
@@ -136,6 +149,8 @@ func fromByte(rawResult []byte, result *any, logger *logger.Logger) error {
 			return errors.New("invalid result")
 		}
 		*result = ok
+	case bool:
+		*result = string(rawResult) == "true"
 	default:
 		var tempResult any
 		err := json.Unmarshal(rawResult, &tempResult)

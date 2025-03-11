@@ -13,7 +13,7 @@ import (
 	"getfund-api-v2/pkg/mail"
 )
 
-func SubscribeEventHandlers(settings settings.ApplicationSettings, eventBus bus.EventBus, cacheService cache_service.Cache) {
+func Compose(settings settings.ApplicationSettings, eventBus bus.EventBus, cacheService cache_service.Cache) {
 
 	//Services
 	mailService := mail_service.New(mail.New(settings))
@@ -24,12 +24,9 @@ func SubscribeEventHandlers(settings settings.ApplicationSettings, eventBus bus.
 	sendActivationAccountMailApplication := send_activation_account_mail_application.New(mailService, settings, templateFileService)
 
 	//Event Handler
-	recoverPasswordStartedEventHandler := recover_password_started_event_handler.New(sendRecoverPasswordMailApplication, cacheService)
-	createUserProcessStartedEventHandler := create_user_process_started_event_handler.New(cacheService, sendActivationAccountMailApplication)
-
 	handlers := map[string]bus.Handler{
-		"RecoverPasswordStartedEvent":   recoverPasswordStartedEventHandler,
-		"CreateUserProcessStartedEvent": createUserProcessStartedEventHandler,
+		"RecoverPasswordStartedEvent":   recover_password_started_event_handler.New(sendRecoverPasswordMailApplication, cacheService),
+		"CreateUserProcessStartedEvent": create_user_process_started_event_handler.New(cacheService, sendActivationAccountMailApplication),
 	}
 
 	for eventName, handler := range handlers {

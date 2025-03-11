@@ -85,6 +85,12 @@ func WithSelectedPrizeDrawId(id int) Option {
 	}
 }
 
+func WithUserId(id int) Option {
+	return func(params *validate_prizedraw_coupon.Input) {
+		params.UserId = id
+	}
+}
+
 func GetValidCoupon() *prizedraw_dto.CouponDto {
 	less72Hours := time.Now().Add(-24 * time.Hour).Unix()
 	more24Hours := time.Now().Add(24 * time.Hour).Unix()
@@ -151,16 +157,16 @@ func GetExpiredCoupon() *prizedraw_dto.CouponDto {
 	return validCoupon
 }
 
-func addUserApplies(limit, userId int) []prizedraw_dto.UserCouponApplyDto {
-	userApplies := make([]prizedraw_dto.UserCouponApplyDto, limit)
+func addUserApplies(limit, userId int) []*prizedraw_dto.UserCouponApplyDto {
+	userApplies := make([]*prizedraw_dto.UserCouponApplyDto, limit)
 	if userId != 0 {
-		userApplies[0] = prizedraw_dto.UserCouponApplyDto{
+		userApplies[0] = &prizedraw_dto.UserCouponApplyDto{
 			UserId: userId,
 		}
 	}
 
 	for id := range limit {
-		userApplies[id] = prizedraw_dto.UserCouponApplyDto{
+		userApplies[id] = &prizedraw_dto.UserCouponApplyDto{
 			UserId: id,
 		}
 
@@ -172,14 +178,14 @@ func GetValidPrizeDraw() *prizedraw_dto.PrizeDrawDto {
 	return &prizedraw_dto.PrizeDrawDto{Id: 5}
 }
 
-func GetProductWithDiferentIdResponse() *prizedraw_dto.ValidationData {
-	return &prizedraw_dto.ValidationData{Product: &prizedraw_dto.ProductData{IsActive: true, Id: 3}}
+func GetProductWithDiferentIdResponse() *prizedraw_dto.ProductDto {
+	return &prizedraw_dto.ProductDto{IsActive: true, Id: 3}
 }
 
-func GetProductResponse() *prizedraw_dto.ValidationData {
-	return &prizedraw_dto.ValidationData{Product: &prizedraw_dto.ProductData{IsActive: true, Id: 10}}
+func GetProductResponse() *prizedraw_dto.ProductDto {
+	return &prizedraw_dto.ProductDto{IsActive: true, Id: 10}
 }
 
-func GetInactiveProductResponse() *prizedraw_dto.ValidationData {
-	return &prizedraw_dto.ValidationData{Product: &prizedraw_dto.ProductData{IsActive: false}}
+func GetInactiveProductResponse() *prizedraw_dto.ProductDto {
+	return &prizedraw_dto.ProductDto{IsActive: false}
 }

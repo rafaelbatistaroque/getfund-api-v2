@@ -6,7 +6,7 @@ type Coupon struct {
 	PrizeDrawID               int    `gorm:"index;column:prize_draw_id"`
 	ProductID                 int    `gorm:"index;column:product_id"`
 	CouponTypeApplicabilityID int    `gorm:"index;column:coupon_type_applicability_id"`
-	CreatedAt                 int64  `gorm:"column:created_at"`
+	CreatedAt                 int64  `gorm:"column:created_at;<-:create"`
 	UpdatedAt                 int64  `gorm:"column:updated_at"`
 
 	// Relacionamentos

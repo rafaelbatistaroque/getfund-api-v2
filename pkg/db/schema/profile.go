@@ -8,7 +8,7 @@ type Profile struct {
 	Gender            string `gorm:"not null;column:gender"`
 	MainSocialNetwork string `gorm:"not null;column:main_social_network"`
 	RegisteredUrl     string `gorm:"not null;column:registered_url"`
-	CreatedAt         int64  `gorm:"column:created_at"`
+	CreatedAt         int64  `gorm:"column:created_at;<-:create"`
 	UpdatedAt         int64  `gorm:"column:updated_at"`
 
 	UserCategoryID uint `gorm:"index;column:user_category_id"`

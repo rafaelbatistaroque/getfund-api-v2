@@ -2,8 +2,9 @@ package main
 
 import (
 	"context"
-	"getfund-api-v2/internal/domain/auth/main/auth_entry_point_composer"
+	"getfund-api-v2/internal/domain/auth/main/auth_composer"
 	"getfund-api-v2/internal/domain/notification/main/notification_composer"
+	"getfund-api-v2/internal/domain/prizedraw/main/prizedraw_composer"
 	"getfund-api-v2/internal/settings"
 	"getfund-api-v2/internal/shared/service/cache_service"
 	"getfund-api-v2/pkg/bus"
@@ -26,29 +27,28 @@ func main() {
 	cacheService := cache_service.New(redis, ctx)
 
 	defer cacheService.Close()
+	currentDb, _ := db.DB()
+	defer currentDb.Close()
 
-	//Subscriber
-	notification_composer.SubscribeEventHandlers(appSettings, eventBus, cacheService)
-
-	//Entry Points
-	authEntryPoints := auth_entry_point_composer.Get(appSettings, cacheService, db, eventBus)
+	//Composer
+	notification_composer.Compose(appSettings, eventBus, cacheService)
+	prizedraw_composer.Compose(appSettings, eventBus, cacheService, db)
+	authComposer := auth_composer.Compose(appSettings, cacheService, db, eventBus)
 
 	//Routes
 	r := chi.NewRouter()
-	r.Route("/api/v2", func(api chi.Router) {
-		api.Get("/", HelloWorld)
+	r.Route("/api/v2", func(route chi.Router) {
+		route.Get("/", HelloWorld)
 
 		//Auth
-		api.
-			With(authEntryPoints.MiddlewareAutenticate).
-			Get("/auth/sign-out", authEntryPoints.Signout)
-		api.Post("/auth/sign-in", authEntryPoints.Signin)
-		api.Post("/auth/recover-password", authEntryPoints.RecoverPassword)
-		api.Post("/auth/reset-password", authEntryPoints.ResetPassword)
-		api.Post("/auth/user", authEntryPoints.CreateUser)
-		api.Get("/auth/user/activate/{activation_code}", authEntryPoints.ActivateUser)
-
-		//User
+		route.
+			With(authComposer.MiddlewareAutenticate).
+			Get("/auth/sign-out", authComposer.Signout)
+		route.Post("/auth/sign-in", authComposer.Signin)
+		route.Post("/auth/recover-password", authComposer.RecoverPassword)
+		route.Post("/auth/reset-password", authComposer.ResetPassword)
+		route.Post("/auth/user", authComposer.CreateUser)
+		route.Get("/auth/user/activate/{activation_code}", authComposer.ActivateUser)
 	})
 
 	http.ListenAndServe(appSettings.GetPort(), r)

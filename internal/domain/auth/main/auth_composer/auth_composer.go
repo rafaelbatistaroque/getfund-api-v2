@@ -1,4 +1,4 @@
-package auth_entry_point_composer
+package auth_composer
 
 import (
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/activate_user_gateway"
@@ -32,7 +32,7 @@ import (
 
 type middlewareFunc = func(http.Handler) http.Handler
 
-type authEntryPointComposer struct {
+type authComposer struct {
 	Signin          http.HandlerFunc
 	Signout         http.HandlerFunc
 	RecoverPassword http.HandlerFunc
@@ -44,11 +44,11 @@ type authEntryPointComposer struct {
 	MiddlewareAutenticateAdmin middlewareFunc
 }
 
-func Get(
+func Compose(
 	settings settings.ApplicationSettings,
 	cache cache_service.Cache,
 	db *gorm.DB,
-	eventBus bus.EventBus) authEntryPointComposer {
+	eventBus bus.EventBus) authComposer {
 
 	//dependencies
 	hasher := security.New()
@@ -79,7 +79,7 @@ func Get(
 
 	//Event Handler
 
-	return authEntryPointComposer{
+	return authComposer{
 		Signin:          response_proxy.New(signinGateway.Signin),
 		Signout:         response_proxy.New(signoutGateway.Signout),
 		RecoverPassword: response_proxy.New(recoverPasswordGateway.RecoverPassword),

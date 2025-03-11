@@ -68,6 +68,45 @@ func Test_GivenExecute_WhenEmailInvalid_ThenEnsureReturnError(t *testing.T) {
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_EMAIL_INVALID.Error(), "Email"))
 }
 
+func Test_GivenExecute_WhenSelectedProductIdLessThanZero_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithSelectedProductId(-1))
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "SelectedProductId"))
+}
+
+func Test_GivenExecute_WhenSelectedPrizeDrawIdLessThanZero_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithSelectedPrizeDrawId(-1))
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "SelectedPrizeDrawId"))
+}
+
+func Test_GivenExecute_WhenUserIdLessThanZero_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	invalidInput := fixture.GetInput(fixture.WithUserId(-1))
+
+	// Act
+	_, err := sut.Execute(invalidInput)
+
+	// Assert
+	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "UserId"))
+}
+
 func Test_GivenExecute_WhenInputValid_ThenEnsureCallGetCouponByCodeWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
@@ -90,7 +129,7 @@ func Test_GivenExecute_WhenGetCouponByCodeError_ThenEnsureReturnError(t *testing
 
 	// Assert
 	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
-	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetCouponByCode"])
+	verify.Should(t, err.Message.Error()).Be("coupon not found")
 }
 
 func Test_GivenExecute_WhenGetCouponByCodeWithSuccessNull_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -101,8 +140,8 @@ func Test_GivenExecute_WhenGetCouponByCodeWithSuccessNull_ThenEnsureReturnApropr
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message.Error()).Be("coupon null")
+	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Message.Error()).Be("coupon not found")
 }
 
 func Test_GivenExecute_WhenGetCouponByCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
@@ -265,8 +304,8 @@ func Test_GivenExecute_WhenGetPrizeDrawByIdWithSuccessNull_ThenEnsureReturnAprop
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
-	verify.Should(t, err.Message.Error()).Be("invalid prizedraw data")
+	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Message.Error()).Be("prizedraw not found")
 }
 
 func Test_GivenExecute_WhenGetPrizeDrawByIdWithSuccessHasWinner_ThenEnsureReturnApropriateError(t *testing.T) {
@@ -368,7 +407,7 @@ func Test_GivenExecute_WhenProductInactive_ThenEnsureReturnApropriateError(t *te
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.BusSpy.DefineResult(fixture.GetInactiveProductResponse())
+	spies.BusSpy.DefinePromiseResult(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{}, fixture.GetInactiveProductResponse())
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
@@ -384,7 +423,7 @@ func Test_GivenExecute_WhenCouponProductDifferentFromSelectedProduct_ThenEnsureR
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.BusSpy.DefineResult(fixture.GetProductWithDiferentIdResponse())
+	spies.BusSpy.DefinePromiseResult(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{}, fixture.GetProductWithDiferentIdResponse())
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
@@ -400,7 +439,7 @@ func Test_GivenExecute_WhenValidateCouponSuccess_ThenEnsureReturnOutput(t *testi
 	validCoupon := fixture.GetValidCoupon()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(validCoupon)
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	spies.BusSpy.DefineResult(fixture.GetProductResponse())
+	spies.BusSpy.DefinePromiseResult(&validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{}, fixture.GetProductResponse())
 
 	// Act
 	result, _ := sut.Execute(fixture.GetInput())
