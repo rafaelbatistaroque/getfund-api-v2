@@ -42,10 +42,27 @@ func Test_GivenHandler_WhenGetProductByIdInvoked_ThenEnsureCallsOnce(t *testing.
 	verify.Should(t, spies.RepoSpy.CallsCount["GetProductById"]).Be(1)
 }
 
-func Test_GivenHandler_WhenGetProductByIdError_ThenEnsureCallResolvePromiseWIthCorrectParameter(t *testing.T) {
+func Test_GivenHandler_WhenGetProductByIdError_ThenEnsureCallResolvePromiseWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetProductByIdError()
+	validEvent := fixture.GetValidValidatePrizeDrawCouponStartedEvent(1)
+
+	// Act
+	sut.Handle(validEvent)
+
+	//Assert
+	select {
+	case received := <-validEvent.GetChannel():
+		verify.Should(t, len(received)).Be(0)
+	case <-time.After(500 * time.Millisecond):
+		verify.Should(t, true).Be(false)
+	}
+}
+
+func Test_GivenHandler_WhenMarshalProductFoundError_ThenEnsureCallResolvePromiseWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
 	validEvent := fixture.GetValidValidatePrizeDrawCouponStartedEvent(1)
 
 	// Act
