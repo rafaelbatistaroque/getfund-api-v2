@@ -25,6 +25,11 @@ var payload struct {
 	ProductId int `json:"product_id"`
 }
 
+var promise struct {
+	Id       int  `json:"id"`
+	IsActive bool `json:"is_active"`
+}
+
 func (h *validatePrizeDrawCouponStartedStartedEventHandler) Handle(event bus.Event) {
 	var err error
 	if err = json.Unmarshal(event.GetPayload(), &payload); err != nil {
@@ -32,19 +37,29 @@ func (h *validatePrizeDrawCouponStartedStartedEventHandler) Handle(event bus.Eve
 		return
 	}
 
-	var product *product_dto.ProductDto
-	if product, err = h.repository.GetProductById(payload.ProductId); err != nil {
+	var productDto *product_dto.ProductDto
+	if productDto, err = h.repository.GetProductById(payload.ProductId); err != nil {
 		h.logger.Error("IsOk: False | get product failed")
 		event.ResolvePromise(app_constant.EMPTYB)
 		return
 	}
 
-	_, err = json.Marshal(product)
-	if err != nil || product == nil {
+	if productDto == nil {
+		h.logger.Error("IsOk: False | product not found")
+		event.ResolvePromise(app_constant.EMPTYB)
+		return
+	}
+
+	promise.Id = productDto.Id
+	promise.IsActive = productDto.IsActive
+
+	var productFound []byte
+	productFound, err = json.Marshal(promise)
+	if err != nil {
 		h.logger.Error("IsOk: False | marshal product failed")
 		event.ResolvePromise(app_constant.EMPTYB)
 		return
 	}
 
-	event.ResolvePromise([]byte("invalid-value"))
+	event.ResolvePromise(productFound)
 }
