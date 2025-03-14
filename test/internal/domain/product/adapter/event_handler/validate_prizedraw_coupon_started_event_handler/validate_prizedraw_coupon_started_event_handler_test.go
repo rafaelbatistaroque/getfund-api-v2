@@ -17,3 +17,15 @@ func Test_GivenHandler_WhenPayloadParseError_ThenEnsureNeverCallGetProductById(t
 	//Assert
 	verify.Should(t, spies.RepoSpy.CallsCount["GetProductById"]).Be(0)
 }
+
+func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetProductByIdWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	expectedProductId := 20
+
+	// Act
+	sut.Handle(fixture.GetValidValidatePrizeDrawCouponStartedEvent(expectedProductId))
+
+	//Assert
+	verify.Should(t, spies.RepoSpy.Params["GetProductById:productId"]).Be(expectedProductId)
+}
