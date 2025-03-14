@@ -1,6 +1,7 @@
 package validate_prizedraw_coupon_started_event_handler_test
 
 import (
+	"encoding/json"
 	fixture "getfund-api-v2/test/internal/domain/product/adapter/event_handler/validate_prizedraw_coupon_started_event_handler/validate_prizedraw_coupon_started_event_handler_fixture"
 	"testing"
 	"time"
@@ -60,6 +61,22 @@ func Test_GivenHandler_WhenGetProductByIdError_ThenEnsureCallResolvePromiseWithC
 	}
 }
 
+func Test_GivenHandler_WhenGetProductByIdFoundNull_ThenEnsureCallResolvePromiseWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSut()
+	validEvent := fixture.GetValidValidatePrizeDrawCouponStartedEvent(1)
+
+	// Act
+	sut.Handle(validEvent)
+
+	//Assert
+	select {
+	case received := <-validEvent.GetChannel():
+		verify.Should(t, len(received)).Be(0)
+	case <-time.After(500 * time.Millisecond):
+		verify.Should(t, true).Be(false)
+	}
+}
 func Test_GivenHandler_WhenMarshalProductFoundError_ThenEnsureCallResolvePromiseWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, _ := fixture.NewSut()
@@ -72,6 +89,31 @@ func Test_GivenHandler_WhenMarshalProductFoundError_ThenEnsureCallResolvePromise
 	select {
 	case received := <-validEvent.GetChannel():
 		verify.Should(t, len(received)).Be(0)
+	case <-time.After(500 * time.Millisecond):
+		verify.Should(t, true).Be(false)
+	}
+}
+
+func Test_GivenHandler_WhenGetProductByIdFound_ThenEnsureCallResolvePromiseWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	expectedProduct := fixture.GetValidProduct()
+	spies.RepoSpy.DefineGetProductByIdSuccess(expectedProduct)
+	validEvent := fixture.GetValidValidatePrizeDrawCouponStartedEvent(1)
+	var receivedProduct struct {
+		Id       int  `json:"id"`
+		IsActive bool `json:"is_active"`
+	}
+
+	// Act
+	sut.Handle(validEvent)
+
+	//Assert
+	select {
+	case received := <-validEvent.GetChannel():
+		json.Unmarshal(received, &receivedProduct)
+		verify.Should(t, receivedProduct.Id).Be(expectedProduct.Id)
+		verify.Should(t, receivedProduct.IsActive).Be(expectedProduct.IsActive)
 	case <-time.After(500 * time.Millisecond):
 		verify.Should(t, true).Be(false)
 	}
