@@ -27,6 +27,10 @@ func (e *EventBase) SetChannel(channel chan []byte) {
 	e.channel = channel
 }
 
+func (e *EventBase) GetChannel() chan []byte {
+	return e.channel
+}
+
 func (e *EventBase) ResolvePromise(result []byte) {
 	if e.channel == nil {
 		return

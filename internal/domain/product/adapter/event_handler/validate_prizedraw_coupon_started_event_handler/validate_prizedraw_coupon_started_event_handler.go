@@ -3,6 +3,7 @@ package validate_prizedraw_coupon_started_event_handler
 import (
 	"encoding/json"
 	product_contract "getfund-api-v2/internal/domain/product/core/contract"
+	"getfund-api-v2/internal/shared/app_constant"
 	"getfund-api-v2/pkg/bus"
 	logger "getfund-api-v2/pkg/log"
 )
@@ -24,10 +25,17 @@ var payload struct {
 }
 
 func (h *validatePrizeDrawCouponStartedStartedEventHandler) Handle(event bus.Event) {
-	if err := json.Unmarshal(event.GetPayload(), &payload); err != nil {
+	var err error
+	if err = json.Unmarshal(event.GetPayload(), &payload); err != nil {
 		h.logger.Error("IsOk: False | get payload failed")
 		return
 	}
 
-	h.repository.GetProductById(payload.ProductId)
+	if _, err = h.repository.GetProductById(payload.ProductId); err != nil {
+		h.logger.Error("IsOk: False | get product failed")
+		event.ResolvePromise(app_constant.EMPTYB)
+		return
+	}
+
+	event.ResolvePromise([]byte("invalid-value"))
 }
