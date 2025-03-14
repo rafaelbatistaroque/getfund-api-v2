@@ -42,7 +42,7 @@ func Test_GivenHandler_WhenGetCouponByCodeInvoked_ThenEnsureCallsOnce(t *testing
 	verify.Should(t, spies.RepoSpy.CallsCount["GetCouponByCode"]).Be(1)
 }
 
-func Test_GivenHandler_WhenGetCouponByCodeError_ThenEnsureNeverCallEmitWithPayloadAndResponse(t *testing.T) {
+func Test_GivenHandler_WhenGetCouponByCodeError_ThenEnsureNeverCallValidatePrizeDrawCoupon(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeError()

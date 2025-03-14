@@ -29,9 +29,11 @@ func GetValidValidatePrizeDrawCouponStartedEvent(productId int) *validate_prized
 	payload, _ := json.Marshal(map[string]any{
 		"product_id": productId,
 	})
+	channel := make(chan []byte, 1)
 
 	event := &validate_prizedraw_coupon.ValidatePrizeDrawCouponStartedEvent{}
 	event.SetPayload(payload)
+	event.SetChannel(channel)
 
 	return event
 }

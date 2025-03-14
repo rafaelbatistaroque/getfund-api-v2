@@ -3,6 +3,7 @@ package validate_prizedraw_coupon_started_event_handler_test
 import (
 	fixture "getfund-api-v2/test/internal/domain/product/adapter/event_handler/validate_prizedraw_coupon_started_event_handler/validate_prizedraw_coupon_started_event_handler_fixture"
 	"testing"
+	"time"
 
 	"github.com/rafaelbatistaroque/verify"
 )
@@ -39,4 +40,22 @@ func Test_GivenHandler_WhenGetProductByIdInvoked_ThenEnsureCallsOnce(t *testing.
 
 	//Assert
 	verify.Should(t, spies.RepoSpy.CallsCount["GetProductById"]).Be(1)
+}
+
+func Test_GivenHandler_WhenGetProductByIdError_ThenEnsureCallResolvePromiseWIthCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.RepoSpy.DefineGetProductByIdError()
+	validEvent := fixture.GetValidValidatePrizeDrawCouponStartedEvent(1)
+
+	// Act
+	sut.Handle(validEvent)
+
+	//Assert
+	select {
+	case received := <-validEvent.GetChannel():
+		verify.Should(t, len(received)).Be(0)
+	case <-time.After(500 * time.Millisecond):
+		verify.Should(t, true).Be(false)
+	}
 }
