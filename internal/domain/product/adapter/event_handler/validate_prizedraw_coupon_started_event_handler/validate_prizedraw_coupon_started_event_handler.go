@@ -20,7 +20,7 @@ func New(repository product_contract.Repository) bus.Handler {
 }
 
 var payload struct {
-	ProductId int
+	ProductId int `json:"product_id"`
 }
 
 func (h *validatePrizeDrawCouponStartedStartedEventHandler) Handle(event bus.Event) {
@@ -29,5 +29,5 @@ func (h *validatePrizeDrawCouponStartedStartedEventHandler) Handle(event bus.Eve
 		return
 	}
 
-	h.repository.GetProductById(0)
+	h.repository.GetProductById(payload.ProductId)
 }
