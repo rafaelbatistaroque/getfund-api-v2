@@ -29,3 +29,14 @@ func Test_GivenHandler_WhenPayloadParseSuccess_ThenEnsureCallGetProductByIdWithC
 	//Assert
 	verify.Should(t, spies.RepoSpy.Params["GetProductById:productId"]).Be(expectedProductId)
 }
+
+func Test_GivenHandler_WhenGetProductByIdInvoked_ThenEnsureCallsOnce(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+
+	// Act
+	sut.Handle(fixture.GetValidValidatePrizeDrawCouponStartedEvent(1))
+
+	//Assert
+	verify.Should(t, spies.RepoSpy.CallsCount["GetProductById"]).Be(1)
+}
