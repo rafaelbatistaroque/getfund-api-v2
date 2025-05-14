@@ -33,5 +33,5 @@ func (p *productRepository) GetProductById(productId int) (*product_dto.ProductD
 		return nil, result.Error
 	}
 
-	return nil, nil
+	return product_dto.MapFromSchema(product), nil
 }
