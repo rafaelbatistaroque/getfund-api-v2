@@ -9,14 +9,14 @@ import (
 	logger "getfund-api-v2/pkg/log"
 )
 
-type validatePrizeDrawCouponStartedStartedEventHandler struct {
+type validatePrizeDrawCouponStartedEventHandler struct {
 	logger     logger.Logger
 	repository product_contract.Repository
 }
 
 func New(repository product_contract.Repository) bus.Handler {
-	return &validatePrizeDrawCouponStartedStartedEventHandler{
-		logger:     *logger.New("validatePrizeDrawCouponStartedStartedEventHandler"),
+	return &validatePrizeDrawCouponStartedEventHandler{
+		logger:     *logger.New("validatePrizeDrawCouponStartedEventHandler"),
 		repository: repository,
 	}
 }
@@ -30,7 +30,7 @@ var promise struct {
 	IsActive bool `json:"is_active"`
 }
 
-func (h *validatePrizeDrawCouponStartedStartedEventHandler) Handle(event bus.Event) {
+func (h *validatePrizeDrawCouponStartedEventHandler) Handle(event bus.Event) {
 	var err error
 	if err = json.Unmarshal(event.GetPayload(), &payload); err != nil {
 		h.logger.Error("IsOk: False | get payload failed")
