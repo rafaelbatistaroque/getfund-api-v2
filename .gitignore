@@ -27,3 +27,4 @@ launch.json
 .vscode/settings.json
 .DS_Store
 export.txt
+.idea/*
