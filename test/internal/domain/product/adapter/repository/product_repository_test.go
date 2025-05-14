@@ -19,3 +19,14 @@ func Test_GivenGetProductById_WhenQueryError_ThenEnsureReturnError(t *testing.T)
 	// Assert
 	verify.Should(t, err).NotNil()
 }
+
+func Test_GivenGetProductById_WhenNotFound_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSUT()
+
+	// Act
+	_, err := sut.GetProductById(0)
+
+	// Assert
+	verify.Should(t, err.Error()).Be("product not found")
+}
