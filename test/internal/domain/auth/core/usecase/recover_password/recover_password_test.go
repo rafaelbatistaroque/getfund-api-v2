@@ -3,8 +3,8 @@ package recover_password_test
 import (
 	"bytes"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
-	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password/event"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"getfund-api-v2/internal/shared/security"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/recover_password/recover_password_fixture"
 	"testing"
@@ -61,7 +61,7 @@ func Test_GivenRecoverPasswordExecute_WhenGetAuthenticatedUserByUsernameError_Th
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Code).Be(shared_error.NOT_FOUND_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
@@ -98,7 +98,7 @@ func Test_GivenRecoverPasswordExecute_WhenGetRandomCodeError_ThenEnsureReturnErr
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["GetRandomCode"])
 }
 
@@ -125,7 +125,7 @@ func Test_GivenRecoverPasswordExecute_WhenHashError_ThenEnsureReturnErrorFromWit
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.HasherSpy.ErrorResult["Hash"])
 }
 
@@ -164,7 +164,7 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetError_ThenEnsureReturnErrorFro
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.CacheSpy.ErrorResult["Set"])
 }
 
@@ -179,7 +179,7 @@ func Test_GivenRecoverPasswordExecute_WhenCacheSetSuccess_ThenEnsureCallPublishW
 	sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, spies.EventBusSpy.Params["EmitWithPayload:event"][0]).Be(&recover_password.RecoverPasswordStartedEvent{})
+	verify.Should(t, spies.EventBusSpy.Params["EmitWithPayload:event"][0]).Be(&event.RecoverPasswordStartedEvent{})
 	verify.Should(t, spies.EventBusSpy.Params["EmitWithPayload:payload"][0]).Be(expectedPaylod)
 }
 

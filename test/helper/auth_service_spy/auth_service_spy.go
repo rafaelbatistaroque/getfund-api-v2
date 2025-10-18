@@ -2,7 +2,7 @@ package auth_service_spy
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 )
 
 type AuthServiceSpy struct {
@@ -11,14 +11,14 @@ type AuthServiceSpy struct {
 	CallsCount int
 
 	SuccessResult *auth_dto.SessionDto
-	ErrorResult   *result_app.ApplicationError
+	ErrorResult   *shared_error.Error
 }
 
 func New() *AuthServiceSpy {
 	return &AuthServiceSpy{Params: make(map[string]string), CallsCount: 0, ErrorResult: nil, SuccessResult: nil}
 }
 
-func (a *AuthServiceSpy) Authenticate(username string, password string) (*auth_dto.SessionDto, *result_app.ApplicationError) {
+func (a *AuthServiceSpy) Authenticate(username string, password string) (*auth_dto.SessionDto, *shared_error.Error) {
 	a.Params["username"] = username
 	a.Params["password"] = password
 
@@ -28,7 +28,7 @@ func (a *AuthServiceSpy) Authenticate(username string, password string) (*auth_d
 }
 
 func (a *AuthServiceSpy) DefineNotAuthenticate(code int, message error) {
-	a.ErrorResult = result_app.New(code, message)
+	a.ErrorResult = shared_error.New(code, message)
 }
 
 func (a *AuthServiceSpy) DefineAuthenticate() {

@@ -39,17 +39,17 @@ func (r *AuthRepositorySpy) UpdatePassword(id int, value string) error {
 	return r.ErrorResult["UpdatePassword"]
 }
 
-func (r *AuthRepositorySpy) CreateUser(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
-	r.Params["CreateUser:user"] = user
+func (r *AuthRepositorySpy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+	r.Params["Signup:user"] = user
 
-	r.CallsCount["CreateUser"]++
+	r.CallsCount["Signup"]++
 
-	sucess := r.SuccessResult["CreateUser"]
+	sucess := r.SuccessResult["Signup"]
 	if sucess != nil {
 		return sucess.(*auth_dto.UserDto), nil
 	}
 
-	return nil, r.ErrorResult["CreateUser"]
+	return nil, r.ErrorResult["Signup"]
 }
 
 func (r *AuthRepositorySpy) UserExists(username string) (*auth_dto.UserDto, error) {
@@ -81,12 +81,12 @@ func (r *AuthRepositorySpy) DefineUpdatePasswordError() {
 	r.ErrorResult["UpdatePassword"] = errors.New("fake-error")
 }
 
-func (r *AuthRepositorySpy) DefineCreateUserError() {
-	r.ErrorResult["CreateUser"] = errors.New("fake-error")
+func (r *AuthRepositorySpy) DefineSignupError() {
+	r.ErrorResult["Signup"] = errors.New("fake-error")
 }
 
-func (r *AuthRepositorySpy) DefineCreateUserSuccess() {
-	r.SuccessResult["CreateUser"] = &auth_dto.UserDto{Id: 1}
+func (r *AuthRepositorySpy) DefineSignupSuccess() {
+	r.SuccessResult["Signup"] = &auth_dto.UserDto{Id: 1}
 }
 
 func (r *AuthRepositorySpy) DefineUserExistsError() {

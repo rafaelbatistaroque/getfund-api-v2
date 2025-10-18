@@ -9,17 +9,17 @@ type Spy struct {
 }
 
 type SigninMapperSpy struct {
-	Params      map[string]interface{}
+	Params      map[string]any
 	ForceReturn bool
 
 	CallsCount map[string]int
 
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 	ErrorResult   map[string]error
 }
 
 func New() *SigninMapperSpy {
-	return &SigninMapperSpy{Params: make(map[string]interface{}), ForceReturn: true, ErrorResult: make(map[string]error), CallsCount: make(map[string]int), SuccessResult: make(map[string]interface{})}
+	return &SigninMapperSpy{Params: make(map[string]any), ForceReturn: true, ErrorResult: make(map[string]error), CallsCount: make(map[string]int), SuccessResult: make(map[string]any)}
 }
 
 func (m *SigninMapperSpy) ToOutput(token string, session *model.SessionDto) *signin.Output {

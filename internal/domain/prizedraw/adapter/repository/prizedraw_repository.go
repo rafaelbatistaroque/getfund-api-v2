@@ -4,16 +4,17 @@ import (
 	"errors"
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
-	"getfund-api-v2/pkg/db/schema"
+	"getfund-api-v2/internal/infra/db"
+	"getfund-api-v2/internal/infra/db/schema"
 
 	"gorm.io/gorm"
 )
 
 type prizedrawRepository struct {
-	db *gorm.DB
+	db *db.GetFund
 }
 
-func New(db *gorm.DB) prizedraw_contract.Repository {
+func New(db *db.GetFund) prizedraw_contract.Repository {
 	return &prizedrawRepository{db: db}
 }
 

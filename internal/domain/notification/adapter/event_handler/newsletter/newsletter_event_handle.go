@@ -3,7 +3,7 @@ package newsletter_event_handler
 import (
 	"encoding/json"
 	"fmt"
-	"getfund-api-v2/pkg/bus"
+	shared_bus "getfund-api-v2/internal/shared/bus"
 )
 
 type newsletterPayload struct {
@@ -15,12 +15,12 @@ type newsletterEventHandler struct {
 	//usecase para acao
 }
 
-func New() bus.Handler {
+func New() shared_bus.Handler {
 	return &newsletterEventHandler{}
 }
 
 // Implementa o Handler genérico para SignedEvent
-func (h *newsletterEventHandler) Handle(event bus.Event) {
+func (h *newsletterEventHandler) Handle(event shared_bus.Event) {
 	payload := &newsletterPayload{}
 	json.Unmarshal(event.GetPayload(), payload)
 	fmt.Printf("Processando newsletter para SignedEvent com ID: %s\n", payload.FirstName)

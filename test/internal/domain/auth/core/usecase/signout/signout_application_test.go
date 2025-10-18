@@ -1,7 +1,7 @@
 package signout_test
 
 import (
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/signout/signout_fixture"
 	"testing"
 
@@ -54,7 +54,7 @@ func Test_GivenSignoutExecute_WhenDeleteSessionError_ThenEnsureReturnError(t *te
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(sessionSpy.ErrorResult["DeleteSession"])
 }
 

@@ -6,7 +6,7 @@ import (
 	signout_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signout_auth_gateway"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signout"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"net/http"
 	"net/http/httptest"
 )
@@ -18,12 +18,12 @@ type SignoutGatewayFixture struct {
 type signoutUsecaseSpy struct {
 	Params        map[string]*signout.Input
 	CallsCount    map[string]int
-	ErrorResult   map[string]*result_app.ApplicationError
+	ErrorResult   map[string]*shared_error.Error
 	SuccessResult map[string]*signout.Output
 }
 
 func NewSut() (signout_gateway.SignoutGateway, *SignoutGatewayFixture) {
-	signoutSpy := &signoutUsecaseSpy{Params: make(map[string]*signout.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*result_app.ApplicationError), SuccessResult: make(map[string]*signout.Output)}
+	signoutSpy := &signoutUsecaseSpy{Params: make(map[string]*signout.Input), CallsCount: make(map[string]int), ErrorResult: make(map[string]*shared_error.Error), SuccessResult: make(map[string]*signout.Output)}
 
 	return signout_gateway.New(signoutSpy),
 		&SignoutGatewayFixture{
@@ -31,7 +31,7 @@ func NewSut() (signout_gateway.SignoutGateway, *SignoutGatewayFixture) {
 		}
 }
 
-func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *result_app.ApplicationError) {
+func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *shared_error.Error) {
 	s.Params["Execute:input"] = input
 
 	s.CallsCount["Execute"]++
@@ -67,7 +67,7 @@ func GetSignoutHeaderToken() string {
 }
 
 func (s *signoutUsecaseSpy) DefineError() {
-	s.ErrorResult["Execute"] = &result_app.ApplicationError{Code: result_app.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
+	s.ErrorResult["Execute"] = &shared_error.Error{Code: shared_error.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
 }
 
 func (s *signoutUsecaseSpy) DefineSuccess() {

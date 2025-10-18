@@ -5,7 +5,7 @@ import (
 	"errors"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/reset_password_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"net/http"
 	"net/http/httptest"
 )
@@ -17,7 +17,7 @@ type ResetPasswordGatewayFixture struct {
 type resetPasswordUsecaseSpy struct {
 	Params        map[string]*reset_password.Input
 	CallsCount    map[string]int
-	ErrorResult   map[string]*result_app.ApplicationError
+	ErrorResult   map[string]*shared_error.Error
 	SuccessResult map[string]*reset_password.Output
 }
 
@@ -25,7 +25,7 @@ func NewSut() (reset_password_gateway.ResetPasswordGateway, *ResetPasswordGatewa
 	resetPasswordSpy := &resetPasswordUsecaseSpy{
 		Params:        make(map[string]*reset_password.Input),
 		CallsCount:    make(map[string]int),
-		ErrorResult:   make(map[string]*result_app.ApplicationError),
+		ErrorResult:   make(map[string]*shared_error.Error),
 		SuccessResult: make(map[string]*reset_password.Output)}
 
 	return reset_password_gateway.New(resetPasswordSpy),
@@ -33,7 +33,7 @@ func NewSut() (reset_password_gateway.ResetPasswordGateway, *ResetPasswordGatewa
 			ResetPasswordUsecaseSpy: resetPasswordSpy}
 }
 
-func (s *resetPasswordUsecaseSpy) Execute(input *reset_password.Input) (*reset_password.Output, *result_app.ApplicationError) {
+func (s *resetPasswordUsecaseSpy) Execute(input *reset_password.Input) (*reset_password.Output, *shared_error.Error) {
 	s.Params["Execute:input"] = input
 
 	s.CallsCount["Execute"]++
@@ -65,7 +65,7 @@ func GetResetPasswordInput() *reset_password.Input {
 }
 
 func (s *resetPasswordUsecaseSpy) DefineError() {
-	s.ErrorResult["Execute"] = &result_app.ApplicationError{Code: result_app.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
+	s.ErrorResult["Execute"] = &shared_error.Error{Code: shared_error.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
 }
 
 func (s *resetPasswordUsecaseSpy) DefineSuccess() {

@@ -6,49 +6,49 @@ import (
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
-	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/internal/shared/service/cache_service"
+	"getfund-api-v2/internal/shared/cache"
+	shared_error "getfund-api-v2/internal/shared/error"
 )
 
 type resetPasswordApplication struct {
-	cacheService   cache_service.Cache
-	authRepository auth_contract.Repository
+	cache      cache.Contract
+	repository auth_contract.Repository
 }
 
-func New(cacheService cache_service.Cache, authRepository auth_contract.Repository) *resetPasswordApplication {
+func New(cache cache.Contract, repository auth_contract.Repository) *resetPasswordApplication {
 	return &resetPasswordApplication{
-		cacheService:   cacheService,
-		authRepository: authRepository,
+		cache:      cache,
+		repository: repository,
 	}
 }
 
-func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_password.Output, *result_app.ApplicationError) {
+func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_password.Output, *shared_error.Error) {
 	validatable := input.Validate()
 	if validatable.IsInvalid() {
-		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validatable.GetErrors())
+		return nil, shared_error.New(shared_error.BAD_REQUEST_CODE, validatable.GetErrors())
 	}
 
-	cacheData, errCache := r.cacheService.Get(input.RecoveryKey)
+	cacheData, errCache := r.cache.Get(input.RecoveryKey)
 	if errCache != nil {
-		return nil, result_app.New(result_app.NOT_FOUND_CODE, errors.New("recovery code not found"))
+		return nil, shared_error.New(shared_error.NOT_FOUND_CODE, errors.New("recovery code not found"))
 	}
 
 	forgetPasswordDto := &auth_dto.ForgetPasswordDto{}
 	errUnmarshal := json.Unmarshal([]byte(cacheData), forgetPasswordDto)
 	if errUnmarshal != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errors.New("error on get recovery password data"))
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errors.New("error on get recovery password data"))
 	}
 
-	authenticatedUser, errGetUser := r.authRepository.GetAuthenticatedUserByUsername(forgetPasswordDto.Username)
+	authenticatedUser, errGetUser := r.repository.GetAuthenticatedUserByUsername(forgetPasswordDto.Username)
 	if errGetUser != nil {
-		return nil, result_app.New(result_app.NOT_FOUND_CODE, errGetUser)
+		return nil, shared_error.New(shared_error.NOT_FOUND_CODE, errGetUser)
 	}
 
-	if errUpdate := r.authRepository.UpdatePassword(authenticatedUser.Id, input.Password); errUpdate != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errUpdate)
+	if errUpdate := r.repository.UpdatePassword(authenticatedUser.Id, input.Password); errUpdate != nil {
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errUpdate)
 	}
 
-	defer r.cacheService.Delete(input.RecoveryKey)
+	defer r.cache.Delete(input.RecoveryKey)
 
 	return &reset_password.Output{Message: "password updated"}, nil
 }

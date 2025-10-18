@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	"getfund-api-v2/internal/proxy/response_proxy"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
+	shared_response_proxy "getfund-api-v2/internal/shared/proxy"
 	"net/http"
 	"strings"
 )
@@ -32,13 +32,13 @@ func (a *authMiddleware) Authenticate(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := extractToken(r)
 		if token == "" {
-			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			shared_response_proxy.SetError(w, shared_error.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
 		sessionSerialized, err := a.session.GetSession(token)
 		if err != nil || sessionSerialized == "" {
-			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			shared_response_proxy.SetError(w, shared_error.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
@@ -53,20 +53,20 @@ func (a *authMiddleware) AuthenticateAdmin(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := extractToken(r)
 		if token == "" {
-			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			shared_response_proxy.SetError(w, shared_error.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
 		sessionSerialized, err := a.session.GetSession(token)
 		if err != nil || sessionSerialized == "" {
-			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			shared_response_proxy.SetError(w, shared_error.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 
 		session := &sessionModel{}
 		errSession := json.Unmarshal([]byte(sessionSerialized), &session)
 		if errSession != nil || session.IdAdmin == 1 {
-			response_proxy.SetError(w, result_app.UNAUTHORIZED_CODE, errors.New("unauthorized"))
+			shared_response_proxy.SetError(w, shared_error.UNAUTHORIZED_CODE, errors.New("unauthorized"))
 			return
 		}
 

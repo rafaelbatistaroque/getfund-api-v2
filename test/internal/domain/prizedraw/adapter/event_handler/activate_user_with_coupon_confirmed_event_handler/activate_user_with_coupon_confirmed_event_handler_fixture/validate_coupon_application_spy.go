@@ -3,13 +3,13 @@ package activate_user_with_coupon_confirmed_event_handler_fixture
 import (
 	"errors"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 )
 
 type ValidatePrizeDrawCouponApplicationSpy struct {
 	Params        map[string]*validate_prizedraw_coupon.Input
 	CallsCount    map[string]int
-	ErrorResult   map[string]*result_app.ApplicationError
+	ErrorResult   map[string]*shared_error.Error
 	SuccessResult map[string]*validate_prizedraw_coupon.Output
 }
 
@@ -17,11 +17,11 @@ func NewValidatePrizeDrawCoupon() *ValidatePrizeDrawCouponApplicationSpy {
 	return &ValidatePrizeDrawCouponApplicationSpy{
 		Params:        make(map[string]*validate_prizedraw_coupon.Input),
 		CallsCount:    make(map[string]int),
-		ErrorResult:   make(map[string]*result_app.ApplicationError),
+		ErrorResult:   make(map[string]*shared_error.Error),
 		SuccessResult: make(map[string]*validate_prizedraw_coupon.Output)}
 }
 
-func (uc *ValidatePrizeDrawCouponApplicationSpy) Execute(input *validate_prizedraw_coupon.Input) (*validate_prizedraw_coupon.Output, *result_app.ApplicationError) {
+func (uc *ValidatePrizeDrawCouponApplicationSpy) Execute(input *validate_prizedraw_coupon.Input) (*validate_prizedraw_coupon.Output, *shared_error.Error) {
 	uc.Params["Execute:input"] = input
 
 	uc.CallsCount["Execute"]++
@@ -30,7 +30,7 @@ func (uc *ValidatePrizeDrawCouponApplicationSpy) Execute(input *validate_prizedr
 }
 
 func (uc *ValidatePrizeDrawCouponApplicationSpy) DefineValidateCouponUsecaseError(withMessage string) {
-	uc.ErrorResult["Execute"] = &result_app.ApplicationError{Message: errors.New(withMessage)}
+	uc.ErrorResult["Execute"] = &shared_error.Error{Message: errors.New(withMessage)}
 }
 
 func (uc *ValidatePrizeDrawCouponApplicationSpy) DefineValidateCouponUsecaseSuccess() {

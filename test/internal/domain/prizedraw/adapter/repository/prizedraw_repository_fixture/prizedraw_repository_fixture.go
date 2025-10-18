@@ -4,22 +4,21 @@ import (
 	prizedraw_repository "getfund-api-v2/internal/domain/prizedraw/adapter/repository"
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
-	"getfund-api-v2/pkg/db/schema"
+	"getfund-api-v2/internal/infra/db"
+	"getfund-api-v2/internal/infra/db/schema"
 	"getfund-api-v2/test/helper/db_fixture"
 	"time"
-
-	"gorm.io/gorm"
 )
 
-func NewSUT() (prizedraw_contract.Repository, *gorm.DB) {
-	db := db_fixture.NewMemoryDB(
+func NewSUT() (prizedraw_contract.Repository, *db.GetFund) {
+	get_fund_db := db_fixture.NewMemoryDB(
 		&schema.Coupon{},
 		&schema.CouponTypeApplicability{},
 		&schema.UserCouponApply{},
 		&schema.Entrance{},
 	)
 
-	return prizedraw_repository.New(db), db
+	return prizedraw_repository.New(get_fund_db), get_fund_db
 }
 
 func GetEntranceDto() *prizedraw_dto.EntranceDto {

@@ -2,7 +2,7 @@ package send_activation_account_mail_application_test
 
 import (
 	"fmt"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/notification/core/usecase/send_activation_account_mail/send_activation_account_mail_fixture"
 	"testing"
 
@@ -18,7 +18,7 @@ func Test_GivenExecute_WhenFirstNameEmpty_ThenEnsureReturnUnprocessableError(t *
 	_, err := sut.Execute(fixture.GetInvalidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "FirstName"))
 }
 
@@ -30,7 +30,7 @@ func Test_GivenExecute_WhenEmailEmpty_ThenEnsureReturnUnprocessableError(t *test
 	_, err := sut.Execute(fixture.GetInvalidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Email"))
 }
 
@@ -42,7 +42,7 @@ func Test_GivenExecute_WhenEmailInvalid_ThenEnsureReturnUnprocessableError(t *te
 	_, err := sut.Execute(fixture.GetInvalidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_EMAIL_INVALID.Error(), "Email"))
 }
 
@@ -54,7 +54,7 @@ func Test_GivenExecute_WhenActivationLinkEmpty_ThenEnsureReturnUnprocessableErro
 	_, err := sut.Execute(fixture.GetInvalidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ActivationLink"))
 }
 
@@ -89,7 +89,7 @@ func Test_GivenExecute_WhenGetActivationAccountTemplateError_ThenEnsureReturnApp
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.TemplateFileSpy.ErrorResult["GetActivationAccountTemplate"])
 }
 
@@ -130,7 +130,7 @@ func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithSer
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.MailSpy.ErrorResult["SendMail"])
 }
 

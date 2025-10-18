@@ -1,6 +1,6 @@
 package product_dto
 
-import "getfund-api-v2/pkg/db/schema"
+import "getfund-api-v2/internal/infra/db/schema"
 
 type ProductDto struct {
 	Id       int  `json:"id"`

@@ -5,23 +5,23 @@ import (
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
-	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/pkg/bus"
-	logger "getfund-api-v2/pkg/log"
+	shared_bus "getfund-api-v2/internal/shared/bus"
+	"getfund-api-v2/internal/shared/cache"
+	shared_error "getfund-api-v2/internal/shared/error"
+	shared_logger "getfund-api-v2/internal/shared/log"
 )
 
 type activateUserWithCouponConfirmedEventHandler struct {
 	repository              prizedraw_contract.Repository
 	validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase
 	applyPrizeDrawCoupon    apply_prizedraw_coupon.UseCase
-	cache                   cache_service.Cache
-	logger                  logger.Logger
+	cache                   cache.Contract
+	logger                  shared_logger.Logger
 }
 
-func New(repository prizedraw_contract.Repository, validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase, applyPrizeDrawCoupon apply_prizedraw_coupon.UseCase, cache cache_service.Cache) bus.Handler {
+func New(repository prizedraw_contract.Repository, validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase, applyPrizeDrawCoupon apply_prizedraw_coupon.UseCase, cache cache.Contract) shared_bus.Handler {
 	return &activateUserWithCouponConfirmedEventHandler{
-		logger:                  *logger.New("activateUserWithCouponConfirmedEventHandler"),
+		logger:                  *shared_logger.New("activateUserWithCouponConfirmedEventHandler"),
 		repository:              repository,
 		cache:                   cache,
 		validatePrizeDrawCoupon: validatePrizeDrawCoupon,
@@ -35,7 +35,7 @@ var payload struct {
 	CouponCode string `json:"coupon_code"`
 }
 
-func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
+func (h *activateUserWithCouponConfirmedEventHandler) Handle(event shared_bus.Event) {
 	var err error
 	if err = json.Unmarshal(event.GetPayload(), &payload); err != nil {
 		h.logger.Error("IsOk: False | get payload failed")
@@ -53,7 +53,7 @@ func (h *activateUserWithCouponConfirmedEventHandler) Handle(event bus.Event) {
 		return
 	}
 
-	var erroUsecase = &result_app.ApplicationError{}
+	var erroUsecase = &shared_error.Error{}
 	var output = &validate_prizedraw_coupon.Output{}
 	output, erroUsecase = h.validatePrizeDrawCoupon.Execute(&validate_prizedraw_coupon.Input{
 		SelectedProductId:   couponDto.ProductId,

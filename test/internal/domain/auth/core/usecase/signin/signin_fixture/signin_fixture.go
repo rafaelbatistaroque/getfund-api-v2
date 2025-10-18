@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/signin/application"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"getfund-api-v2/test/helper/auth_service_spy"
 	"getfund-api-v2/test/helper/mapper_spy/signin_mapper_spy"
 	"getfund-api-v2/test/helper/session_spy"
@@ -35,12 +35,12 @@ func GetValidInput() *signin.Input {
 	return &signin.Input{Password: "fake-password", Username: "fake-username"}
 }
 
-func GetInputWithUserNameInvalid() (*signin.Input, *result_app.ApplicationError) {
+func GetInputWithUserNameInvalid() (*signin.Input, *shared_error.Error) {
 	return &signin.Input{Username: "", Password: "fake-password"},
-		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "UserName"))
+		shared_error.New(shared_error.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "UserName"))
 }
 
-func GetInputWithPasswordInvalid() (*signin.Input, *result_app.ApplicationError) {
+func GetInputWithPasswordInvalid() (*signin.Input, *shared_error.Error) {
 	return &signin.Input{Password: "", Username: "fake-username"},
-		result_app.New(result_app.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
+		shared_error.New(shared_error.BAD_REQUEST_CODE, fmt.Errorf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
 }

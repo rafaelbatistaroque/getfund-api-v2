@@ -3,7 +3,7 @@ package eventbus_spy
 import (
 	"encoding/json"
 	"errors"
-	"getfund-api-v2/pkg/bus"
+	shared_bus "getfund-api-v2/internal/shared/bus"
 	"reflect"
 	"strconv"
 	"time"
@@ -29,24 +29,24 @@ func New() *EventBusSpy {
 	}
 }
 
-func (eb *EventBusSpy) Subscribe(eventName string, handler bus.Handler) {
+func (eb *EventBusSpy) Subscribe(eventName string, handler shared_bus.Handler) {
 
 }
 
-func (eb *EventBusSpy) Emit(event bus.Event) {
+func (eb *EventBusSpy) Emit(event shared_bus.Event) {
 	eb.Params["Publish:event"] = append(eb.Params["Publish:event"], event)
 
 	eb.CallsCount["Publish"]++
 }
 
-func (eb *EventBusSpy) EmitWithPayload(event bus.Event, payload any) {
+func (eb *EventBusSpy) EmitWithPayload(event shared_bus.Event, payload any) {
 	eb.Params["EmitWithPayload:event"] = append(eb.Params["EmitWithPayload:event"], event)
 	eb.Params["EmitWithPayload:payload"] = append(eb.Params["EmitWithPayload:payload"], payload)
 
 	eb.CallsCount["EmitWithPayload"]++
 }
 
-func (eb *EventBusSpy) EmitWithPayloadAndResponse(event bus.Event, payload any, responseChannel chan []byte) {
+func (eb *EventBusSpy) EmitWithPayloadAndResponse(event shared_bus.Event, payload any, responseChannel chan []byte) {
 	eb.Params["EmitWithPayloadAndResponse:event"] = append(eb.Params["EmitWithPayloadAndResponse:event"], event)
 	eb.Params["EmitWithPayloadAndResponse:payload"] = append(eb.Params["EmitWithPayloadAndResponse:payload"], payload)
 	eb.Params["EmitWithPayloadAndResponse:responseChannel"] = append(eb.Params["EmitWithPayloadAndResponse:responseChannel"], responseChannel)
@@ -54,7 +54,7 @@ func (eb *EventBusSpy) EmitWithPayloadAndResponse(event bus.Event, payload any, 
 	eb.CallsCount["EmitWithPayloadAndResponse"]++
 }
 
-func (eb *EventBusSpy) Wait(promise *bus.Promise, result any) {
+func (eb *EventBusSpy) Wait(promise *shared_bus.Promise, result any) {
 	eb.Params["Wait:promise"] = append(eb.Params["Wait:promise"], promise)
 	eb.Params["Wait:result"] = append(eb.Params["Wait:result"], result)
 
@@ -100,7 +100,7 @@ func fromByte(rawResult []byte, result any) error {
 	return nil
 }
 
-func (eb *EventBusSpy) EmitWithPromise(event bus.Event, payload any) *bus.Promise {
+func (eb *EventBusSpy) EmitWithPromise(event shared_bus.Event, payload any) *shared_bus.Promise {
 	eb.Params["EmitWithPromise:event"] = append(eb.Params["EmitWithPromise:event"], event)
 	eb.Params["EmitWithPromise:payload"] = append(eb.Params["EmitWithPromise:payload"], payload)
 
@@ -109,13 +109,13 @@ func (eb *EventBusSpy) EmitWithPromise(event bus.Event, payload any) *bus.Promis
 	resultChannel := make(chan []byte, 1)
 	eb.EmitWithPayloadAndResponse(event, payload, resultChannel)
 
-	promise := &bus.Promise{}
-	eb.SuccessResult["EmitWithPromise"] = &bus.Promise{}
+	promise := &shared_bus.Promise{}
+	eb.SuccessResult["EmitWithPromise"] = &shared_bus.Promise{}
 
 	return promise
 }
 
-func (eb *EventBusSpy) EmitAndWaitPromise(event bus.Event, payload any, result any) *bus.Promise {
+func (eb *EventBusSpy) EmitAndWaitPromise(event shared_bus.Event, payload any, result any) *shared_bus.Promise {
 	eb.Params["EmitAndWaitPromise:event"] = append(eb.Params["EmitAndWaitPromise:event"], event)
 	eb.Params["EmitAndWaitPromise:payload"] = append(eb.Params["EmitAndWaitPromise:payload"], payload)
 	eb.Params["EmitAndWaitPromise:result"] = append(eb.Params["EmitAndWaitPromise:result"], result)
@@ -132,21 +132,21 @@ func (eb *EventBusSpy) EmitAndWaitPromise(event bus.Event, payload any, result a
 		return nil
 	}
 
-	return eb.SuccessResult["EmitAndWaitPromise"].(*bus.Promise)
+	return eb.SuccessResult["EmitAndWaitPromise"].(*shared_bus.Promise)
 }
 
 func (eb *EventBusSpy) DefineEmitAndWaitPromiseError() {
-	promise := &bus.Promise{}
+	promise := &shared_bus.Promise{}
 	promise.SetError(errors.New("error"))
 	eb.ErrorResult["EmitAndWaitPromise"] = errors.New("error")
 	eb.SuccessResult["EmitAndWaitPromise"] = promise
 }
 
 func (eb *EventBusSpy) DefineEmitAndWaitPromiseErrorNull() {
-	eb.SuccessResult["EmitAndWaitPromise"] = &bus.Promise{}
+	eb.SuccessResult["EmitAndWaitPromise"] = &shared_bus.Promise{}
 }
 
-func (eb *EventBusSpy) DefinePromiseResult(event bus.Event, result any) {
-	eb.SuccessResult["EmitAndWaitPromise"] = &bus.Promise{}
+func (eb *EventBusSpy) DefinePromiseResult(event shared_bus.Event, result any) {
+	eb.SuccessResult["EmitAndWaitPromise"] = &shared_bus.Promise{}
 	eb.ReferenceResult["EmitAndWaitPromise"+event.GetName()] = result
 }

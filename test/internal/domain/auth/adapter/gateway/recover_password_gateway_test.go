@@ -2,7 +2,7 @@ package auth_gateway_test
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/gateway/recover_password_gateway_fixture"
 	"testing"
 
@@ -18,7 +18,7 @@ func Test_GivenRecoverPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestW
 	_, code, err := sut.RecoverPassword(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err).NotNil()
 }
 
@@ -72,6 +72,6 @@ func Test_GivenRecoverPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSucc
 
 	// Assert
 	success := result.(*recover_password.Output)
-	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
+	verify.Should(t, code).Be(shared_error.SUCCESS_CODE)
 	verify.Should(t, success.Message).Be(spies.RecoverPasswordUsecaseSpy.SuccessResult["Execute"].Message)
 }

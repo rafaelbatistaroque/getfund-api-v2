@@ -3,26 +3,27 @@ package recover_password_started_event_handler
 import (
 	"encoding/json"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail"
-	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/pkg/bus"
-	logger "getfund-api-v2/pkg/log"
+
+	shared_bus "getfund-api-v2/internal/shared/bus"
+	"getfund-api-v2/internal/shared/cache"
+	shared_logger "getfund-api-v2/internal/shared/log"
 )
 
 type recoverPasswordStartedEventHandler struct {
-	logger                  logger.Logger
+	logger                  shared_logger.Logger
 	sendRecoverPasswordMail send_recover_password_mail.UseCase
-	cache                   cache_service.Cache
+	cache                   cache.Contract
 }
 
-func New(sendRecoverPasswordMail send_recover_password_mail.UseCase, cache cache_service.Cache) bus.Handler {
+func New(sendRecoverPasswordMail send_recover_password_mail.UseCase, cache cache.Contract) shared_bus.Handler {
 	return &recoverPasswordStartedEventHandler{
-		logger:                  *logger.New("recoverPasswordStartedEventHandler"),
+		logger:                  *shared_logger.New("recoverPasswordStartedEventHandler"),
 		sendRecoverPasswordMail: sendRecoverPasswordMail,
 		cache:                   cache,
 	}
 }
 
-func (h *recoverPasswordStartedEventHandler) Handle(event bus.Event) {
+func (h *recoverPasswordStartedEventHandler) Handle(event shared_bus.Event) {
 	payload := string(event.GetPayload())
 	if payload == "" {
 		h.logger.Error("IsOk: False | get payload failed")

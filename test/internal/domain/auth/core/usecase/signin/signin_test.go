@@ -2,7 +2,7 @@ package signin_application_test
 
 import (
 	"errors"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixtures "getfund-api-v2/test/internal/domain/auth/core/usecase/signin/signin_fixture"
 	"testing"
 
@@ -64,7 +64,7 @@ func Test_GivenSigninExecute_WhenAuthenticateInvoke_ThenEnsureCallsOnce(t *testi
 func Test_GivenSigninExecute_WhenAuthenticateError_ThenEnsureReturnErrorFrom(t *testing.T) {
 	// Arrange
 	sut, spies := fixtures.NewSut()
-	anyError := result_app.New(result_app.UNAUTHORIZED_CODE, errors.New("fake-message"))
+	anyError := shared_error.New(shared_error.UNAUTHORIZED_CODE, errors.New("fake-message"))
 	spies.AuthServiceSpy.DefineNotAuthenticate(anyError.Code, anyError.Message)
 
 	// Act
@@ -109,7 +109,7 @@ func Test_GivenSigninExecute_WhenSaveSessionError_ThenEnsureReturnServerError(t 
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).NotNil()
 }
 

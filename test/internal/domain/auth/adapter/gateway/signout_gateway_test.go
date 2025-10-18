@@ -2,7 +2,7 @@ package auth_gateway_test
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/usecase/signout"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/gateway/signout_gateway_fixture"
 	"testing"
 
@@ -18,7 +18,7 @@ func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnServerErrorWithError(
 	_, code, err := sut.Signout(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(result_app.UNAUTHORIZED_CODE)
+	verify.Should(t, code).Be(shared_error.UNAUTHORIZED_CODE)
 	verify.Should(t, err).NotNil()
 }
 
@@ -60,6 +60,6 @@ func Test_GivenSignout_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(
 
 	// Assert
 	success := result.(*signout.Output)
-	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
+	verify.Should(t, code).Be(shared_error.SUCCESS_CODE)
 	verify.Should(t, success.Message).Be(spies.SignoutUsecaseSpy.SuccessResult["Execute"].Message)
 }

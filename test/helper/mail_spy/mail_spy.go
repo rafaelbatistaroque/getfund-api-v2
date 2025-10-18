@@ -3,18 +3,18 @@ package mail_spy
 import "errors"
 
 type MailServiceSpy struct {
-	Params     map[string]interface{}
+	Params     map[string]any
 	CallsCount map[string]int
 
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 	ErrorResult   map[string]error
 }
 
 func New() *MailServiceSpy {
 	return &MailServiceSpy{
-		Params:        make(map[string]interface{}),
+		Params:        make(map[string]any),
 		CallsCount:    make(map[string]int),
-		SuccessResult: make(map[string]interface{}),
+		SuccessResult: make(map[string]any),
 		ErrorResult:   make(map[string]error),
 	}
 }

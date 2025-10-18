@@ -4,16 +4,17 @@ import (
 	"errors"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	"getfund-api-v2/pkg/db/schema"
+	"getfund-api-v2/internal/infra/db"
+	"getfund-api-v2/internal/infra/db/schema"
 
 	"gorm.io/gorm"
 )
 
 type authRepository struct {
-	db *gorm.DB
+	db *db.GetFund
 }
 
-func New(db *gorm.DB) auth_contract.Repository {
+func New(db *db.GetFund) auth_contract.Repository {
 	return &authRepository{db: db}
 }
 
@@ -53,7 +54,7 @@ func (r *authRepository) UpdatePassword(id int, value string) error {
 	return nil
 }
 
-func (u *authRepository) CreateUser(dto *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+func (u *authRepository) Signup(dto *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
 	var user = schema.User{
 		FirstName: dto.FirstName,
 		LastName:  dto.LastName,

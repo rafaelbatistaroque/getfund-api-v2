@@ -212,13 +212,13 @@ func Test_GivenUpdatePassword_WhenUpdatePasswordSuccess_ThenEnsureNull(t *testin
 	verify.Should(t, result).Nil()
 }
 
-func Test_GivenCreateUser_WhenInit_ThenEnsureCallHasherMethodsWithCorrectParameter(t *testing.T) {
+func Test_GivenSignup_WhenInit_ThenEnsureCallHasherMethodsWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetFilledActivationUserDto()
 
 	// Act
-	sut.CreateUser(expectedInput)
+	sut.Signup(expectedInput)
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.ParamsByCall["Encrypt:input"][0]).Be(expectedInput.FirstName)
@@ -231,12 +231,12 @@ func Test_GivenCreateUser_WhenInit_ThenEnsureCallHasherMethodsWithCorrectParamet
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
 
-func Test_GivenCreateUser_WhenHasherMethodsInvoked_ThenEnsureCallsCorrectTimes(t *testing.T) {
+func Test_GivenSignup_WhenHasherMethodsInvoked_ThenEnsureCallsCorrectTimes(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 
 	// Act
-	sut.CreateUser(fixture.GetEmptyActivationUserDto())
+	sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
 	verify.Should(t, spies.HasherSpy.CallsCount["Encrypt"]).Be(2)
@@ -244,19 +244,19 @@ func Test_GivenCreateUser_WhenHasherMethodsInvoked_ThenEnsureCallsCorrectTimes(t
 	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
 }
 
-func Test_GivenCreateUser_WhenHashWithSaltError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenSignup_WhenHashWithSaltError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltError()
 
 	// Act
-	_, err := sut.CreateUser(fixture.GetEmptyActivationUserDto())
+	_, err := sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
 	verify.Should(t, err).Be(spies.HasherSpy.ErrorResult["HashWithSalt"])
 }
 
-func Test_GivenCreateUser_WhenHasherMethodsSuccess_ThenEnsureCallCreateUserWithCorrectParameter(t *testing.T) {
+func Test_GivenSignup_WhenHasherMethodsSuccess_ThenEnsureCallSignupWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineEncryptSuccess()
@@ -264,52 +264,52 @@ func Test_GivenCreateUser_WhenHasherMethodsSuccess_ThenEnsureCallCreateUserWithC
 	spies.HasherSpy.DefineHashWithSaltSuccess(uuid.NewString())
 
 	// Act
-	sut.CreateUser(fixture.GetEmptyActivationUserDto())
+	sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
-	createUserParams := spies.RepoSpy.Params["CreateUser:user"].(*auth_dto.ActivationUserDto)
-	verify.Should(t, createUserParams.FirstName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][0])
-	verify.Should(t, createUserParams.LastName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][1])
-	verify.Should(t, createUserParams.Password).Be(spies.HasherSpy.SuccessResult["HashAndMerge"])
-	verify.Should(t, createUserParams.Username).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
+	SignupParams := spies.RepoSpy.Params["Signup:user"].(*auth_dto.ActivationUserDto)
+	verify.Should(t, SignupParams.FirstName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][0])
+	verify.Should(t, SignupParams.LastName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][1])
+	verify.Should(t, SignupParams.Password).Be(spies.HasherSpy.SuccessResult["HashAndMerge"])
+	verify.Should(t, SignupParams.Username).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
 }
 
-func Test_GivenCreateUser_WhenRepoCreateUserInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenSignup_WhenRepoSignupInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess("")
 
 	// Act
-	sut.CreateUser(fixture.GetEmptyActivationUserDto())
+	sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.CallsCount["CreateUser"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["Signup"]).Be(1)
 }
 
-func Test_GivenCreateUser_WhenRepoCreateUserError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenSignup_WhenRepoSignupError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess("")
-	spies.RepoSpy.DefineCreateUserError()
+	spies.RepoSpy.DefineSignupError()
 
 	// Act
-	_, err := sut.CreateUser(fixture.GetEmptyActivationUserDto())
+	_, err := sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
-	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["CreateUser"])
+	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["Signup"])
 }
 
-func Test_GivenCreateUser_WhenRepoCreateUserSuccess_ThenEnsureReturnCorrectUserDto(t *testing.T) {
+func Test_GivenSignup_WhenRepoSignupSuccess_ThenEnsureReturnCorrectUserDto(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess("")
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 
 	// Act
-	userReturned, _ := sut.CreateUser(fixture.GetEmptyActivationUserDto())
+	userReturned, _ := sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
-	verify.Should(t, userReturned).Be(spies.RepoSpy.SuccessResult["CreateUser"])
+	verify.Should(t, userReturned).Be(spies.RepoSpy.SuccessResult["Signup"])
 }
 
 func Test_GivenUserExists_WhenInit_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {

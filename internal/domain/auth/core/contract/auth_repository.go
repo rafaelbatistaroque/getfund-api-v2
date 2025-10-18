@@ -7,6 +7,6 @@ import (
 type Repository interface {
 	GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error)
 	UpdatePassword(id int, value string) error
-	CreateUser(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error)
+	Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error)
 	UserExists(username string) (*auth_dto.UserDto, error)
 }

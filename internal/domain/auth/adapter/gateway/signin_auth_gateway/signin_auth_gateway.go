@@ -3,12 +3,12 @@ package signin_gateway
 import (
 	"encoding/json"
 	signin "getfund-api-v2/internal/domain/auth/core/usecase/signin"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"net/http"
 )
 
 type SigninGateway interface {
-	Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error)
+	Signin(w http.ResponseWriter, r *http.Request) (any, int, error)
 }
 
 type signinGateway struct {
@@ -21,11 +21,11 @@ func New(signin signin.UseCase) SigninGateway {
 	}
 }
 
-func (h *signinGateway) Signin(w http.ResponseWriter, r *http.Request) (interface{}, int, error) {
+func (h *signinGateway) Signin(w http.ResponseWriter, r *http.Request) (any, int, error) {
 	var input signin.Input
 
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		return nil, result_app.BAD_REQUEST_CODE, err
+		return nil, shared_error.BAD_REQUEST_CODE, err
 	}
 
 	output, err := h.signin.Execute(&input)
@@ -33,5 +33,5 @@ func (h *signinGateway) Signin(w http.ResponseWriter, r *http.Request) (interfac
 		return nil, err.Code, err.Message
 	}
 
-	return output, result_app.SUCCESS_CODE, nil
+	return output, shared_error.SUCCESS_CODE, nil
 }

@@ -3,7 +3,7 @@ package reset_password_test
 import (
 	"fmt"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/reset_password/reset_password_fixture"
 	"testing"
 
@@ -20,7 +20,7 @@ func Test_GivenExecute_WhenInputRecoveryCodeEmpty_ThenEnsureReturnErrorFromValid
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "RecoveryCode"))
 }
 
@@ -34,7 +34,7 @@ func Test_GivenExecute_WhenInputRecoveryCodeLengthNotExactly64_ThenEnsureReturnE
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "RecoveryCode", 64))
 }
 
@@ -47,7 +47,7 @@ func Test_GivenExecute_WhenInputRecoveryKeyEmpty_ThenEnsureReturnErrorFromValida
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "RecoveryKey"))
 }
 
@@ -60,7 +60,7 @@ func Test_GivenExecute_WhenInputRecoveryKeyInvalid_ThenEnsureReturnErrorFromVali
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_INVALID.Error(), "RecoveryKey"))
 }
 
@@ -73,7 +73,7 @@ func Test_GivenExecute_WhenInputPasswordEmpty_ThenEnsureReturnErrorFromValidate(
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "Password"))
 }
 
@@ -86,7 +86,7 @@ func Test_GivenExecute_WhenInputPasswordLowerThan8Character_ThenEnsureReturnErro
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_LENGHT_INVALID.Error(), "Password", 8))
 }
 
@@ -99,7 +99,7 @@ func Test_GivenExecute_WhenInputPasswordMissingUpperCaseCharacter_ThenEnsureRetu
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_SHOULD_HAVE_UPPER_CHARACTER.Error(), "Password"))
 }
 
@@ -112,7 +112,7 @@ func Test_GivenExecute_WhenInputPasswordMissingLowerCaseCharacter_ThenEnsureRetu
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_SHOULD_HAVE_LOWER_CHARACTER.Error(), "Password"))
 }
 
@@ -125,7 +125,7 @@ func Test_GivenExecute_WhenInputPasswordMissingDigitCharacter_ThenEnsureReturnEr
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message).Be(fmt.Errorf(validation.Err_PARAMETER_SHOULD_HAVE_DIGIT_CHARACTER.Error(), "Password"))
 }
 
@@ -162,7 +162,7 @@ func Test_GivenExecute_WhenGetCacheError_ThenEnsureReturnNotFoundWithErrorFrom(t
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Code).Be(shared_error.NOT_FOUND_CODE)
 	verify.Should(t, err.Message.Error()).Be("recovery code not found")
 }
 
@@ -204,7 +204,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("error on get recovery password data")
 }
 
@@ -245,7 +245,7 @@ func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnN
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Code).Be(shared_error.NOT_FOUND_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
@@ -289,7 +289,7 @@ func Test_GivenExecute_WhenUpdatePasswordError_ThenEnsureReturnServerError(t *te
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["UpdatePassword"])
 }
 

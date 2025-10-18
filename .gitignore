@@ -28,3 +28,5 @@ launch.json
 .DS_Store
 export.txt
 .idea/*
+IA/*
+GEMINI.md

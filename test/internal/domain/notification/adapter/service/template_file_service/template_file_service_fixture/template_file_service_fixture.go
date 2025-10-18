@@ -10,7 +10,7 @@ type TemplateFileSpy struct {
 	SettingsSpy *settings_spy.ApplicationSettingsSpy
 }
 
-func NewSUT() (contract.TemplateFileService, *TemplateFileSpy) {
+func NewSUT() (contract.TemplateFileContract, *TemplateFileSpy) {
 	settingsSpy := settings_spy.New()
 
 	return template_file_service.New(settingsSpy),

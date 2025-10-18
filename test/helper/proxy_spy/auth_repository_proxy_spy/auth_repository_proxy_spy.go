@@ -39,17 +39,17 @@ func (r *AuthRepositoryProxySpy) UpdatePassword(id int, value string) error {
 	return r.ErrorResult["UpdatePassword"]
 }
 
-func (r *AuthRepositoryProxySpy) CreateUser(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
-	r.Params["CreateUser:user"] = user
+func (r *AuthRepositoryProxySpy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+	r.Params["Signup:user"] = user
 
-	r.CallsCount["CreateUser"]++
+	r.CallsCount["Signup"]++
 
-	sucess := r.SuccessResult["CreateUser"]
+	sucess := r.SuccessResult["Signup"]
 	if sucess != nil {
 		return sucess.(*auth_dto.UserDto), nil
 	}
 
-	return nil, r.ErrorResult["CreateUser"]
+	return nil, r.ErrorResult["Signup"]
 }
 
 func (r *AuthRepositoryProxySpy) UserExists(username string) (*auth_dto.UserDto, error) {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	signin_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signin_auth_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"net/http"
 	"net/http/httptest"
 )
@@ -17,7 +17,7 @@ type SigninGatewayFixture struct {
 type signinUsecaseSpy struct {
 	Params        map[string]*signin.Input
 	CallsCount    map[string]int
-	ErrorResult   map[string]*result_app.ApplicationError
+	ErrorResult   map[string]*shared_error.Error
 	SuccessResult map[string]*signin.Output
 }
 
@@ -25,7 +25,7 @@ func NewSut() (signin_gateway.SigninGateway, *SigninGatewayFixture) {
 	signinSpy := &signinUsecaseSpy{
 		Params:        make(map[string]*signin.Input),
 		CallsCount:    make(map[string]int),
-		ErrorResult:   make(map[string]*result_app.ApplicationError),
+		ErrorResult:   make(map[string]*shared_error.Error),
 		SuccessResult: make(map[string]*signin.Output)}
 
 	return signin_gateway.New(signinSpy),
@@ -34,7 +34,7 @@ func NewSut() (signin_gateway.SigninGateway, *SigninGatewayFixture) {
 		}
 }
 
-func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *result_app.ApplicationError) {
+func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *shared_error.Error) {
 	s.Params["Execute:input"] = input
 
 	s.CallsCount["Execute"]++
@@ -62,7 +62,7 @@ func GetSigninInputSerialized() string {
 }
 
 func (s *signinUsecaseSpy) DefineError() {
-	s.ErrorResult["Execute"] = &result_app.ApplicationError{Code: result_app.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
+	s.ErrorResult["Execute"] = &shared_error.Error{Code: shared_error.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
 }
 
 func (s *signinUsecaseSpy) DefineSuccess() {

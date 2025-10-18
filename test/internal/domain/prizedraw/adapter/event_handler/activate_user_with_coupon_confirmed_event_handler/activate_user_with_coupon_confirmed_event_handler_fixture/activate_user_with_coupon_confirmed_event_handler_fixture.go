@@ -2,10 +2,10 @@ package activate_user_with_coupon_confirmed_event_handler_fixture
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
+	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user/event"
 	event_handler "getfund-api-v2/internal/domain/prizedraw/adapter/event_handler/activate_user_with_coupon_confirmed_event_handler"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
-	"getfund-api-v2/pkg/bus"
+	shared_bus "getfund-api-v2/internal/shared/bus"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
 	"time"
@@ -18,7 +18,7 @@ type ActivateUserWithCouponConfirmedEventHandlerFixture struct {
 	ApplyPrizeDrawCouponSpy    *ApplyPrizeDrawCouponApplicationSpy
 }
 
-func NewSut() (bus.Handler, *ActivateUserWithCouponConfirmedEventHandlerFixture) {
+func NewSut() (shared_bus.Handler, *ActivateUserWithCouponConfirmedEventHandlerFixture) {
 	repoSpy := prizedraw_repository_spy.New()
 	cacheSpy := cache_spy.New()
 	validatePrizeDrawCouponSpy := NewValidatePrizeDrawCoupon()
@@ -33,18 +33,18 @@ func NewSut() (bus.Handler, *ActivateUserWithCouponConfirmedEventHandlerFixture)
 		}
 }
 
-func GetInvalidActivateUserWithCouponConfirmedEvent() *activate_user.ActivateUserWithCouponConfirmedEvent {
-	return &activate_user.ActivateUserWithCouponConfirmedEvent{}
+func GetInvalidActivateUserWithCouponConfirmedEvent() *event.ActivateUserWithCouponConfirmedEvent {
+	return &event.ActivateUserWithCouponConfirmedEvent{}
 }
 
-func GetValidActivateUserWithCouponConfirmedEvent(couponCode, email string, userId int) *activate_user.ActivateUserWithCouponConfirmedEvent {
+func GetValidActivateUserWithCouponConfirmedEvent(couponCode, email string, userId int) *event.ActivateUserWithCouponConfirmedEvent {
 	payload, _ := json.Marshal(map[string]any{
 		"user_id":     userId,
 		"coupon_code": couponCode,
 		"email":       email,
 	})
 
-	event := &activate_user.ActivateUserWithCouponConfirmedEvent{}
+	event := &event.ActivateUserWithCouponConfirmedEvent{}
 	event.SetPayload(payload)
 
 	return event

@@ -4,19 +4,19 @@ import (
 	"encoding/json"
 	product_contract "getfund-api-v2/internal/domain/product/core/contract"
 	"getfund-api-v2/internal/domain/product/core/dto/product_dto"
-	"getfund-api-v2/internal/shared/app_constant"
-	"getfund-api-v2/pkg/bus"
-	logger "getfund-api-v2/pkg/log"
+	shared_bus "getfund-api-v2/internal/shared/bus"
+	shared_constant "getfund-api-v2/internal/shared/constant"
+	shared_logger "getfund-api-v2/internal/shared/log"
 )
 
 type validatePrizeDrawCouponStartedEventHandler struct {
-	logger     logger.Logger
+	logger     shared_logger.Logger
 	repository product_contract.Repository
 }
 
-func New(repository product_contract.Repository) bus.Handler {
+func New(repository product_contract.Repository) shared_bus.Handler {
 	return &validatePrizeDrawCouponStartedEventHandler{
-		logger:     *logger.New("validatePrizeDrawCouponStartedEventHandler"),
+		logger:     *shared_logger.New("validatePrizeDrawCouponStartedEventHandler"),
 		repository: repository,
 	}
 }
@@ -30,7 +30,7 @@ var promise struct {
 	IsActive bool `json:"is_active"`
 }
 
-func (h *validatePrizeDrawCouponStartedEventHandler) Handle(event bus.Event) {
+func (h *validatePrizeDrawCouponStartedEventHandler) Handle(event shared_bus.Event) {
 	var err error
 	if err = json.Unmarshal(event.GetPayload(), &payload); err != nil {
 		h.logger.Error("IsOk: False | get payload failed")
@@ -40,13 +40,13 @@ func (h *validatePrizeDrawCouponStartedEventHandler) Handle(event bus.Event) {
 	var productDto *product_dto.ProductDto
 	if productDto, err = h.repository.GetProductById(payload.ProductId); err != nil {
 		h.logger.Error("IsOk: False | get product failed")
-		event.ResolvePromise(app_constant.EMPTYB)
+		event.ResolvePromise(shared_constant.BYTE_EMPTY)
 		return
 	}
 
 	if productDto == nil {
 		h.logger.Error("IsOk: False | product not found")
-		event.ResolvePromise(app_constant.EMPTYB)
+		event.ResolvePromise(shared_constant.BYTE_EMPTY)
 		return
 	}
 
@@ -57,7 +57,7 @@ func (h *validatePrizeDrawCouponStartedEventHandler) Handle(event bus.Event) {
 	productFound, err = json.Marshal(promise)
 	if err != nil {
 		h.logger.Error("IsOk: False | marshal product failed")
-		event.ResolvePromise(app_constant.EMPTYB)
+		event.ResolvePromise(shared_constant.BYTE_EMPTY)
 		return
 	}
 

@@ -6,7 +6,7 @@ type TemplateFileSpy struct {
 	Params     map[string]string
 	CallsCount map[string]int
 
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 	ErrorResult   map[string]error
 }
 
@@ -14,7 +14,7 @@ func New() *TemplateFileSpy {
 	return &TemplateFileSpy{
 		Params:        make(map[string]string),
 		CallsCount:    make(map[string]int),
-		SuccessResult: make(map[string]interface{}),
+		SuccessResult: make(map[string]any),
 		ErrorResult:   make(map[string]error),
 	}
 }

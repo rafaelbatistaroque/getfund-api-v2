@@ -3,7 +3,7 @@ package auth_service_test
 import (
 	"errors"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/domain_service/auth_service/auth_service_fixture"
 	"testing"
 
@@ -45,7 +45,7 @@ func Test_GivenAuthenticate_WhenGetAuthenticatedUserByUsernameError_ThenEnsureRe
 	// Assert
 	verify.Should(t, err).NotNil()
 	verify.Should(t, spies.AuthRepoSpy.ErrorResult["GetAuthenticatedUserByUsername"]).Be(err.Message)
-	verify.Should(t, result_app.UNAUTHORIZED_CODE).Be(err.Code)
+	verify.Should(t, shared_error.UNAUTHORIZED_CODE).Be(err.Code)
 }
 
 func Test_GivenAuthenticate_WhenGetAuthenticatedUserByUsernameSuccess_ThenCallIsMatchWithCorrectParameter(t *testing.T) {
@@ -87,7 +87,7 @@ func Test_GivenAuthenticate_WhenIsMatchFalse_ThenEnsureReturnUnauthorizedError(t
 
 	// Assert
 	verify.Should(t, err).NotNil()
-	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message).Be(expectedPasswordError)
 }
 

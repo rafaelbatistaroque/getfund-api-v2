@@ -1,7 +1,7 @@
 package auth_user_repository_test
 
 import (
-	"getfund-api-v2/pkg/db/schema"
+	"getfund-api-v2/internal/infra/db/schema"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/repository/auth_repository_fixture"
 	"testing"
 
@@ -13,7 +13,7 @@ import (
 func Test_GivenGetAuthenticatedUserByUsername_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act
@@ -52,7 +52,7 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenQuerySuccess_ThenEnsureReturnU
 func Test_GivenUpdatePassword_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act
@@ -79,26 +79,26 @@ func Test_GivenUpdatePassword_WhenSuccess_ThenEnsureNull(t *testing.T) {
 	verify.Should(t, user.Password).Be(newPassword)
 }
 
-func Test_GivenCreateUser_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenSignup_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act
-	_, err := sut.CreateUser(fixture.GetEmptyActivationUserDto())
+	_, err := sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
 	verify.Should(t, err).NotNil()
 }
 
-func Test_GivenCreateUser_WhenUserCreatedSuccess_ThenEnsureReturnUserDtoFilled(t *testing.T) {
+func Test_GivenSignup_WhenUserCreatedSuccess_ThenEnsureReturnUserDtoFilled(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
 	expectedUserCreated := fixture.GetFilledActivationUserDto()
 
 	// Act
-	result, err := sut.CreateUser(expectedUserCreated)
+	result, err := sut.Signup(expectedUserCreated)
 
 	// Assert
 	userSaved := &schema.User{}
@@ -120,7 +120,7 @@ func Test_GivenCreateUser_WhenUserCreatedSuccess_ThenEnsureReturnUserDtoFilled(t
 func Test_GivenUserExists_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act

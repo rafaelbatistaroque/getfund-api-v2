@@ -2,7 +2,7 @@ package template_file_service
 
 import (
 	"errors"
-	"getfund-api-v2/internal/settings"
+	"getfund-api-v2/internal/config/env"
 	"os"
 )
 
@@ -13,17 +13,17 @@ const (
 )
 
 type templateFileService struct {
-	settings settings.ApplicationSettings
+	env env.Variable
 }
 
-func New(settings settings.ApplicationSettings) *templateFileService {
+func New(env env.Variable) *templateFileService {
 	return &templateFileService{
-		settings: settings,
+		env: env,
 	}
 }
 
 func (t *templateFileService) GetRecoveryPasswordTemplate() (string, error) {
-	template, err := os.ReadFile(t.settings.GetTemplateDir() + _RECOVER_PASSWORD_TEMPLATE)
+	template, err := os.ReadFile(t.env.GetTemplateDir() + _RECOVER_PASSWORD_TEMPLATE)
 	if err != nil {
 		return "", errors.New(_TEMPLATE_NOTFOUND_MESSAGE)
 	}
@@ -32,7 +32,7 @@ func (t *templateFileService) GetRecoveryPasswordTemplate() (string, error) {
 }
 
 func (t *templateFileService) GetActivationAccountTemplate() (string, error) {
-	template, err := os.ReadFile(t.settings.GetTemplateDir() + _ACTIVATION_ACCOUNT_TEMPLATE)
+	template, err := os.ReadFile(t.env.GetTemplateDir() + _ACTIVATION_ACCOUNT_TEMPLATE)
 	if err != nil {
 		return "", errors.New(_TEMPLATE_NOTFOUND_MESSAGE)
 	}

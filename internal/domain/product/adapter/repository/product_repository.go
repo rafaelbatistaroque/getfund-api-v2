@@ -4,16 +4,17 @@ import (
 	"errors"
 	product_contract "getfund-api-v2/internal/domain/product/core/contract"
 	"getfund-api-v2/internal/domain/product/core/dto/product_dto"
-	"getfund-api-v2/pkg/db/schema"
+	"getfund-api-v2/internal/infra/db"
+	"getfund-api-v2/internal/infra/db/schema"
 
 	"gorm.io/gorm"
 )
 
 type productRepository struct {
-	db *gorm.DB
+	db *db.GetFund
 }
 
-func New(db *gorm.DB) product_contract.Repository {
+func New(db *db.GetFund) product_contract.Repository {
 	return &productRepository{db: db}
 }
 

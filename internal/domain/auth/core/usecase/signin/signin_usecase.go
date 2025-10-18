@@ -1,9 +1,11 @@
 package signin
 
-import "getfund-api-v2/internal/shared/result_app"
+import (
+	shared_error "getfund-api-v2/internal/shared/error"
+)
 
 type UseCase = signin
 
 type signin interface {
-	Execute(input *Input) (*Output, *result_app.ApplicationError)
+	Execute(input *Input) (*Output, *shared_error.Error)
 }

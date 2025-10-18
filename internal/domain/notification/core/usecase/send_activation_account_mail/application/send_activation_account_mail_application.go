@@ -1,36 +1,37 @@
 package send_activation_account_mail_application
 
 import (
+	"getfund-api-v2/internal/config/env"
 	notification_contract "getfund-api-v2/internal/domain/notification/core/contract"
-	replacer "getfund-api-v2/internal/domain/notification/core/domain_service"
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_activation_account_mail"
-	"getfund-api-v2/internal/settings"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
+	"getfund-api-v2/internal/shared/mail"
+	"getfund-api-v2/internal/shared/replacer"
 )
 
 type sendActivationAccountMailApplication struct {
-	mailService notification_contract.MailService
-	settings    settings.ApplicationSettings
-	template    notification_contract.TemplateFileService
+	mail     mail.Contract
+	env      env.Variable
+	template notification_contract.TemplateFileContract
 }
 
-func New(mailService notification_contract.MailService, settings settings.ApplicationSettings, template notification_contract.TemplateFileService) send_activation_account_mail.UseCase {
+func New(mail mail.Contract, env env.Variable, template notification_contract.TemplateFileContract) send_activation_account_mail.UseCase {
 	return &sendActivationAccountMailApplication{
-		mailService: mailService,
-		settings:    settings,
-		template:    template,
+		mail:     mail,
+		env:      env,
+		template: template,
 	}
 }
 
-func (s *sendActivationAccountMailApplication) Execute(input *send_activation_account_mail.Input) (*send_activation_account_mail.Output, *result_app.ApplicationError) {
+func (s *sendActivationAccountMailApplication) Execute(input *send_activation_account_mail.Input) (*send_activation_account_mail.Output, *shared_error.Error) {
 	validatable := input.Validate()
 	if validatable.IsInvalid() {
-		return nil, result_app.New(result_app.UNPROCESSABLE_CONTENT_CODE, validatable.GetErrors())
+		return nil, shared_error.New(shared_error.UNPROCESSABLE_CONTENT_CODE, validatable.GetErrors())
 	}
 
 	activationAccountTemplate, errTemplate := s.template.GetActivationAccountTemplate()
 	if errTemplate != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errTemplate)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errTemplate)
 	}
 
 	replacer.Build(&activationAccountTemplate,
@@ -38,12 +39,12 @@ func (s *sendActivationAccountMailApplication) Execute(input *send_activation_ac
 		replacer.Replaceable{Tag: "{{activation_link}}", Value: input.ActivationLink},
 	)
 
-	if err := s.mailService.SendMail(
+	if err := s.mail.SendMail(
 		input.Email,
 		"Activation Account",
 		activationAccountTemplate,
 		nil); err != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, err)
 	}
 
 	return &send_activation_account_mail.Output{Message: "Email sent successfully"}, nil

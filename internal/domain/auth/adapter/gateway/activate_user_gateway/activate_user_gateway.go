@@ -4,13 +4,10 @@ import (
 	"errors"
 	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_constant "getfund-api-v2/internal/shared/constant"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"net/http"
 	"strings"
-)
-
-const (
-	_KEY_USER_ACTIVATION_PREFIX = "user_activation_"
 )
 
 type ActiveUserGateway interface {
@@ -33,12 +30,12 @@ func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request)
 	activationCode := getActivationCodeParam(r)
 
 	if activationCode == "" {
-		return nil, result_app.BAD_REQUEST_CODE, errors.New("activation code is required")
+		return nil, shared_error.BAD_REQUEST_CODE, errors.New("activation code is required")
 	}
 
 	input := activate_user.Input{
 		ActivationCode:    activationCode,
-		ActivationDataKey: _KEY_USER_ACTIVATION_PREFIX + activationCode}
+		ActivationDataKey: shared_constant.UserActivationCacheKeyPrefix + activationCode}
 
 	output, err := u.activateUser.Execute(&input)
 	if err != nil {
@@ -46,7 +43,7 @@ func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request)
 	}
 
 	if output == nil {
-		return nil, result_app.SERVER_ERROR_CODE, errors.New("error to activate user")
+		return nil, shared_error.SERVER_ERROR_CODE, errors.New("error to activate user")
 	}
 
 	outputSignin, errSignin := u.signin.Execute(&signin.Input{
@@ -58,7 +55,7 @@ func (u *activeUserGateway) ActivateUser(w http.ResponseWriter, r *http.Request)
 		return nil, errSignin.Code, errSignin.Message
 	}
 
-	return outputSignin, result_app.SUCCESS_CODE, nil
+	return outputSignin, shared_error.SUCCESS_CODE, nil
 }
 
 func getActivationCodeParam(r *http.Request) string {

@@ -1,6 +1,6 @@
 package notification_contract
 
-type TemplateFileService interface {
+type TemplateFileContract interface {
 	GetRecoveryPasswordTemplate() (string, error)
 	GetActivationAccountTemplate() (string, error)
 }

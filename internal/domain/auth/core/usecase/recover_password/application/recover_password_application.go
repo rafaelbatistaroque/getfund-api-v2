@@ -1,14 +1,15 @@
 package recover_password_application
 
 import (
+	"getfund-api-v2/internal/config/env"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
-	"getfund-api-v2/internal/settings"
-	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password/event"
+	shared_bus "getfund-api-v2/internal/shared/bus"
+	"getfund-api-v2/internal/shared/cache"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"getfund-api-v2/internal/shared/security"
-	"getfund-api-v2/internal/shared/service/cache_service"
-	"getfund-api-v2/pkg/bus"
 	"time"
 )
 
@@ -18,68 +19,68 @@ const (
 
 type recoverPasswordApplication struct {
 	hasher         security.Hasher
-	settings       settings.ApplicationSettings
+	env            env.Variable
 	authRepository auth_contract.Repository
-	cacheService   cache_service.Cache
-	bus            bus.EventBus
+	cache          cache.Contract
+	bus            shared_bus.EventBus
 }
 
 func New(
 	hasher security.Hasher,
-	settings settings.ApplicationSettings,
+	env env.Variable,
 	authRepository auth_contract.Repository,
-	cacheService cache_service.Cache,
-	bus bus.EventBus) recover_password.UseCase {
+	cacheService cache.Contract,
+	bus shared_bus.EventBus) recover_password.UseCase {
 
 	return &recoverPasswordApplication{
 		hasher:         hasher,
-		settings:       settings,
+		env:            env,
 		authRepository: authRepository,
-		cacheService:   cacheService,
+		cache:          cacheService,
 		bus:            bus,
 	}
 }
 
-func (uc *recoverPasswordApplication) Execute(input *recover_password.Input) (*recover_password.Output, *result_app.ApplicationError) {
+func (uc *recoverPasswordApplication) Execute(input *recover_password.Input) (*recover_password.Output, *shared_error.Error) {
 	validated := input.Validate()
 	if validated.IsInvalid() {
-		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
+		return nil, shared_error.New(shared_error.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
 	authenticatedUser, errRepo := uc.authRepository.GetAuthenticatedUserByUsername(input.Username)
 	if errRepo != nil {
-		return nil, result_app.New(result_app.NOT_FOUND_CODE, errRepo)
+		return nil, shared_error.New(shared_error.NOT_FOUND_CODE, errRepo)
 	}
 
 	randomCode, errCode := uc.hasher.GetRandomCode(8)
 	if errCode != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errCode)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errCode)
 	}
 
-	recoveryCode, errHash := uc.hasher.Hash(randomCode, uc.settings.GetServerSalt())
+	recoveryCode, errHash := uc.hasher.Hash(randomCode, uc.env.GetServerSalt())
 	if errHash != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errHash)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errHash)
 	}
 
 	data := auth_dto.ForgetPasswordDto{
 		Username:     input.Username,
 		FirstName:    authenticatedUser.FirstName,
-		RecoveryLink: buildRecoverLink(uc.settings, recoveryCode.Data),
+		RecoveryLink: buildRecoverLink(uc.env, recoveryCode.Data),
 	}
 
 	keyCache := buildKeyCache(recoveryCode.Data)
-	cacheErr := uc.cacheService.Set(keyCache, data, time.Hour)
+	cacheErr := uc.cache.Set(keyCache, data, time.Hour)
 	if cacheErr != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, cacheErr)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, cacheErr)
 	}
 
-	uc.bus.EmitWithPayload(&recover_password.RecoverPasswordStartedEvent{}, keyCache)
+	uc.bus.EmitWithPayload(&event.RecoverPasswordStartedEvent{}, keyCache)
 
 	return &recover_password.Output{Message: "recover password started"}, nil
 }
 
-func buildRecoverLink(applicationSettings settings.ApplicationSettings, recoveryCode string) string {
-	return applicationSettings.GetBaseUrl() + "/new-password/" + recoveryCode
+func buildRecoverLink(env env.Variable, recoveryCode string) string {
+	return env.GetBaseUrl() + "/new-password/" + recoveryCode
 }
 
 func buildKeyCache(recoveryCode string) string {

@@ -1,38 +1,37 @@
 package send_recover_password_mail_application
 
 import (
+	"getfund-api-v2/internal/config/env"
 	contract "getfund-api-v2/internal/domain/notification/core/contract"
-	replacer "getfund-api-v2/internal/domain/notification/core/domain_service"
-
 	"getfund-api-v2/internal/domain/notification/core/usecase/send_recover_password_mail"
-
-	"getfund-api-v2/internal/settings"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
+	"getfund-api-v2/internal/shared/mail"
+	"getfund-api-v2/internal/shared/replacer"
 )
 
 type sendRecoverPasswordMailApplication struct {
-	mailService contract.MailService
-	settings    settings.ApplicationSettings
-	template    contract.TemplateFileService
+	mailService mail.Contract
+	env         env.Variable
+	template    contract.TemplateFileContract
 }
 
-func New(mailService contract.MailService, settings settings.ApplicationSettings, template contract.TemplateFileService) send_recover_password_mail.UseCase {
+func New(mailService mail.Contract, env env.Variable, template contract.TemplateFileContract) send_recover_password_mail.UseCase {
 	return &sendRecoverPasswordMailApplication{
 		mailService: mailService,
-		settings:    settings,
+		env:         env,
 		template:    template,
 	}
 }
 
-func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_password_mail.Input) (*send_recover_password_mail.Output, *result_app.ApplicationError) {
+func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_password_mail.Input) (*send_recover_password_mail.Output, *shared_error.Error) {
 	validated := input.Validate()
 	if validated.IsInvalid() {
-		return nil, result_app.New(result_app.BAD_REQUEST_CODE, validated.GetErrors())
+		return nil, shared_error.New(shared_error.BAD_REQUEST_CODE, validated.GetErrors())
 	}
 
 	recoveryPasswordTemplate, errTemplate := uc.template.GetRecoveryPasswordTemplate()
 	if errTemplate != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, errTemplate)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errTemplate)
 	}
 
 	replacer.Build(&recoveryPasswordTemplate,
@@ -46,7 +45,7 @@ func (uc *sendRecoverPasswordMailApplication) Execute(input *send_recover_passwo
 		recoveryPasswordTemplate, nil)
 
 	if err != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, err)
 	}
 
 	return &send_recover_password_mail.Output{Messagem: "Email sent successfully"}, nil

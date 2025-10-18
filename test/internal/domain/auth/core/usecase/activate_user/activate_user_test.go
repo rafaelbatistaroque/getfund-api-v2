@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto/auth_payload"
 	"getfund-api-v2/internal/domain/auth/core/entity/user_entity"
-	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
-	"getfund-api-v2/internal/shared/result_app"
+	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user/event"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/activate_user/activate_user_fixture"
 	"testing"
 
@@ -24,7 +23,7 @@ func Test_GivenExecute_WhenActivationCodeEmpty_ThenEnsureReturnError(t *testing.
 	_, err := sut.Execute(inputWithActivationCodeEmpty)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ActivationCode"))
 }
 
@@ -37,7 +36,7 @@ func Test_GivenExecute_WhenActivationCodeInvalid_ThenEnsureReturnError(t *testin
 	_, err := sut.Execute(inputWithActivationCodeInvalid)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_HAVE_EXACTLY_CHARACTER.Error(), "ActivationCode", 20))
 }
 
@@ -50,7 +49,7 @@ func Test_GivenExecute_WhenActivationDataKeyEmpty_ThenEnsureReturnError(t *testi
 	_, err := sut.Execute(inputWithActivationCodeEmpty)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_NOT_EMPTY.Error(), "ActivationDataKey"))
 }
 
@@ -63,7 +62,7 @@ func Test_GivenExecute_WhenActivationDataKeyInvalid_ThenEnsureReturnError(t *tes
 	_, err := sut.Execute(inputWithActivationCodeInvalid)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAUTHORIZED_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAUTHORIZED_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_INVALID.Error(), "ActivationDataKey"))
 }
 
@@ -99,7 +98,7 @@ func Test_GivenExecute_WhenCacheGetError_ThenEnsureReturnNotFoundErrorWIthApropr
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.NOT_FOUND_CODE)
+	verify.Should(t, err.Code).Be(shared_error.NOT_FOUND_CODE)
 	verify.Should(t, err.Message.Error()).Be("activation code not found")
 }
 
@@ -112,7 +111,7 @@ func Test_GivenExecute_WhenUnmarshalError_ThenEnsureReturnAppropriateError(t *te
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("error on get user data")
 }
 
@@ -120,7 +119,7 @@ func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallUserExistsWithCorrectP
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 	var expectedParam = auth_dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
@@ -135,7 +134,7 @@ func Test_GivenExecute_WhenUserExistsInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -154,7 +153,7 @@ func Test_GivenExecute_WhenUserExistsError_ThenEnsureReturnNotFoundError(t *test
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["UserExists"])
 }
 
@@ -170,7 +169,7 @@ func Test_GivenExecute_WhenUserExistsFound_ThenEnsureReturnDuplicateEntryError(t
 	_, err := sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.DUPLICATED_ENTRY_CODE)
+	verify.Should(t, err.Code).Be(shared_error.DUPLICATED_ENTRY_CODE)
 	verify.Should(t, err.Message.Error()).Be("user already exists")
 	verify.Should(t, spies.CacheSpy.Params["Delete:key"]).Be(expectedParam)
 	verify.Should(t, spies.CacheSpy.CallsCount["Delete"]).Be(1)
@@ -180,7 +179,7 @@ func Test_GivenExecute_WhenUserExistsNotFound_ThenEnsureCallMapperToDtoWithCorre
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 	var expectedParam = auth_dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
@@ -203,7 +202,7 @@ func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -212,52 +211,52 @@ func Test_GivenExecute_WhenToDtoInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	verify.Should(t, spies.MapperSpy.CallsCount["ToDto"]).Be(1)
 }
 
-func Test_GivenExecute_WhenToDtoSuccess_ThenEnsureCallCreateUserWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenToDtoSuccess_ThenEnsureCallSignupWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.MapperSpy.DefineToDtoSuccess(fixture.GetActivateUserEntity())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.Params["CreateUser:user"]).Be(spies.MapperSpy.SuccessResult["ToDto"])
+	verify.Should(t, spies.RepoSpy.Params["Signup:user"]).Be(spies.MapperSpy.SuccessResult["ToDto"])
 }
 
-func Test_GivenExecute_WhenCreateUserInvoked_ThenEnsureCallsOnce(t *testing.T) {
+func Test_GivenExecute_WhenSignupInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.RepoSpy.CallsCount["CreateUser"]).Be(1)
+	verify.Should(t, spies.RepoSpy.CallsCount["Signup"]).Be(1)
 }
 
-func Test_GivenExecute_WhenCreateUserError_ThenEnsureReturnError(t *testing.T) {
+func Test_GivenExecute_WhenSignupError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserError()
+	spies.RepoSpy.DefineSignupError()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
-	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["CreateUser"])
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
+	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["Signup"])
 }
 
-func Test_GivenExecute_WhenCreateUserSuccess_ThenEnsureCallCacheDeleteWithCorrectParameter(t *testing.T) {
+func Test_GivenExecute_WhenSignupSuccess_ThenEnsureCallCacheDeleteWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 	validInput := fixture.GetInput()
 	expectedParam := "user_activation_" + validInput.ActivationCode
 
@@ -273,10 +272,10 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 	userData := fixture.GetUserDataWithCoupon()
-	expectedPaylod := &auth_payload.ActivateUserWithCouponConfirmedPayload{
-		UserId:     spies.RepoSpy.SuccessResult["CreateUser"].(*auth_dto.UserDto).Id,
+	expectedPaylod := &event.ActivateUserWithCouponConfirmedPayload{
+		UserId:     spies.RepoSpy.SuccessResult["Signup"].(*auth_dto.UserDto).Id,
 		CouponCode: userData.CouponCode,
 		Email:      userData.Username,
 	}
@@ -285,7 +284,7 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&activate_user.ActivateUserWithCouponConfirmedEvent{})
+	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:event"][0]).Be(&event.ActivateUserWithCouponConfirmedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitWithPayload:payload"][0]).Be(expectedPaylod)
 }
 
@@ -293,7 +292,7 @@ func Test_GivenExecute_WhenEmitWithPayloadWithActivateUserWithCouponConfirmedEve
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -306,7 +305,7 @@ func Test_GivenExecute_WhenUserSaved_ThenEnsureReturnCorrectParameter(t *testing
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithoutCouponSerialized())
-	spies.RepoSpy.DefineCreateUserSuccess()
+	spies.RepoSpy.DefineSignupSuccess()
 	expectedOutput := fixture.GetOutput()
 
 	// Act

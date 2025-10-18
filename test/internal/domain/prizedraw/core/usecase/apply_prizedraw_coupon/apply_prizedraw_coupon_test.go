@@ -3,10 +3,9 @@ package apply_prizedraw_coupon_test
 import (
 	"fmt"
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_payload"
-	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
-	"getfund-api-v2/internal/shared/result_app"
-	"getfund-api-v2/pkg/bus"
+	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/event"
+	shared_bus "getfund-api-v2/internal/shared/bus"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/apply_prizedraw_coupon_fixture"
 	"testing"
 
@@ -23,7 +22,7 @@ func Test_GivenExecute_WhenCouponIdZero_ThenEnsureReturnError(t *testing.T) {
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "CouponId"))
 }
 
@@ -36,7 +35,7 @@ func Test_GivenExecute_WhenPrizeDrawIdZero_ThenEnsureReturnError(t *testing.T) {
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "PrizeDrawId"))
 }
 
@@ -49,7 +48,7 @@ func Test_GivenExecute_WhenProductIdZero_ThenEnsureReturnError(t *testing.T) {
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "ProductId"))
 }
 
@@ -62,7 +61,7 @@ func Test_GivenExecute_WhenUserIdZero_ThenEnsureReturnError(t *testing.T) {
 	_, err := sut.Execute(invalidInput)
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNPROCESSABLE_CONTENT_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNPROCESSABLE_CONTENT_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(validation.Err_PARAMETER_SHOULD_BE_GREATHER_THAN_ZERO.Error(), "UserId"))
 }
 
@@ -71,7 +70,7 @@ func Test_GivenExecute_WhenValidInput_ThenEnsureCallEmitAndWaitPromiseWithCorrec
 	sut, spies := fixture.NewSut()
 	spies.BusSpy.DefineEmitAndWaitPromiseError()
 	validInput := fixture.GetInput()
-	expectedPayload := &prizedraw_payload.ApplyPrizeDrawCouponStartedPayload{
+	expectedPayload := &event.ApplyPrizeDrawCouponStartedPayload{
 		UserId:       validInput.UserId,
 		ProductId:    validInput.ProductId,
 		PrizeDrawId:  validInput.PrizeDrawId,
@@ -83,7 +82,7 @@ func Test_GivenExecute_WhenValidInput_ThenEnsureCallEmitAndWaitPromiseWithCorrec
 	sut.Execute(validInput)
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:event"][0]).Be(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{})
+	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:event"][0]).Be(&event.ApplyPrizeDrawCouponStartedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:payload"][0]).Be(expectedPayload)
 	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:result"][0]).NotNil()
 }
@@ -104,13 +103,13 @@ func Test_GivenExecute_WhenEmitAndWaitPromiseEmpty_ThenEnsureReturnApropriateErr
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.BusSpy.DefineEmitAndWaitPromiseError()
-	expectedError := "[coupon apply] " + spies.BusSpy.SuccessResult["EmitAndWaitPromise"].(*bus.Promise).ErrorToString()
+	expectedError := "[coupon apply] " + spies.BusSpy.SuccessResult["EmitAndWaitPromise"].(*shared_bus.Promise).ErrorToString()
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAVAILABLE_CODE)
 	verify.Should(t, err.Message.Error()).Be(expectedError)
 }
 
@@ -123,14 +122,14 @@ func Test_GivenExecute_WhenEmitAndWaitPromiseZero_ThenEnsureReturnApropriateErro
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAVAILABLE_CODE)
 	verify.Should(t, err.Message.Error()).Be("[coupon apply] invalid purchase id")
 }
 
 func Test_GivenExecute_WhenPurchaseIdReceived_ThenEnsureCallHasherRandomCodeWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 
 	// Act
 	sut.Execute(fixture.GetInput())
@@ -142,7 +141,7 @@ func Test_GivenExecute_WhenPurchaseIdReceived_ThenEnsureCallHasherRandomCodeWith
 func Test_GivenExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 	spies.HasherSpy.DefineGetRandomCodeError()
 
 	// Act
@@ -155,33 +154,33 @@ func Test_GivenExecute_WhenGetRandomCodeInvoked_ThenEnsureCallsOnce(t *testing.T
 func Test_GivenExecute_WhenGetRandomCodeError_ThenEnsureReturnApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
-	spies.HasherSpy.DefineGetRandomCodeError()
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("erro on build lucky number")
 }
+
 func Test_GivenExecute_WhenGetRandomCodeSuccessEmprty_ThenEnsureReturnApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message.Error()).Be("erro on build lucky number")
 }
 
 func Test_GivenExecute_WhenGetRandomCodeSuccess_ThenEnsureCallGetCouponByIdWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	expectedParams := fixture.GetInput()
 
@@ -195,7 +194,7 @@ func Test_GivenExecute_WhenGetRandomCodeSuccess_ThenEnsureCallGetCouponByIdWithC
 func Test_GivenExecute_WhenGetCouponByIdInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 
 	// Act
@@ -208,7 +207,7 @@ func Test_GivenExecute_WhenGetCouponByIdInvoked_ThenEnsureCallsOnce(t *testing.T
 func Test_GivenExecute_WhenGetCouponByIdError_ThenEnsureReturnApropriateError(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	spies.RepoSpy.DefineGetCouponByIdError()
 
@@ -216,14 +215,14 @@ func Test_GivenExecute_WhenGetCouponByIdError_ThenEnsureReturnApropriateError(t 
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAVAILABLE_CODE)
 	verify.Should(t, err.Message).Be(spies.RepoSpy.ErrorResult["GetCouponById"])
 }
 
 func Test_GivenExecute_WhenGetCouponByIdSuccess_ThenEnsureCallWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	validInput := fixture.GetInput()
 	expectedCouponDto := fixture.GetValidCoupon()
@@ -258,7 +257,7 @@ func Test_GivenExecute_WhenGetCouponByIdSuccess_ThenEnsureCallWithCorrectParamet
 func Test_GivenExecute_WhenSaveEntranceWithCouponAppliedInvoked_ThenEnsureCallsOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, 2)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, 2)
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	spies.RepoSpy.DefineGetCouponByIdSuccess(fixture.GetValidCoupon())
 
@@ -273,12 +272,12 @@ func Test_GivenExecute_WhenSaveEntranceWithCouponAppliedError_ThenEnsureCallEmit
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedPurchaseId := 7
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, expectedPurchaseId)
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponFailedEvent{}, false)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, expectedPurchaseId)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponFailedEvent{}, false)
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	spies.RepoSpy.DefineGetCouponByIdSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineSaveEntranceWithCouponAppliedError()
-	expectedPayload := &prizedraw_payload.ApplyPrizeDrawCouponFailedPayload{
+	expectedPayload := &event.ApplyPrizeDrawCouponFailedPayload{
 		PurchaseId: expectedPurchaseId,
 	}
 
@@ -286,10 +285,10 @@ func Test_GivenExecute_WhenSaveEntranceWithCouponAppliedError_ThenEnsureCallEmit
 	_, err := sut.Execute(fixture.GetInput())
 
 	// Assert
-	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:event"][1]).Be(&apply_prizedraw_coupon.ApplyPrizeDrawCouponFailedEvent{})
+	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:event"][1]).Be(&event.ApplyPrizeDrawCouponFailedEvent{})
 	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:payload"][1]).Be(expectedPayload)
 	verify.Should(t, spies.BusSpy.Params["EmitAndWaitPromise:result"][1]).NotNil()
-	verify.Should(t, err.Code).Be(result_app.UNAVAILABLE_CODE)
+	verify.Should(t, err.Code).Be(shared_error.UNAVAILABLE_CODE)
 	verify.Should(t, err.Message.Error()).Be("erro on apply coupon")
 }
 
@@ -297,8 +296,8 @@ func Test_GivenExecute_WhenSaveEntranceWithCouponAppliedSuccess_ThenEnsureReturn
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedPurchaseId := 7
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}, expectedPurchaseId)
-	spies.BusSpy.DefinePromiseResult(&apply_prizedraw_coupon.ApplyPrizeDrawCouponFailedEvent{}, false)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponStartedEvent{}, expectedPurchaseId)
+	spies.BusSpy.DefinePromiseResult(&event.ApplyPrizeDrawCouponFailedEvent{}, false)
 	spies.HasherSpy.DefineGetRandomCodeSuccess()
 	spies.RepoSpy.DefineGetCouponByIdSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineSaveEntranceWithCouponAppliedSuccess()

@@ -1,7 +1,7 @@
 package prizedraw_repository_test
 
 import (
-	"getfund-api-v2/pkg/db/schema"
+	"getfund-api-v2/internal/infra/db/schema"
 	fixture "getfund-api-v2/test/internal/domain/prizedraw/adapter/repository/prizedraw_repository_fixture"
 	"testing"
 	"time"
@@ -13,7 +13,7 @@ import (
 func Test_GivenGetCouponByCode_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act
@@ -61,7 +61,7 @@ func Test_GivenGetCouponByCode_WhenFound_ThenEnsureReturnSuccess(t *testing.T) {
 func Test_GivenGetPrizeDrawById_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act
@@ -109,7 +109,7 @@ func Test_GivenGetPrizeDrawById_WhenFound_ThenEnsureReturnSuccess(t *testing.T) 
 func Test_GivenGetCouponById_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act
@@ -155,7 +155,7 @@ func Test_GivenGetCouponById_WhenFound_ThenEnsureReturnSuccess(t *testing.T) {
 func Test_GivenSaveEntranceWithCouponApplied_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act

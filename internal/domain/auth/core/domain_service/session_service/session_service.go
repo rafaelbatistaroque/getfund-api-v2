@@ -3,11 +3,11 @@ package session_service
 import (
 	"encoding/json"
 	"errors"
+	"getfund-api-v2/internal/config/env"
 	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
-	"getfund-api-v2/internal/settings"
+	"getfund-api-v2/internal/shared/cache"
 	"getfund-api-v2/internal/shared/security"
-	"getfund-api-v2/internal/shared/service/cache_service"
 	"time"
 )
 
@@ -16,16 +16,16 @@ var (
 )
 
 type sessionService struct {
-	cache    cache_service.Cache
-	hasher   security.Hasher
-	settings settings.ApplicationSettings
+	cache  cache.Contract
+	hasher security.Hasher
+	env    env.Variable
 }
 
-func New(cache cache_service.Cache, hasher security.Hasher, settings settings.ApplicationSettings) auth_contract.SessionService {
+func New(cache cache.Contract, hasher security.Hasher, env env.Variable) auth_contract.SessionService {
 	return &sessionService{
-		cache:    cache,
-		hasher:   hasher,
-		settings: settings,
+		cache:  cache,
+		hasher: hasher,
+		env:    env,
 	}
 }
 
@@ -35,8 +35,8 @@ func (s *sessionService) SaveSession(session *auth_dto.SessionDto) (string, erro
 	}
 
 	sessionSerialized, _ := json.Marshal(session)
-	sessionEncrypted := s.hasher.Encrypt(string(sessionSerialized), s.settings.GetSecretKey())
-	token := s.hasher.HashAndMerge(sessionEncrypted, s.settings.GetServerSalt())
+	sessionEncrypted := s.hasher.Encrypt(string(sessionSerialized), s.env.GetSecretKey())
+	token := s.hasher.HashAndMerge(sessionEncrypted, s.env.GetServerSalt())
 
 	errCache := s.cache.Set(token, sessionEncrypted, time_24_HOURS)
 	if errCache != nil {
@@ -64,5 +64,5 @@ func (s *sessionService) GetSession(token string) (string, error) {
 		return "", err
 	}
 
-	return s.hasher.DecryptMerged(sessionEncrypted, s.settings.GetSecretKey()), nil
+	return s.hasher.DecryptMerged(sessionEncrypted, s.env.GetSecretKey()), nil
 }

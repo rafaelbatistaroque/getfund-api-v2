@@ -2,7 +2,7 @@ package auth_gateway_test
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/gateway/activate_user_gateway_fixture"
 	"testing"
 
@@ -18,7 +18,7 @@ func Test_GivenActivateUser_WhenActivationCodeUrlParamNotFound_ThenEnsureReturnB
 	_, code, err := sut.ActivateUser(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Error()).Be("activation code is required")
 }
 
@@ -87,7 +87,7 @@ func Test_GivenActivateUser_WhenSigninUsecaseSuccessNUll_ThenEnsureApropriateErr
 	_, code, err := sut.ActivateUser(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Error()).Be("error to activate user")
 }
 
@@ -130,6 +130,6 @@ func Test_GivenActivateUser_WhenSigninUsecaseSuccess_ThenEnsureReturnOutput(t *t
 	result, code, _ := sut.ActivateUser(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
+	verify.Should(t, code).Be(shared_error.SUCCESS_CODE)
 	verify.Should(t, result).Be(usecase.SigninUsecaseSpy.SuccessResult["Execute"])
 }

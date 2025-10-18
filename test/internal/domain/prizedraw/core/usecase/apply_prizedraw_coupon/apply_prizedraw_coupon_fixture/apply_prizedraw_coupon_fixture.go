@@ -4,6 +4,7 @@ import (
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	apply_prizedraw_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/application"
+	event_prizedraw "getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/event"
 	"getfund-api-v2/test/helper/eventbus_spy"
 	"getfund-api-v2/test/helper/repository_spy/prizedraw_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
@@ -73,7 +74,7 @@ func WithUserId(userId int) Option {
 }
 
 func (f *ApplyPrizeDrawCouponFixture) GetEntranceDto() *prizedraw_dto.EntranceDto {
-	event := &apply_prizedraw_coupon.ApplyPrizeDrawCouponStartedEvent{}
+	event := &event_prizedraw.ApplyPrizeDrawCouponStartedEvent{}
 	return &prizedraw_dto.EntranceDto{
 		LuckyCode:   f.HasherSpy.SuccessResult["GetRandomCode"].(string),
 		UserId:      1,

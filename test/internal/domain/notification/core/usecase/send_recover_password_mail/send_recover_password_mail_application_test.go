@@ -2,7 +2,7 @@ package send_recover_password_mail_application_test
 
 import (
 	"fmt"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/notification/core/usecase/send_recover_password_mail/send_recover_password_mail_fixture"
 	"testing"
 
@@ -19,7 +19,7 @@ func Test_GivenExecute_WhenInvalidInput_ThenEnsureReturnApplicationErrorWithBadR
 	_, err := sut.Execute(fixture.GetInvalidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, err.Code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "Username"))
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "FirstName"))
 	verify.Should(t, err.Message.Error()).Contain(fmt.Sprintf(inputvalidation.Err_PARAMETER_NOT_EMPTY.Error(), "RecoveryLink"))
@@ -56,7 +56,7 @@ func Test_GivenExecute_WhenGetRecoveryPasswordTemplateError_ThenEnsureReturnAppl
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.TemplateFileSpy.ErrorResult["GetRecoveryPasswordTemplate"])
 }
 
@@ -96,7 +96,7 @@ func Test_GivenExecute_WhenSendMailError_ThenEnsureReturnApplicationErrorWithSer
 	_, err := sut.Execute(fixture.GetValidInput())
 
 	// Assert
-	verify.Should(t, err.Code).Be(result_app.SERVER_ERROR_CODE)
+	verify.Should(t, err.Code).Be(shared_error.SERVER_ERROR_CODE)
 	verify.Should(t, err.Message).Be(spies.MailSpy.ErrorResult["SendMail"])
 }
 

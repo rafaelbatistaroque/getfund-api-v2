@@ -6,7 +6,7 @@ import (
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/activate_user_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	"net/http"
 	"net/http/httptest"
 )
@@ -19,14 +19,14 @@ type ActivateUserUsecaseFixture struct {
 type activateUserUsecaseSpy struct {
 	Params        map[string]*activate_user.Input
 	CallsCount    map[string]int
-	ErrorResult   map[string]*result_app.ApplicationError
+	ErrorResult   map[string]*shared_error.Error
 	SuccessResult map[string]*activate_user.Output
 }
 
 type signinUsecaseSpy struct {
 	Params        map[string]*signin.Input
 	CallsCount    map[string]int
-	ErrorResult   map[string]*result_app.ApplicationError
+	ErrorResult   map[string]*shared_error.Error
 	SuccessResult map[string]*signin.Output
 }
 
@@ -34,13 +34,13 @@ func NewSut() (activate_user_gateway.ActiveUserGateway, *ActivateUserUsecaseFixt
 	activateUserUsecase := &activateUserUsecaseSpy{
 		Params:        make(map[string]*activate_user.Input),
 		CallsCount:    make(map[string]int),
-		ErrorResult:   make(map[string]*result_app.ApplicationError),
+		ErrorResult:   make(map[string]*shared_error.Error),
 		SuccessResult: make(map[string]*activate_user.Output)}
 
 	signinUsecase := &signinUsecaseSpy{
 		Params:        make(map[string]*signin.Input),
 		CallsCount:    make(map[string]int),
-		ErrorResult:   make(map[string]*result_app.ApplicationError),
+		ErrorResult:   make(map[string]*shared_error.Error),
 		SuccessResult: make(map[string]*signin.Output)}
 
 	return activate_user_gateway.New(activateUserUsecase, signinUsecase),
@@ -50,7 +50,7 @@ func NewSut() (activate_user_gateway.ActiveUserGateway, *ActivateUserUsecaseFixt
 		}
 }
 
-func (s *activateUserUsecaseSpy) Execute(input *activate_user.Input) (*activate_user.Output, *result_app.ApplicationError) {
+func (s *activateUserUsecaseSpy) Execute(input *activate_user.Input) (*activate_user.Output, *shared_error.Error) {
 	s.Params["Execute:input"] = input
 
 	s.CallsCount["Execute"]++
@@ -58,7 +58,7 @@ func (s *activateUserUsecaseSpy) Execute(input *activate_user.Input) (*activate_
 	return s.SuccessResult["Execute"], s.ErrorResult["Execute"]
 }
 
-func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *result_app.ApplicationError) {
+func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *shared_error.Error) {
 	s.Params["Execute:input"] = input
 
 	s.CallsCount["Execute"]++
@@ -82,7 +82,7 @@ func GetActivateUserInput() *activate_user.Input {
 }
 
 func (s *activateUserUsecaseSpy) DefineError() {
-	s.ErrorResult["Execute"] = &result_app.ApplicationError{Code: result_app.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
+	s.ErrorResult["Execute"] = &shared_error.Error{Code: shared_error.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
 }
 
 func (s *activateUserUsecaseSpy) DefineSuccess() {
@@ -97,7 +97,7 @@ func (s *activateUserUsecaseSpy) DefineSuccessWithValue() {
 }
 
 func (s *signinUsecaseSpy) DefineError() {
-	s.ErrorResult["Execute"] = &result_app.ApplicationError{Code: result_app.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
+	s.ErrorResult["Execute"] = &shared_error.Error{Code: shared_error.SERVER_ERROR_CODE, Message: errors.New("fake-error")}
 }
 
 func (s *signinUsecaseSpy) DefineSuccess() {

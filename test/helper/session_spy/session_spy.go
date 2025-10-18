@@ -6,15 +6,15 @@ import (
 )
 
 type SessionServiceSpy struct {
-	Params     map[string]interface{}
+	Params     map[string]any
 	CallsCount map[string]int
 
-	SuccessResult map[string]interface{}
+	SuccessResult map[string]any
 	ErrorResult   map[string]error
 }
 
 func New() *SessionServiceSpy {
-	return &SessionServiceSpy{CallsCount: make(map[string]int), Params: make(map[string]interface{}), SuccessResult: make(map[string]interface{}), ErrorResult: make(map[string]error)}
+	return &SessionServiceSpy{CallsCount: make(map[string]int), Params: make(map[string]any), SuccessResult: make(map[string]any), ErrorResult: make(map[string]error)}
 }
 
 func (s *SessionServiceSpy) SaveSession(session *auth_dto.SessionDto) (string, error) {

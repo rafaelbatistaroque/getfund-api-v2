@@ -3,7 +3,7 @@ package signout_application
 import (
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signout"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 )
 
 type signoutApplication struct {
@@ -16,15 +16,15 @@ func New(sessionService auth_contract.SessionService) signout.UseCase {
 	}
 }
 
-func (u *signoutApplication) Execute(input *signout.Input) (*signout.Output, *result_app.ApplicationError) {
+func (u *signoutApplication) Execute(input *signout.Input) (*signout.Output, *shared_error.Error) {
 	validated := input.Validate()
 	if validated.IsInvalid() {
-		return nil, result_app.New(result_app.UNAUTHORIZED_CODE, validated.GetErrors())
+		return nil, shared_error.New(shared_error.UNAUTHORIZED_CODE, validated.GetErrors())
 	}
 
 	err := u.sessionService.DeleteSession(input.Token)
 	if err != nil {
-		return nil, result_app.New(result_app.SERVER_ERROR_CODE, err)
+		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, err)
 	}
 
 	return &signout.SignoutOutput{Message: "user disconnected"}, nil

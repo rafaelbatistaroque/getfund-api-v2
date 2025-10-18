@@ -2,7 +2,7 @@ package auth_gateway_test
 
 import (
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
-	"getfund-api-v2/internal/shared/result_app"
+	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/gateway/signin_gateway_fixture"
 	"testing"
 
@@ -18,7 +18,7 @@ func Test_GivenSignin_WhenDecodeError_ThenEnsureReturnBadRequestWithError(t *tes
 	_, code, err := sut.Signin(res, req)
 
 	// Assert
-	verify.Should(t, code).Be(result_app.BAD_REQUEST_CODE)
+	verify.Should(t, code).Be(shared_error.BAD_REQUEST_CODE)
 	verify.Should(t, err).NotNil()
 }
 
@@ -72,7 +72,7 @@ func Test_GivenSignin_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t
 
 	// Assert
 	success := signed.(*signin.Output)
-	verify.Should(t, code).Be(result_app.SUCCESS_CODE)
+	verify.Should(t, code).Be(shared_error.SUCCESS_CODE)
 	verify.Should(t, success.Token).Be(spies.SigninUsecaseSpy.SuccessResult["Execute"].Token)
 	verify.Should(t, success.Session.ID).Be(spies.SigninUsecaseSpy.SuccessResult["Execute"].Session.ID)
 	verify.Should(t, success.Session.FirstName).Be(spies.SigninUsecaseSpy.SuccessResult["Execute"].Session.FirstName)

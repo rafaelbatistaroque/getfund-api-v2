@@ -26,28 +26,41 @@ const (
 	CODE_LENGTH          = 8
 )
 
+// Hasher defines the interface for security operations like hashing and encryption.
 type Hasher interface {
+	// HashWithSalt generates a SHA-256 hash from a given text using a server salt and a salt derived from the input text's length.
+	// This method is deterministic for a given input and server salt.
 	HashWithSalt(inputText string, serverSalt []byte) (string, error)
+	// IsMatch compares a plain text string against a merged hash (salt + hash) to check for a match.
 	IsMatch(inputHashed, inputText string, serverSalt []byte) bool
+	// Encrypt encrypts a string using AES-256 with the provided secret key.
+	// It returns a merged hex string containing the IV and the encrypted data.
 	Encrypt(input string, secretKey []byte) string
+	// DecryptMerged decrypts a merged hex string (IV + data) using AES-256 and the secret key.
 	DecryptMerged(mergedEncryptedData string, secretKey []byte) string
+	// HashAndMerge generates a SHA-256 hash with a unique, random salt and merges them into a single hex string.
 	HashAndMerge(input string, serverSalt []byte) string
+	// GetRandomCode generates a random code of a given length from the ENTRANCE_CODE character set.
 	GetRandomCode(length int) (string, error)
+	// Hash generates a SHA-256 hash with a unique, random salt, returning the hash and salt as separate fields in a Hashing struct.
 	Hash(inputText string, serverSalt []byte) (*Hashing, error)
 }
 
 type hasher struct {
 }
 
+// New creates and returns a new instance of the default Hasher implementation.
 func New() Hasher {
 	return &hasher{}
 }
 
+// encryption holds the Initialization Vector (IV) and encrypted data, both as hex strings.
 type encryption struct {
 	IV   string
 	Data string
 }
 
+// Hashing holds the salt and the resulting hash data, both as hex strings.
 type Hashing struct {
 	Salt string
 	Data string
@@ -240,6 +253,7 @@ func mergeEncryption(encryption *encryption) string {
 }
 
 // Função para gerar um UUID (GUID)
+// GetGUID generates a new Version 4 UUID (Universally Unique Identifier).
 func GetGUID() string {
 	return uuid.New().String()
 }

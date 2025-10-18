@@ -1,7 +1,7 @@
 package product_repository_test
 
 import (
-	"getfund-api-v2/pkg/db/schema"
+	"getfund-api-v2/internal/infra/db/schema"
 	fixture "getfund-api-v2/test/internal/domain/product/adapter/repository/product_repository_fixture"
 	"testing"
 
@@ -11,7 +11,7 @@ import (
 func Test_GivenGetProductById_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
 	// Arrange
 	sut, db := fixture.NewSUT()
-	currentDb, _ := db.DB()
+	currentDb, _ := db.DB.DB()
 	currentDb.Close()
 
 	// Act
