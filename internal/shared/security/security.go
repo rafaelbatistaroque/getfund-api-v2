@@ -6,6 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"io"
@@ -17,13 +18,13 @@ import (
 )
 
 const (
-	SIZE_IV              = 16
-	SIZE_SALT            = 16
-	HASH_LENGTH          = 64
-	MERGE_HASHING_LENGTH = HASH_LENGTH + (SIZE_SALT * 2)
-	BYTES_LENGTH         = 32
-	ENTRANCE_CODE        = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	CODE_LENGTH          = 8
+	_SIZE_IV              = 16
+	_SIZE_SALT            = 16
+	_HASH_LENGTH          = 64
+	_MERGE_HASHING_LENGTH = _HASH_LENGTH + (_SIZE_SALT * 2)
+	_BYTES_LENGTH         = 32
+	_ENTRANCE_CODE        = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	_CODE_LENGTH          = 8
 )
 
 // Hasher defines the interface for security operations like hashing and encryption.
@@ -31,6 +32,9 @@ type Hasher interface {
 	// HashWithSalt generates a SHA-256 hash from a given text using a server salt and a salt derived from the input text's length.
 	// This method is deterministic for a given input and server salt.
 	HashWithSalt(inputText string, serverSalt []byte) (string, error)
+	// HashWithSaltLegacy is the old implementation of HashWithSalt. It should only be used for migrating existing data.
+	// It uses the string representation of the input length as a salt.
+	HashWithSaltLegacy(inputText string, serverSalt []byte) (string, error)
 	// IsMatch compares a plain text string against a merged hash (salt + hash) to check for a match.
 	IsMatch(inputHashed, inputText string, serverSalt []byte) bool
 	// Encrypt encrypts a string using AES-256 with the provided secret key.
@@ -68,10 +72,8 @@ type Hashing struct {
 
 // Gera um hash com um salt específico
 func (s *hasher) HashWithSalt(inputText string, serverSalt []byte) (string, error) {
-	salt, err := hex.DecodeString(fmt.Sprint(len(inputText)))
-	if err != nil {
-		return "", err
-	}
+	salt := make([]byte, _CODE_LENGTH)
+	binary.BigEndian.PutUint64(salt, uint64(len(inputText)))
 
 	inputData := []byte(inputText)
 	hash := sha256.New()
@@ -80,9 +82,23 @@ func (s *hasher) HashWithSalt(inputText string, serverSalt []byte) (string, erro
 	return hex.EncodeToString(hash.Sum(nil)), nil
 }
 
+// Gera um hash com um salt específico (LÓGICA ANTIGA/LEGADA)
+func (s *hasher) HashWithSaltLegacy(inputText string, serverSalt []byte) (string, error) {
+	// ATENÇÃO: Esta é a implementação antiga, mantida apenas para migração.
+	salt, err := hex.DecodeString(fmt.Sprint(len(inputText)))
+	if err != nil {
+		return "", err
+	}
+
+	inputData := []byte(inputText)
+	hash := sha256.New()
+	hash.Write(append(append(serverSalt, inputData...), salt...))
+	return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
 // Gera um Hash com salt
 func (s *hasher) Hash(inputText string, serverSalt []byte) (*Hashing, error) {
-	entrySalt := make([]byte, SIZE_SALT)
+	entrySalt := make([]byte, _SIZE_SALT)
 	if _, err := io.ReadFull(rand.Reader, entrySalt); err != nil {
 		return nil, err
 	}
@@ -100,7 +116,7 @@ func (s *hasher) Hash(inputText string, serverSalt []byte) (*Hashing, error) {
 
 // Função principal para encriptar e mesclar sem hashing adicional
 func (s *hasher) Encrypt(input string, secretKey []byte) string {
-	if len(secretKey) != BYTES_LENGTH {
+	if len(secretKey) != _BYTES_LENGTH {
 		panic("The secret key must have 32 bytes to AES-256")
 	}
 
@@ -146,18 +162,18 @@ func (s *hasher) DecryptMerged(mergedEncryptedData string, secretKey []byte) str
 
 // // Função para extrair o IV do dado encriptado mesclado
 func extractEncryptionIV(encryptedData string) string {
-	return encryptedData[:SIZE_IV*2] // Extrai o IV em hexadecimal
+	return encryptedData[:_SIZE_IV*2] // Extrai o IV em hexadecimal
 }
 
 // Função para extrair os dados encriptados do dado encriptado mesclado
 func extractEncryptionData(encryptedData string) string {
-	return encryptedData[SIZE_IV*2:] // Extrai os dados encriptados em hexadecimal
+	return encryptedData[_SIZE_IV*2:] // Extrai os dados encriptados em hexadecimal
 }
 
 // Testa se o hash mesclado corresponde ao hash de entrada
 func (h *hasher) IsMatch(inputHashed, inputText string, serverSalt []byte) bool {
 	// Certifique-se de que o hash mesclado tem o comprimento mínimo necessário
-	if len(inputHashed) < MERGE_HASHING_LENGTH {
+	if len(inputHashed) < _MERGE_HASHING_LENGTH {
 		return false
 	}
 
@@ -165,7 +181,7 @@ func (h *hasher) IsMatch(inputHashed, inputText string, serverSalt []byte) bool 
 	hashedData := extractHashingData(inputHashed)
 
 	// Certifique-se de que o salt extraído tem o comprimento esperado
-	if len(entrySalt) != SIZE_SALT {
+	if len(entrySalt) != _SIZE_SALT {
 		return false
 	}
 
@@ -178,21 +194,21 @@ func (h *hasher) IsMatch(inputHashed, inputText string, serverSalt []byte) bool 
 
 // Extrai o salt de um hash mesclado
 func extractHashingSalt(mergedHashing string) []byte {
-	hexSalt := mergedHashing[:SIZE_SALT*2]
+	hexSalt := mergedHashing[:_SIZE_SALT*2]
 	salt, _ := hex.DecodeString(hexSalt)
 	return salt
 }
 
 // Extrai os dados de um hash mesclado
 func extractHashingData(mergedHashing string) []byte {
-	hexData := mergedHashing[SIZE_SALT*2:]
+	hexData := mergedHashing[_SIZE_SALT*2:]
 	data, _ := hex.DecodeString(hexData)
 	return data
 }
 
 func encrypt(inputText string, secretKey []byte) (*encryption, error) {
 	// Gerar IV aleatório
-	iv := make([]byte, SIZE_IV)
+	iv := make([]byte, _SIZE_IV)
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
 		return nil, fmt.Errorf("erro ao gerar IV: %v", err)
 	}
@@ -275,12 +291,15 @@ func unpad(src []byte, blockSize int) ([]byte, error) {
 }
 
 func (h *hasher) GetRandomCode(length int) (string, error) {
+	if length <= 0 {
+		return "", fmt.Errorf("length must be greater than zero")
+	}
 	var code strings.Builder
 	mathrand.NewSource(time.Now().UnixNano())
 
 	for range length {
-		randomIndex := mathrand.Intn(len(ENTRANCE_CODE))
-		code.WriteByte(ENTRANCE_CODE[randomIndex])
+		randomIndex := mathrand.Intn(len(_ENTRANCE_CODE))
+		code.WriteByte(_ENTRANCE_CODE[randomIndex])
 	}
 
 	return code.String(), nil

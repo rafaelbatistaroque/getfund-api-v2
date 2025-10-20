@@ -25,6 +25,7 @@ func New(repository auth_contract.Repository, env env.Variable, hasher security.
 }
 
 func (p *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
+	// 1. Tenta encontrar o usuário com a NOVA lógica de hash
 	usernameHashed, err := p.hasher.HashWithSalt(username, p.env.GetServerSalt())
 	if err != nil {
 		return nil, err
@@ -35,10 +36,29 @@ func (p *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*
 	}
 
 	authenticatedUser, errRepo := p.repository.GetAuthenticatedUserByUsername(usernameHashed)
-	if errRepo != nil {
-		return nil, errRepo
+
+	// 2. Se não encontrou, tenta com a lógica ANTIGA (legada)
+	if authenticatedUser == nil || errRepo != nil {
+		usernameHashedLegacy, errLegacy := p.hasher.HashWithSaltLegacy(username, p.env.GetServerSalt())
+		if errLegacy != nil {
+			return nil, errors.New(_DEFAULT_ERROR)
+		}
+
+		authenticatedUser, errRepo = p.repository.GetAuthenticatedUserByUsername(usernameHashedLegacy)
+		if errRepo != nil {
+			return nil, errRepo
+		}
+
+		// Se encontrou com a lógica antiga, atualiza o hash no banco para a nova lógica (MIGRAÇÃO)
+		if authenticatedUser != nil {
+			errUpdate := p.repository.UpdateUsernameHash(authenticatedUser.Id, usernameHashed)
+			if errUpdate != nil {
+				return nil, errUpdate
+			}
+		}
 	}
 
+	// 3. Se depois de ambas as tentativas o usuário for nulo, retorna erro.
 	if authenticatedUser == nil {
 		return nil, errors.New(_DEFAULT_ERROR)
 	}
@@ -55,6 +75,10 @@ func (p *authRepositoryProxy) UpdatePassword(id int, value string) error {
 	passwordHashed := p.hasher.HashAndMerge(value, p.env.GetServerSalt())
 
 	return p.repository.UpdatePassword(id, passwordHashed)
+}
+
+func (p *authRepositoryProxy) UpdateUsernameHash(id int, username string) error {
+	return p.repository.UpdateUsernameHash(id, username)
 }
 
 func (p *authRepositoryProxy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {

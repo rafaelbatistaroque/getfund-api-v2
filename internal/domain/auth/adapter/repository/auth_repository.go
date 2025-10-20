@@ -96,3 +96,20 @@ func (u *authRepository) UserExists(username string) (*auth_dto.UserDto, error) 
 		Id: int(user.ID),
 	}, nil
 }
+
+func (r *authRepository) UpdateUsernameHash(id int, username string) error {
+	result := r.db.
+		Model(&schema.User{}).
+		Where("id=?", id).
+		Update("username", username)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New("user not found")
+	}
+
+	return nil
+}

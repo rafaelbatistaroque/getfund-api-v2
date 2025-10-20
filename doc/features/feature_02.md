@@ -1,16 +1,16 @@
----
-Metadados da Feature:
+--- Metadados da Feature:
     - Nome: Melhorias em API plataforma GetFund
     - Código: FEAT02
-    - Status: Draft
+    - Status: Review
     - Message: N/A
 
 Recursos:
     - STATUS: Draft|ToDo|Spec|Proj|Dev|Blocked|Review|Done
     - Prefixo Feature: FEAT{0-N}
-    - Prefixo Requisito Funcional: [STATUS]RF{0-N}
-    - Prefixo Requisito Técnico: [RF{0-N}]RT{0-N}
-    - Prefixo Task de Teste: [RF{0-N}][TASK{0-N}]TEST{0-N}
+    - Prefixo Requisito Funcional: [STATUS] RF{0-N}
+    - Prefixo Requisito Técnico: [RF{0-N}] RT{0-N}
+    - Prefixo Task: [RT{0-N}] TASK{0-N}
+    - Prefixo Task de Teste: [TASK{0-N}] TEST{0-N}
 ---
 
 # 1. API para acesso a plataforma GetFund
@@ -28,8 +28,9 @@ Recursos:
 - Código limpo, robusto, enxuto, escalável e técnico.
 
 ## 4. Requisitos Funcionais
-- **[Todo] RF01:** Criar testes para o serviço compartilhado do pacote security.
-- **[Draft] RF02:** ...
+- **[Done] RF01:** Criar testes para o serviço compartilhado do pacote security.
+- **[Done] RF02:** Organizar, neste documento, as referências das tarefas confome critérios da documentação.
+- **[Done] RF03:** Criar teste para reposítório de autenticação
 
 ### 4.1. Diagramas Caso de Uso
 
@@ -37,7 +38,11 @@ N/A
 
 ## 5. Requisitos Técnicos
 - **[RF01] RT01:** Não é necessários criar diagramas.
-- **[RF01] RT02:** Criar teste para todos os métodos pública do pacote security obedecendo os padões estabelecidos na documentação.
+- **[RF01] RT02:** Criar teste para TODOS os métodos público do pacote security obedecendo os padões estabelecidos na documentação.
+- **[RF01] RT03:** Continuar implemetação de fallback do método `GetAuthenticatedUserByUsername`.
+- **[RF01] RT04:** Garantir teste dos novos métodos do repositório `authRepositoryProxy`.
+- **[RF02] RT01:** Olhar para cada requisito técnico e identificar qual tarefa está relacionada a ele e alterar o prefixo da tarefa para o RT correspondente.
+- **[RF03] RT01:** Garantir testes do `UpdateUsernameHash` do repositório `authRepository`.
 
 - **Hipóteses:**
     - N/A.
@@ -61,4 +66,29 @@ N/A
 
 ## 7. Tarefas
 
-### 7.1 Diagram de Sequência
+- [X] **[RF01]**
+    - [X] **[RT02]TASK01:** Criar o arquivo de teste `test/internal/shared/security/security_test.go`.
+        - [X] **[TASK01]TEST01:** Criar os testes para o método `GetRandomCode`.
+        - [X] **[TASK01]TEST02:** Criar os testes para o método `Encrypt`.
+        - [X] **[TASK01]TEST03:** Criar os testes para o método `Decrypt`.
+        - [X] **[TASK01]TEST04:** Criar os testes para o método `HashAndMerge`.
+        - [X] **[TASK01]TEST05:** Criar os testes para o método `IsMatch`.
+        - [X] **[TASK01]TEST06:** Criar os testes para o método `HashWithSalt`.
+        - [X] **[TASK01]TEST07:** Criar os testes para o método `Hash`.
+    - [X] **[RT03]TASK02:** Implementar fallback para o método `GetAuthenticatedUserByUsername` no `authRepositoryProxy`.
+        - [X] **[TASK02]TEST01:** Criar teste para o fallback do método `GetAuthenticatedUserByUsername`.
+        - [X] **[TASK02]TEST02:** Criar teste para a chamada do método `HashWithSaltLegacy` no fallback.
+        - [X] **[TASK02]TEST03:** Criar teste para os parâmetros do método `HashWithSaltLegacy` no fallback.
+        - [X] **[TASK02]TEST04:** Criar teste para o erro de retorno do método `HashWithSaltLegacy` no fallback.
+        - [X] **[TASK02]TEST05:** Criar teste para a chamada do método `GetAuthenticatedUserByUsername` no fallback.
+        - [X] **[TASK02]TEST06:** Criar teste para os parâmetros do método `GetAuthenticatedUserByUsername` no fallback.
+        - [X] **[TASK02]TEST07:** Criar teste para o erro de retorno do método `GetAuthenticatedUserByUsername` no fallback.
+- [X] **[RF03]**
+    - [X] **[RT01]TASK03:** Criar os testes para o método `UpdateUsernameHash` em `test/internal/domain/auth/adapter/repository/auth_repository_test.go`.
+        - [X] **[TASK03]TEST01:** Criar teste para o sucesso na atualização do username.
+        - [X] **[TASK03]TEST02:** Criar teste para o erro na atualização do username.
+        - [X] **[TASK03]TEST03:** Criar teste para a atualização de um usuário inexistente.
+
+### 7.1 Diagrama de Sequência
+
+N/A
