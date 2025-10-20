@@ -1,5 +1,4 @@
----
-Metadados da Feature:
+--- Metadados da Feature:
     - Nome: Melhorias em API plataforma GetFund
     - Código: FEAT01
     - Status: Review
@@ -8,9 +7,10 @@ Metadados da Feature:
 Recursos:
     - STATUS: Draft|ToDo|Spec|Proj|Dev|Blocked|Review|Done
     - Prefixo Feature: FEAT{0-N}
-    - Prefixo Requisito Funcional: [STATUS]RF{0-N}
-    - Prefixo Requisito Técnico: [RF{0-N}]RT{0-N}
-    - Prefixo Task de Teste: [RF{0-N}][TASK{0-N}]TEST{0-N}
+    - Prefixo Requisito Funcional: [STATUS] RF{0-N}
+    - Prefixo Requisito Técnico: [RF{0-N}] RT{0-N}
+    - Prefixo Task: [RT{0-N}] TASK{0-N}
+    - Prefixo Task de Teste: [TASK{0-N}] TEST{0-N}
 ---
 
 # 1. API para acesso a plataforma GetFund
