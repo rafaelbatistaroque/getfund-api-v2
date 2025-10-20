@@ -5,7 +5,7 @@ import (
 	fixture "getfund-api-v2/test/internal/domain/auth/core/domain_service/session_service/session_service_fixture"
 	"testing"
 
-	"github.com/rafaelbatistaroque/verify"
+	"github.com/rafaelbatistaroque/verify/v2"
 )
 
 func Test_GivenGetSession_WhenInvalidInput_ThenEnsureReturnError(t *testing.T) {

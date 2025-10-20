@@ -5,7 +5,7 @@ import (
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/repository/auth_repository_fixture"
 	"testing"
 
-	"github.com/rafaelbatistaroque/verify"
+	"github.com/rafaelbatistaroque/verify/v2"
 
 	"github.com/google/uuid"
 )

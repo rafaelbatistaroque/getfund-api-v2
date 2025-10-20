@@ -4,7 +4,7 @@ import (
 	fixture "getfund-api-v2/test/internal/domain/notification/adapter/event_handler/recover_password_started_event_handler/recover_password_started_event_handler_fixture"
 	"testing"
 
-	"github.com/rafaelbatistaroque/verify"
+	"github.com/rafaelbatistaroque/verify/v2"
 
 	"github.com/google/uuid"
 )

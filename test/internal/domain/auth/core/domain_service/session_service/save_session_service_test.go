@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rafaelbatistaroque/verify"
+	"github.com/rafaelbatistaroque/verify/v2"
 )
 
 func Test_GivenSaveSession_WhenInputNull_ThenEnsureReturnError(t *testing.T) {

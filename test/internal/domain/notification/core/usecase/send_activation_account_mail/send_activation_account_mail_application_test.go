@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/rafaelbatistaroque/validation"
-	"github.com/rafaelbatistaroque/verify"
+	"github.com/rafaelbatistaroque/verify/v2"
 )
 
 func Test_GivenExecute_WhenFirstNameEmpty_ThenEnsureReturnUnprocessableError(t *testing.T) {

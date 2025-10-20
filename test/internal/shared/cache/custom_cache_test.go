@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rafaelbatistaroque/verify"
+	"github.com/rafaelbatistaroque/verify/v2"
 
 	"github.com/google/uuid"
 )
