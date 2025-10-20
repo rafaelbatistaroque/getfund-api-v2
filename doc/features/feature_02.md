@@ -31,6 +31,7 @@ Recursos:
 - **[Done] RF01:** Criar testes para o serviço compartilhado do pacote security.
 - **[Done] RF02:** Organizar, neste documento, as referências das tarefas confome critérios da documentação.
 - **[Done] RF03:** Criar teste para reposítório de autenticação
+- **[Done] RF04:** Criar testes para o serviço compartilhado do pacote email
 
 ### 4.1. Diagramas Caso de Uso
 
@@ -43,6 +44,7 @@ N/A
 - **[RF01] RT04:** Garantir teste dos novos métodos do repositório `authRepositoryProxy`.
 - **[RF02] RT01:** Olhar para cada requisito técnico e identificar qual tarefa está relacionada a ele e alterar o prefixo da tarefa para o RT correspondente.
 - **[RF03] RT01:** Garantir testes do `UpdateUsernameHash` do repositório `authRepository`.
+- **[RF04] RT01:** Refatorar/Criar/Limpar testes que estão em `test/internal/shared/mail`.
 
 - **Hipóteses:**
     - N/A.
@@ -88,6 +90,10 @@ N/A
         - [X] **[TASK03]TEST01:** Criar teste para o sucesso na atualização do username.
         - [X] **[TASK03]TEST02:** Criar teste para o erro na atualização do username.
         - [X] **[TASK03]TEST03:** Criar teste para a atualização de um usuário inexistente.
+- [X] **[RF04]**
+    - [X] **[RT01]TASK04:** Refatorar/Criar/Limpar testes que estão em `test/internal/shared/mail`.
+        - [X] **[TASK04]TEST01:** Criar teste para o sucesso no envio do email.
+        - [X] **[TASK04]TEST02:** Criar teste para o erro no envio do email.
 
 ### 7.1 Diagrama de Sequência
 
