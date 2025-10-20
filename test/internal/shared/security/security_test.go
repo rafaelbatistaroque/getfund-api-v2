@@ -3,7 +3,7 @@ package security_test
 import (
 	"testing"
 
-	fixture "getfund-api-v2/test/internal/shared/security/fixture"
+	fixture "getfund-api-v2/test/internal/shared/security/security_fixture"
 
 	"github.com/rafaelbatistaroque/verify/v2"
 )
