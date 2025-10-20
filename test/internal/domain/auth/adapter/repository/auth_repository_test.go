@@ -156,3 +156,45 @@ func Test_GivenUserExists_WhenFound_ThenEnsureReturnError(t *testing.T) {
 	verify.Should(t, userFound).NotNil()
 	verify.Should(t, userFound.Id).Be(1)
 }
+
+func Test_GivenUpdateUsernameHash_WhenQueryError_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	currentDb, _ := db.DB.DB()
+	currentDb.Close()
+
+	// Act
+	err := sut.UpdateUsernameHash(1, "")
+
+	// Assert
+	verify.Should(t, err).NotNil()
+}
+
+func Test_GivenUpdateUsernameHash_WhenUserNotExists_ThenEnsureReturnError(t *testing.T) {
+	// Arrange
+	sut, _ := fixture.NewSUT()
+	newUsername := uuid.NewString()
+
+	// Act
+	err := sut.UpdateUsernameHash(999, newUsername) // 999 is a non-existent user id
+
+	// Assert
+	verify.Should(t, err).NotNil()
+}
+
+func Test_GivenUpdateUsernameHash_WhenSuccess_ThenEnsureUsernameIsUpdated(t *testing.T) {
+	// Arrange
+	sut, db := fixture.NewSUT()
+	newUsername := uuid.NewString()
+	db.Create(&schema.User{Username: uuid.NewString()})
+
+	// Act
+	result := sut.UpdateUsernameHash(1, newUsername)
+
+	// Assert
+	user := &schema.User{}
+	db.Where("id = ?", 1).First(user)
+
+	verify.Should(t, result).Nil()
+	verify.Should(t, user.Username).Be(newUsername)
+}

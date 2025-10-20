@@ -14,7 +14,12 @@ type AuthRepositorySpy struct {
 
 func New() *AuthRepositorySpy {
 
-	return &AuthRepositorySpy{Params: make(map[string]any, 1), ErrorResult: make(map[string]error), SuccessResult: make(map[string]any, 1), CallsCount: make(map[string]int, 1)}
+	return &AuthRepositorySpy{
+		Params:        make(map[string]any, 1),
+		ErrorResult:   make(map[string]error),
+		SuccessResult: make(map[string]any, 1),
+		CallsCount:    make(map[string]int, 1),
+	}
 }
 
 func (r *AuthRepositorySpy) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
@@ -22,9 +27,13 @@ func (r *AuthRepositorySpy) GetAuthenticatedUserByUsername(username string) (*au
 
 	r.CallsCount["GetAuthenticatedUserByUsername"]++
 
+	if r.CallsCount["GetAuthenticatedUserByUsername"] == 1 && r.ErrorResult["GetAuthenticatedUserByUsername"] != nil {
+		return nil, r.ErrorResult["GetAuthenticatedUserByUsername"]
+	}
+
 	sucess := r.SuccessResult["GetAuthenticatedUserByUsername"]
 	if sucess != nil {
-		return sucess.(*auth_dto.AuthenticatedUserDto), r.ErrorResult["GetAuthenticatedUserByUsername"]
+		return sucess.(*auth_dto.AuthenticatedUserDto), nil
 	}
 
 	return nil, r.ErrorResult["GetAuthenticatedUserByUsername"]
@@ -37,6 +46,15 @@ func (r *AuthRepositorySpy) UpdatePassword(id int, value string) error {
 	r.CallsCount["UpdatePassword"]++
 
 	return r.ErrorResult["UpdatePassword"]
+}
+
+func (r *AuthRepositorySpy) UpdateUsernameHash(id int, username string) error {
+	r.Params["UpdateUsernameHash:id"] = id
+	r.Params["UpdateUsernameHash:username"] = username
+
+	r.CallsCount["UpdateUsernameHash"]++
+
+	return r.ErrorResult["UpdateUsernameHash"]
 }
 
 func (r *AuthRepositorySpy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
@@ -77,6 +95,11 @@ func (r *AuthRepositorySpy) DefineGetAuthenticatedUserByUsernameSuccess() {
 	r.SuccessResult["GetAuthenticatedUserByUsername"] = &auth_dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
 }
 
+func (r *AuthRepositorySpy) DefineGetAuthenticatedUserByUsernameFallback() {
+	r.ErrorResult["GetAuthenticatedUserByUsername"] = errors.New("user not found")
+	r.SuccessResult["GetAuthenticatedUserByUsername"] = &auth_dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
+}
+
 func (r *AuthRepositorySpy) DefineUpdatePasswordError() {
 	r.ErrorResult["UpdatePassword"] = errors.New("fake-error")
 }
@@ -99,4 +122,8 @@ func (r *AuthRepositorySpy) DefineUserExistsSuccessUserFound() {
 
 func (r *AuthRepositorySpy) DefineUserExistsSuccess() {
 	r.SuccessResult["UserExists"] = nil
+}
+
+func (r *AuthRepositorySpy) DefineUpdateUsernameHashError() {
+	r.ErrorResult["UpdateUsernameHash"] = errors.New("fake-error")
 }

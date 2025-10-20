@@ -10,7 +10,7 @@ import (
 	"github.com/rafaelbatistaroque/verify"
 )
 
-func Test_GivenGetAuthenticatedUserByUsername_WhenInit_ThenEnsureCallHashWithSaltWithCorrectParameter(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenInit_ThenEnsureCallOnceHashWithSaltWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedInputText := "fake-username"
 	sut, spies := fixture.NewSut()
@@ -19,6 +19,7 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenInit_ThenEnsureCallHashWithSal
 	sut.GetAuthenticatedUserByUsername(expectedInputText)
 
 	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
 	verify.Should(t, spies.HasherSpy.Params["HashWithSalt:inputText"]).Be(expectedInputText)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSalt:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
 }
@@ -46,47 +47,86 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenHashWithSaltResultEmpty_ThenEn
 	verify.Should(t, err.Error()).Be("error on get authenticated user")
 }
 
-func Test_GivenGetAuthenticatedUserByUsername_WhenHashWithSaltInvoked_ThenEnsureCallHashWithSaltOnce(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-
-	// Act
-	sut.GetAuthenticatedUserByUsername("fake-username")
-
-	// Assert
-	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSalt"]).Be(1)
-}
-
-func Test_GivenGetAuthenticatedUserByUsername_WhenHashWithSaltSuccess_ThenEnsureCallRepositoryGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenHashWithSaltSuccess_ThenEnsureCallOnceRepositoryGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
 	// Arrange
 	expectedParameter := "fake-username-hashed"
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess(expectedParameter)
-
-	// Act
-	sut.GetAuthenticatedUserByUsername("fake-username")
-
-	// Assert
-	verify.Should(t, spies.RepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedParameter)
-}
-
-func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallsOnce(t *testing.T) {
-	// Arrange
-	sut, spies := fixture.NewSut()
-	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 
 	// Act
 	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
 	verify.Should(t, spies.RepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(1)
+	verify.Should(t, spies.RepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(expectedParameter)
 }
 
-func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameError_ThenEnsureReturnErrorFrom(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameError_ThenEnsureStartFallback(t *testing.T) {
 	// Arrange
+	username := "fake-username"
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
 	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameError()
+
+	// Act
+	sut.GetAuthenticatedUserByUsername(username)
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSaltLegacy"]).Be(1)
+	verify.Should(t, spies.HasherSpy.Params["HashWithSaltLegacy:inputText"]).Be(username)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSaltLegacy:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+}
+
+func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameNil_ThenEnsureStartFallback(t *testing.T) {
+	// Arrange
+	username := "fake-username"
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+
+	// Act
+	sut.GetAuthenticatedUserByUsername(username)
+
+	// Assert
+	verify.Should(t, spies.HasherSpy.CallsCount["HashWithSaltLegacy"]).Be(1)
+	verify.Should(t, spies.HasherSpy.Params["HashWithSaltLegacy:inputText"]).Be(username)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["HashWithSaltLegacy:serverSalt"].([]byte), spies.SettingsSpy.GetServerSalt())).BeTrue()
+}
+
+func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackHashWithSaltLegacyError_ThenEnsureReturnAppropriateError(t *testing.T) {
+	// Arrange
+	username := "fake-username"
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+	spies.HasherSpy.DefineHashWithSaltLegacyError()
+
+	// Act
+	_, err := sut.GetAuthenticatedUserByUsername(username)
+
+	// Assert
+	verify.Should(t, err.Error()).Be("error on get authenticated user")
+}
+
+func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackHashWithSaltLegacySuccess_ThenEnsureCallOnceGetAuthenticatedUserByUsernameWithCorrectParameter(t *testing.T) {
+	// Arrange
+	usernameHashed := "fake-username-hashed-legacy"
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+	spies.HasherSpy.DefineHashWithSaltLegacySuccess(usernameHashed)
+
+	// Act
+	sut.GetAuthenticatedUserByUsername("fake-username")
+
+	// Assert
+	verify.Should(t, spies.RepoSpy.CallsCount["GetAuthenticatedUserByUsername"]).Be(2)
+	verify.Should(t, spies.RepoSpy.Params["GetAuthenticatedUserByUsername:username"]).Be(usernameHashed)
+}
+
+func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackGetAuthenticatedUserByUsernameResultError_ThenEnsureReturnAppropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameError() // para a primeira e segunda chamada
 
 	// Act
 	_, err := sut.GetAuthenticatedUserByUsername("fake-username")
@@ -95,16 +135,52 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsername
 	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["GetAuthenticatedUserByUsername"])
 }
 
-func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameResultNull_ThenEnsureReturnAppropriateError(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackGetAuthenticatedUserByUsernameResultSuccess_ThenEnsureCallOnceUpdateUsernameHashWithCorrectParameter(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameError()   //para a primeira chamada
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess() //para a segunda chamada
+
+	// Act
+	sut.GetAuthenticatedUserByUsername("fake-username")
+
+	// Assert
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	verify.Should(t, spies.RepoSpy.CallsCount["UpdateUsernameHash"]).Be(1)
+	verify.Should(t, spies.RepoSpy.Params["UpdateUsernameHash:id"]).Be(authenticatedUser.Id)
+	verify.Should(t, spies.RepoSpy.Params["UpdateUsernameHash:username"]).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
+}
+
+func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackUpdateUsernameHashError_ThenEnsureReturnAppropriateError(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameError() // para a primeira e segunda chamada
+	spies.RepoSpy.DefineUpdateUsernameHashError()
 
 	// Act
 	_, err := sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	verify.Should(t, err.Error()).Be("error on get authenticated user")
+	verify.Should(t, err).Be(spies.RepoSpy.ErrorResult["UpdateUsernameHash"])
+}
+
+func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackUpdateUsernameHashSuccess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
+	// Arrange
+	sut, spies := fixture.NewSut()
+	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameError()   // para a primeira
+	spies.RepoSpy.DefineGetAuthenticatedUserByUsernameSuccess() //para a segunda chamada
+
+	// Act
+	sut.GetAuthenticatedUserByUsername("fake-username")
+
+	// Assert
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	verify.Should(t, spies.HasherSpy.CallsCount["DecryptMerged"]).Be(1)
+	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(authenticatedUser.FirstName)
+	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
 }
 
 func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameSuccess_ThenEnsureCallDecryptMergedWithCorrectParameter(t *testing.T) {
@@ -118,11 +194,12 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsername
 
 	// Assert
 	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	verify.Should(t, spies.HasherSpy.CallsCount["DecryptMerged"]).Be(1)
 	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(authenticatedUser.FirstName)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
 }
 
-func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameSucess_ThenEnsureReturnModelDeserialized(t *testing.T) {
+func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsernameSuccess_ThenEnsureReturnModelDeserialized(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.HasherSpy.DefineHashWithSaltSuccess("fake-username-hashed")

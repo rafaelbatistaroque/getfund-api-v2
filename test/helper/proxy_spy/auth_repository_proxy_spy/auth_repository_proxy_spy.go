@@ -39,6 +39,15 @@ func (r *AuthRepositoryProxySpy) UpdatePassword(id int, value string) error {
 	return r.ErrorResult["UpdatePassword"]
 }
 
+func (r *AuthRepositoryProxySpy) UpdateUsernameHash(id int, username string) error {
+	r.Params["UpdateUsernameHash:id"] = id
+	r.Params["UpdateUsernameHash:username"] = username
+
+	r.CallsCount["UpdateUsernameHash"]++
+
+	return r.ErrorResult["UpdateUsernameHash"]
+}
+
 func (r *AuthRepositoryProxySpy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
 	r.Params["Signup:user"] = user
 

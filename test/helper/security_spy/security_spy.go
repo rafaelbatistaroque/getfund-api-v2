@@ -134,12 +134,34 @@ func (h *HasherSpy) Hash(inputText string, serverSalt []byte) (*security.Hashing
 	return &security.Hashing{}, h.ErrorResult["Hash"]
 }
 
+func (h *HasherSpy) HashWithSaltLegacy(inputText string, serverSalt []byte) (string, error) {
+	h.Params["HashWithSaltLegacy:inputText"] = inputText
+	h.Params["HashWithSaltLegacy:serverSalt"] = serverSalt
+
+	h.CallsCount["HashWithSaltLegacy"]++
+
+	success := h.SuccessResult["HashWithSaltLegacy"]
+	if success != nil {
+		return success.(string), h.ErrorResult["HashWithSaltLegacy"]
+	}
+
+	return "", h.ErrorResult["HashWithSaltLegacy"]
+}
+
 func (h *HasherSpy) DefineHashWithSaltError() {
 	h.ErrorResult["HashWithSalt"] = errors.New("fake-error")
 }
 
 func (h *HasherSpy) DefineHashWithSaltSuccess(result string) {
 	h.SuccessResult["HashWithSalt"] = result
+}
+
+func (h *HasherSpy) DefineHashWithSaltLegacySuccess(result string) {
+	h.SuccessResult["HashWithSaltLegacy"] = result
+}
+
+func (h *HasherSpy) DefineHashWithSaltLegacyError() {
+	h.ErrorResult["HashWithSaltLegacy"] = errors.New("fake-error")
 }
 
 func (h *HasherSpy) DefineIsMatchError() {
