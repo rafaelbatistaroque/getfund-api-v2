@@ -1,7 +1,7 @@
 package apply_prizedraw_coupon_fixture
 
 import (
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	apply_prizedraw_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/application"
 	event_prizedraw "getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/event"
@@ -73,9 +73,9 @@ func WithUserId(userId int) Option {
 	}
 }
 
-func (f *ApplyPrizeDrawCouponFixture) GetEntranceDto() *prizedraw_dto.EntranceDto {
+func (f *ApplyPrizeDrawCouponFixture) GetEntranceDto() *dto.EntranceDto {
 	event := &event_prizedraw.ApplyPrizeDrawCouponStartedEvent{}
-	return &prizedraw_dto.EntranceDto{
+	return &dto.EntranceDto{
 		LuckyCode:   f.HasherSpy.SuccessResult["GetRandomCode"].(string),
 		UserId:      1,
 		PrizeDrawId: 1,
@@ -84,15 +84,15 @@ func (f *ApplyPrizeDrawCouponFixture) GetEntranceDto() *prizedraw_dto.EntranceDt
 	}
 }
 
-func GetValidCoupon() *prizedraw_dto.CouponDto {
+func GetValidCoupon() *dto.CouponDto {
 	less72Hours := time.Now().Add(-24 * time.Hour).Unix()
 	more24Hours := time.Now().Add(24 * time.Hour).Unix()
 	email := "fake@mail.com"
-	return &prizedraw_dto.CouponDto{
+	return &dto.CouponDto{
 		ProductId:   10,
 		PrizeDrawId: 5,
 		Id:          1,
-		CouponTypeApplicability: &prizedraw_dto.CouponTypeApplicabilityDto{
+		CouponTypeApplicability: &dto.CouponTypeApplicabilityDto{
 			StartAt:     less72Hours,
 			EndAt:       &more24Hours,
 			LinkedEmail: &email,
@@ -100,9 +100,9 @@ func GetValidCoupon() *prizedraw_dto.CouponDto {
 	}
 }
 
-func ApplyCoupon(dto *prizedraw_dto.CouponDto, userId, couponId int) {
-	dto.UserCouponApplies = make([]*prizedraw_dto.UserCouponApplyDto, 0)
-	dto.UserCouponApplies = append(dto.UserCouponApplies, &prizedraw_dto.UserCouponApplyDto{
+func ApplyCoupon(couponDto *dto.CouponDto, userId, couponId int) {
+	couponDto.UserCouponApplies = make([]*dto.UserCouponApplyDto, 0)
+	couponDto.UserCouponApplies = append(couponDto.UserCouponApplies, &dto.UserCouponApplyDto{
 		CouponId: couponId,
 		UserId:   userId,
 	})

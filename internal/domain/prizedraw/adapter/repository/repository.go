@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto"
 	"getfund-api-v2/internal/infra/db"
 	"getfund-api-v2/internal/infra/db/schema"
 
@@ -18,7 +18,7 @@ func New(db *db.GetFund) prizedraw_contract.Repository {
 	return &prizedrawRepository{db: db}
 }
 
-func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto.CouponDto, error) {
+func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*dto.CouponDto, error) {
 	var coupon = &schema.Coupon{}
 
 	result := p.db.
@@ -36,9 +36,9 @@ func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto
 		return nil, result.Error
 	}
 
-	userApply := make([]*prizedraw_dto.UserCouponApplyDto, len(coupon.UserCouponApply))
+	userApply := make([]*dto.UserCouponApplyDto, len(coupon.UserCouponApply))
 	for i, apply := range coupon.UserCouponApply {
-		userApply[i] = &prizedraw_dto.UserCouponApplyDto{
+		userApply[i] = &dto.UserCouponApplyDto{
 			UserId:   apply.UserID,
 			CouponId: apply.CouponID,
 		}
@@ -47,7 +47,7 @@ func (p *prizedrawRepository) GetCouponByCode(couponCode string) (*prizedraw_dto
 	return p.convertCouponToDto(coupon), nil
 }
 
-func (p *prizedrawRepository) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDrawDto, error) {
+func (p *prizedrawRepository) GetPrizeDrawById(id int) (*dto.PrizeDrawDto, error) {
 	var prizeDraw = &schema.PrizeDraw{}
 
 	result := p.db.
@@ -63,17 +63,17 @@ func (p *prizedrawRepository) GetPrizeDrawById(id int) (*prizedraw_dto.PrizeDraw
 		return nil, result.Error
 	}
 
-	return &prizedraw_dto.PrizeDrawDto{
+	return &dto.PrizeDrawDto{
 		Id:               int(prizeDraw.ID),
 		WinnerEntranceId: prizeDraw.WinnerEntranceID,
 	}, nil
 }
 
-func (p *prizedrawRepository) CreateEntrance(entrance *prizedraw_dto.EntranceDto) error {
+func (p *prizedrawRepository) CreateEntrance(entrance *dto.EntranceDto) error {
 	return nil
 }
 
-func (p *prizedrawRepository) SaveEntranceWithCouponApplied(entrance *prizedraw_dto.EntranceDto, coupon *prizedraw_dto.CouponDto) error {
+func (p *prizedrawRepository) SaveEntranceWithCouponApplied(entrance *dto.EntranceDto, coupon *dto.CouponDto) error {
 	return p.db.Transaction(func(tx *gorm.DB) error {
 		if len(entrance.LuckyCode) > 8 {
 			return gorm.ErrInvalidValue
@@ -114,7 +114,7 @@ func (p *prizedrawRepository) SaveEntranceWithCouponApplied(entrance *prizedraw_
 	})
 }
 
-func (p *prizedrawRepository) GetCouponById(couponId int) (*prizedraw_dto.CouponDto, error) {
+func (p *prizedrawRepository) GetCouponById(couponId int) (*dto.CouponDto, error) {
 	var coupon = &schema.Coupon{}
 
 	result := p.db.
@@ -135,22 +135,22 @@ func (p *prizedrawRepository) GetCouponById(couponId int) (*prizedraw_dto.Coupon
 	return p.convertCouponToDto(coupon), nil
 }
 
-func (p *prizedrawRepository) convertCouponToDto(coupon *schema.Coupon) *prizedraw_dto.CouponDto {
-	userApply := make([]*prizedraw_dto.UserCouponApplyDto, len(coupon.UserCouponApply))
+func (p *prizedrawRepository) convertCouponToDto(coupon *schema.Coupon) *dto.CouponDto {
+	userApply := make([]*dto.UserCouponApplyDto, len(coupon.UserCouponApply))
 	for i, apply := range coupon.UserCouponApply {
-		userApply[i] = &prizedraw_dto.UserCouponApplyDto{
+		userApply[i] = &dto.UserCouponApplyDto{
 			UserId:   apply.UserID,
 			CouponId: apply.CouponID,
 		}
 	}
 
-	return &prizedraw_dto.CouponDto{
+	return &dto.CouponDto{
 		Id:                int(coupon.ID),
 		Code:              coupon.Code,
 		PrizeDrawId:       coupon.PrizeDrawID,
 		ProductId:         coupon.ProductID,
 		UserCouponApplies: userApply,
-		CouponTypeApplicability: &prizedraw_dto.CouponTypeApplicabilityDto{
+		CouponTypeApplicability: &dto.CouponTypeApplicabilityDto{
 			Id:               coupon.CouponTypeApplicability.ID,
 			CouponTypeCode:   coupon.CouponTypeApplicability.CouponTypeCode,
 			LimitApplication: coupon.CouponTypeApplicability.LimitApplication,
@@ -161,7 +161,7 @@ func (p *prizedrawRepository) convertCouponToDto(coupon *schema.Coupon) *prizedr
 	}
 }
 
-func areAllAppliesFalse(coupon *prizedraw_dto.CouponDto) bool {
+func areAllAppliesFalse(coupon *dto.CouponDto) bool {
 	allFalse := true
 
 	for _, apply := range coupon.UserCouponApplies {

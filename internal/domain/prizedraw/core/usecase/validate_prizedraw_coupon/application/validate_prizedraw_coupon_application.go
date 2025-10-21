@@ -4,7 +4,7 @@ import (
 	"errors"
 	"getfund-api-v2/internal/config/env"
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/event"
 	shared_bus "getfund-api-v2/internal/shared/bus"
@@ -39,7 +39,7 @@ func (v *validatePrizeDrawCouponApplication) Execute(input *validate_prizedraw_c
 	var applicationError = &shared_error.Error{}
 
 	//Handle Coupon validation
-	var couponDtoFound = &prizedraw_dto.CouponDto{}
+	var couponDtoFound = &dto.CouponDto{}
 	if couponDtoFound, applicationError = v.getCouponFromDb(input.CouponCode); applicationError != nil {
 		return nil, applicationError
 	}
@@ -53,7 +53,7 @@ func (v *validatePrizeDrawCouponApplication) Execute(input *validate_prizedraw_c
 	coupon.LinkPrizeDrawIfThereIsNo(input.SelectedPrizeDrawId)
 
 	//Handle PrizeDraw validation
-	var prizeDrawDtoFound *prizedraw_dto.PrizeDrawDto
+	var prizeDrawDtoFound *dto.PrizeDrawDto
 	if prizeDrawDtoFound, applicationError = v.getPrizeDrawFromDb(coupon.GetPrizeDrawId()); applicationError != nil {
 		return nil, applicationError
 	}
@@ -64,7 +64,7 @@ func (v *validatePrizeDrawCouponApplication) Execute(input *validate_prizedraw_c
 	}
 
 	//Handle Product validation
-	var productDto *prizedraw_dto.ProductDto
+	var productDto *dto.ProductDto
 	if productDto, applicationError = v.getValidationCouponFromResponse(coupon.GetProductId()); applicationError != nil {
 		return nil, applicationError
 	}
@@ -82,7 +82,7 @@ func (v *validatePrizeDrawCouponApplication) Execute(input *validate_prizedraw_c
 	}, nil
 }
 
-func (v *validatePrizeDrawCouponApplication) getPrizeDrawFromDb(prizeDrawId int) (*prizedraw_dto.PrizeDrawDto, *shared_error.Error) {
+func (v *validatePrizeDrawCouponApplication) getPrizeDrawFromDb(prizeDrawId int) (*dto.PrizeDrawDto, *shared_error.Error) {
 	prizeDrawFound, err := v.repository.GetPrizeDrawById(prizeDrawId)
 	if err != nil || prizeDrawFound == nil {
 		return nil, shared_error.New(shared_error.NOT_FOUND_CODE, errors.New("prizedraw not found"))
@@ -91,7 +91,7 @@ func (v *validatePrizeDrawCouponApplication) getPrizeDrawFromDb(prizeDrawId int)
 	return prizeDrawFound, nil
 }
 
-func (v *validatePrizeDrawCouponApplication) getCouponFromDb(couponCode string) (*prizedraw_dto.CouponDto, *shared_error.Error) {
+func (v *validatePrizeDrawCouponApplication) getCouponFromDb(couponCode string) (*dto.CouponDto, *shared_error.Error) {
 	couponDtoFound, err := v.repository.GetCouponByCode(couponCode)
 	if err != nil || couponDtoFound == nil {
 		return nil, shared_error.New(shared_error.NOT_FOUND_CODE, errors.New("coupon not found"))
@@ -100,12 +100,12 @@ func (v *validatePrizeDrawCouponApplication) getCouponFromDb(couponCode string) 
 	return couponDtoFound, nil
 }
 
-func (v *validatePrizeDrawCouponApplication) getValidationCouponFromResponse(productId int) (*prizedraw_dto.ProductDto, *shared_error.Error) {
+func (v *validatePrizeDrawCouponApplication) getValidationCouponFromResponse(productId int) (*dto.ProductDto, *shared_error.Error) {
 	payload := &event.ValidatePrizeDrawCouponStartedPayload{
 		ProductId: productId,
 	}
 
-	var product *prizedraw_dto.ProductDto
+	var product *dto.ProductDto
 	promise := v.bus.EmitAndWaitPromise(&event.ValidatePrizeDrawCouponStartedEvent{}, payload, &product)
 	if promise.HasError() {
 		return nil, shared_error.New(shared_error.UNAVAILABLE_CODE, errors.New(_COUPON_VALIDATE+promise.GetError().Error()))

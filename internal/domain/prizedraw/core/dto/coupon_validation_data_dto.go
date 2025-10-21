@@ -1,4 +1,4 @@
-package prizedraw_dto
+package dto
 
 type ValidationData struct {
 	Product *ProductData `json:"product"`

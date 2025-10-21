@@ -3,7 +3,7 @@ package apply_prizedraw_coupon_application
 import (
 	"errors"
 	prizedraw_contract "getfund-api-v2/internal/domain/prizedraw/core/contract"
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/entity"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/event"
@@ -104,7 +104,7 @@ func (a *applyPrizeDrawCouponApplication) getCoupon(couponId int) (*entity.Coupo
 }
 
 func (a *applyPrizeDrawCouponApplication) saveEntranceAndCoupon(entrance *entity.Entrance, coupon *entity.Coupon) *shared_error.Error {
-	if err := a.repository.SaveEntranceWithCouponApplied(prizedraw_dto.ToEntranceDto(entrance), prizedraw_dto.ToCouponDto(coupon)); err != nil {
+	if err := a.repository.SaveEntranceWithCouponApplied(dto.ToEntranceDto(entrance), dto.ToCouponDto(coupon)); err != nil {
 		return shared_error.New(shared_error.UNAVAILABLE_CODE, errors.New("erro on apply coupon"))
 	}
 	return nil

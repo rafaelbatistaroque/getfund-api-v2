@@ -1,7 +1,7 @@
 package validate_prizedraw_coupon_fixture
 
 import (
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/entity"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon"
 	validate_coupon_application "getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/application"
@@ -91,15 +91,15 @@ func WithUserId(id int) Option {
 	}
 }
 
-func GetValidCoupon() *prizedraw_dto.CouponDto {
+func GetValidCoupon() *dto.CouponDto {
 	less72Hours := time.Now().Add(-24 * time.Hour).Unix()
 	more24Hours := time.Now().Add(24 * time.Hour).Unix()
 	email := "fake@mail.com"
-	return &prizedraw_dto.CouponDto{
+	return &dto.CouponDto{
 		ProductId:   10,
 		PrizeDrawId: 5,
 		Id:          1,
-		CouponTypeApplicability: &prizedraw_dto.CouponTypeApplicabilityDto{
+		CouponTypeApplicability: &dto.CouponTypeApplicabilityDto{
 			StartAt:     less72Hours,
 			EndAt:       &more24Hours,
 			LinkedEmail: &email,
@@ -107,21 +107,21 @@ func GetValidCoupon() *prizedraw_dto.CouponDto {
 	}
 }
 
-func GetCouponWithoutPrizeDrawLinked(id int) *prizedraw_dto.CouponDto {
+func GetCouponWithoutPrizeDrawLinked(id int) *dto.CouponDto {
 	validCoupon := GetValidCoupon()
 	validCoupon.PrizeDrawId = id
 
 	return validCoupon
 }
 
-func GetCouponNotStartYet(startAt time.Duration) *prizedraw_dto.CouponDto {
+func GetCouponNotStartYet(startAt time.Duration) *dto.CouponDto {
 	validCoupon := GetValidCoupon()
 	validCoupon.CouponTypeApplicability.StartAt = int64(startAt)
 
 	return validCoupon
 }
 
-func GetValidCouponWithApplication(userId int, couponTypeCode string) *prizedraw_dto.CouponDto {
+func GetValidCouponWithApplication(userId int, couponTypeCode string) *dto.CouponDto {
 	validCoupon := GetValidCoupon()
 	validCoupon.CouponTypeApplicability.CouponTypeCode = couponTypeCode
 	validCoupon.UserCouponApplies = addUserApplies(2, userId)
@@ -129,7 +129,7 @@ func GetValidCouponWithApplication(userId int, couponTypeCode string) *prizedraw
 	return validCoupon
 }
 
-func GetValidCouponWithEmailLinked() *prizedraw_dto.CouponDto {
+func GetValidCouponWithEmailLinked() *dto.CouponDto {
 	validCoupon := GetValidCoupon()
 	validCoupon.CouponTypeApplicability.CouponTypeCode = entity.UNIQUE_APPLICATION_BY_EMAIL_TYPE
 	validCoupon.UserCouponApplies = addUserApplies(1, 1)
@@ -137,7 +137,7 @@ func GetValidCouponWithEmailLinked() *prizedraw_dto.CouponDto {
 	return validCoupon
 }
 
-func GetValidCouponWithApplicationReached(limit int, couponTypeCode string) *prizedraw_dto.CouponDto {
+func GetValidCouponWithApplicationReached(limit int, couponTypeCode string) *dto.CouponDto {
 	validCoupon := GetValidCoupon()
 	validCoupon.CouponTypeApplicability.LimitApplication = &limit
 	validCoupon.CouponTypeApplicability.CouponTypeCode = couponTypeCode
@@ -146,7 +146,7 @@ func GetValidCouponWithApplicationReached(limit int, couponTypeCode string) *pri
 	return validCoupon
 }
 
-func GetExpiredCoupon() *prizedraw_dto.CouponDto {
+func GetExpiredCoupon() *dto.CouponDto {
 	minus72Hours := time.Now().Add(-72 * time.Hour).Unix()
 	minus24Hours := time.Now().Add(-24 * time.Hour).Unix()
 	validCoupon := GetValidCoupon()
@@ -157,16 +157,16 @@ func GetExpiredCoupon() *prizedraw_dto.CouponDto {
 	return validCoupon
 }
 
-func addUserApplies(limit, userId int) []*prizedraw_dto.UserCouponApplyDto {
-	userApplies := make([]*prizedraw_dto.UserCouponApplyDto, limit)
+func addUserApplies(limit, userId int) []*dto.UserCouponApplyDto {
+	userApplies := make([]*dto.UserCouponApplyDto, limit)
 	if userId != 0 {
-		userApplies[0] = &prizedraw_dto.UserCouponApplyDto{
+		userApplies[0] = &dto.UserCouponApplyDto{
 			UserId: userId,
 		}
 	}
 
 	for id := range limit {
-		userApplies[id] = &prizedraw_dto.UserCouponApplyDto{
+		userApplies[id] = &dto.UserCouponApplyDto{
 			UserId: id,
 		}
 
@@ -174,18 +174,18 @@ func addUserApplies(limit, userId int) []*prizedraw_dto.UserCouponApplyDto {
 	return userApplies
 }
 
-func GetValidPrizeDraw() *prizedraw_dto.PrizeDrawDto {
-	return &prizedraw_dto.PrizeDrawDto{Id: 5}
+func GetValidPrizeDraw() *dto.PrizeDrawDto {
+	return &dto.PrizeDrawDto{Id: 5}
 }
 
-func GetProductWithDiferentIdResponse() *prizedraw_dto.ProductDto {
-	return &prizedraw_dto.ProductDto{IsActive: true, Id: 3}
+func GetProductWithDiferentIdResponse() *dto.ProductDto {
+	return &dto.ProductDto{IsActive: true, Id: 3}
 }
 
-func GetProductResponse() *prizedraw_dto.ProductDto {
-	return &prizedraw_dto.ProductDto{IsActive: true, Id: 10}
+func GetProductResponse() *dto.ProductDto {
+	return &dto.ProductDto{IsActive: true, Id: 10}
 }
 
-func GetInactiveProductResponse() *prizedraw_dto.ProductDto {
-	return &prizedraw_dto.ProductDto{IsActive: false}
+func GetInactiveProductResponse() *dto.ProductDto {
+	return &dto.ProductDto{IsActive: false}
 }

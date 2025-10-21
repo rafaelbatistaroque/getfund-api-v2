@@ -2,7 +2,7 @@ package apply_prizedraw_coupon_test
 
 import (
 	"fmt"
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/apply_prizedraw_coupon/event"
 	shared_bus "getfund-api-v2/internal/shared/bus"
 	shared_error "getfund-api-v2/internal/shared/error"
@@ -234,7 +234,7 @@ func Test_GivenExecute_WhenGetCouponByIdSuccess_ThenEnsureCallWithCorrectParamet
 	sut.Execute(validInput)
 
 	// Assert
-	saveEntranceWithCouponAppliedParamEntrance := spies.RepoSpy.Params["SaveEntranceWithCouponApplied:entrance"].(*prizedraw_dto.EntranceDto)
+	saveEntranceWithCouponAppliedParamEntrance := spies.RepoSpy.Params["SaveEntranceWithCouponApplied:entrance"].(*dto.EntranceDto)
 	verify.Should(t, saveEntranceWithCouponAppliedParamEntrance.LuckyCode).Be(expectedEntranceParam.LuckyCode)
 	verify.Should(t, saveEntranceWithCouponAppliedParamEntrance.PrizeDrawId).Be(expectedEntranceParam.PrizeDrawId)
 	verify.Should(t, saveEntranceWithCouponAppliedParamEntrance.PurchaseId).Be(expectedEntranceParam.PurchaseId)
@@ -242,7 +242,7 @@ func Test_GivenExecute_WhenGetCouponByIdSuccess_ThenEnsureCallWithCorrectParamet
 	verify.Should(t, saveEntranceWithCouponAppliedParamEntrance.IsDonation).Be(expectedEntranceParam.IsDonation)
 	verify.Should(t, saveEntranceWithCouponAppliedParamEntrance.CreatedAt).NotNil()
 	verify.Should(t, saveEntranceWithCouponAppliedParamEntrance.UpdatedAt).NotNil()
-	saveEntranceWithCouponAppliedParamCoupon := spies.RepoSpy.Params["SaveEntranceWithCouponApplied:coupon"].(*prizedraw_dto.CouponDto)
+	saveEntranceWithCouponAppliedParamCoupon := spies.RepoSpy.Params["SaveEntranceWithCouponApplied:coupon"].(*dto.CouponDto)
 	verify.Should(t, saveEntranceWithCouponAppliedParamCoupon.UserCouponApplies[0].UserId).Be(validInput.UserId)
 	verify.Should(t, saveEntranceWithCouponAppliedParamCoupon.UserCouponApplies[0].CouponId).Be(expectedCouponDto.Id)
 	verify.Should(t, saveEntranceWithCouponAppliedParamCoupon.PrizeDrawId).Be(expectedCouponDto.PrizeDrawId)

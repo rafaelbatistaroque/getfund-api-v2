@@ -2,7 +2,7 @@ package validate_prizedraw_coupon_test
 
 import (
 	"fmt"
-	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"
+	"getfund-api-v2/internal/domain/prizedraw/core/dto"
 	"getfund-api-v2/internal/domain/prizedraw/core/entity"
 	"getfund-api-v2/internal/domain/prizedraw/core/usecase/validate_prizedraw_coupon/event"
 	shared_bus "getfund-api-v2/internal/shared/bus"
@@ -312,7 +312,7 @@ func Test_GivenExecute_WhenGetPrizeDrawByIdWithSuccessHasWinner_ThenEnsureReturn
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	winner := 1
-	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(&prizedraw_dto.PrizeDrawDto{WinnerEntranceId: &winner})
+	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(&dto.PrizeDrawDto{WinnerEntranceId: &winner})
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
@@ -326,7 +326,7 @@ func Test_GivenExecute_WhenGetPrizeDrawByIdSuccessDifferentFromSelectedPrizeDraw
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
-	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(&prizedraw_dto.PrizeDrawDto{Id: 8})
+	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(&dto.PrizeDrawDto{Id: 8})
 
 	// Act
 	_, err := sut.Execute(fixture.GetInput())
@@ -342,7 +342,7 @@ func Test_GivenExecute_WhenPrizeDrawIsValid_ThenEnsureCallEmitAndWaitPromiseWith
 	spies.BusSpy.DefineEmitAndWaitPromiseError()
 	spies.RepoSpy.DefineGetCouponByCodeSuccess(fixture.GetValidCoupon())
 	spies.RepoSpy.DefineGetPrizeDrawByIdSuccess(fixture.GetValidPrizeDraw())
-	coupon := spies.RepoSpy.SuccessResult["GetCouponByCode"].(*prizedraw_dto.CouponDto)
+	coupon := spies.RepoSpy.SuccessResult["GetCouponByCode"].(*dto.CouponDto)
 	expectedPayload := &event.ValidatePrizeDrawCouponStartedPayload{
 		ProductId: coupon.ProductId,
 	}

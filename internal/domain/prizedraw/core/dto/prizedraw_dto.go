@@ -1,4 +1,4 @@
-package prizedraw_dto
+package dto
 
 import "getfund-api-v2/internal/domain/prizedraw/core/entity"
 
