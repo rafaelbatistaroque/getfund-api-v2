@@ -3,8 +3,8 @@ package auth_repository_proxy
 import (
 	"errors"
 	"getfund-api-v2/internal/config/env"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/shared/security"
 )
 
@@ -24,7 +24,7 @@ func New(repository auth_contract.Repository, env env.Variable, hasher security.
 	}
 }
 
-func (p *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
+func (p *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*dto.AuthenticatedUserDto, error) {
 	// 1. Tenta encontrar o usuário com a NOVA lógica de hash
 	usernameHashed, err := p.hasher.HashWithSalt(username, p.env.GetServerSalt())
 	if err != nil {
@@ -63,7 +63,7 @@ func (p *authRepositoryProxy) GetAuthenticatedUserByUsername(username string) (*
 		return nil, errors.New(_DEFAULT_ERROR)
 	}
 
-	return &auth_dto.AuthenticatedUserDto{
+	return &dto.AuthenticatedUserDto{
 		Id:        authenticatedUser.Id,
 		FirstName: p.hasher.DecryptMerged(authenticatedUser.FirstName, p.env.GetSecretKey()),
 		IsAdmin:   authenticatedUser.IsAdmin,
@@ -81,7 +81,7 @@ func (p *authRepositoryProxy) UpdateUsernameHash(id int, username string) error 
 	return p.repository.UpdateUsernameHash(id, username)
 }
 
-func (p *authRepositoryProxy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+func (p *authRepositoryProxy) Signup(user *dto.ActivationUserDto) (*dto.UserDto, error) {
 	userHashed := *user
 
 	userHashed.FirstName = p.hasher.Encrypt(user.FirstName, p.env.GetSecretKey())
@@ -102,7 +102,7 @@ func (p *authRepositoryProxy) Signup(user *auth_dto.ActivationUserDto) (*auth_dt
 	return userCreated, nil
 }
 
-func (p *authRepositoryProxy) UserExists(username string) (*auth_dto.UserDto, error) {
+func (p *authRepositoryProxy) UserExists(username string) (*dto.UserDto, error) {
 	usernameHashed, err := p.hasher.HashWithSalt(username, p.env.GetServerSalt())
 	if err != nil {
 		return nil, err

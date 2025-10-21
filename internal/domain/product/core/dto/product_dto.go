@@ -1,4 +1,4 @@
-package product_dto
+package dto
 
 import "getfund-api-v2/internal/infra/db/schema"
 

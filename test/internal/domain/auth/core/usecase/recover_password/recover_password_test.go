@@ -2,7 +2,7 @@ package recover_password_test
 
 import (
 	"bytes"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password/event"
 	shared_error "getfund-api-v2/internal/shared/error"
 	"getfund-api-v2/internal/shared/security"
@@ -138,8 +138,8 @@ func Test_GivenRecoverPasswordExecute_WhenHashSuccess_ThenEnsureCallCacheSetWith
 	spies.HasherSpy.DefineHashSuccess()
 	hashCode := spies.HasherSpy.SuccessResult["Hash"].(*security.Hashing).Data
 	expectedKey := "recovery_password_" + hashCode
-	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
-	expectedValue := auth_dto.ForgetPasswordDto{
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
+	expectedValue := dto.ForgetPasswordDto{
 		Username:     validInput.Username,
 		FirstName:    authenticatedUser.FirstName,
 		RecoveryLink: spies.SettingsSpy.GetBaseUrl() + "/new-password/" + hashCode,

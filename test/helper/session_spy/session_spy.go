@@ -2,7 +2,7 @@ package session_spy
 
 import (
 	"errors"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 )
 
 type SessionServiceSpy struct {
@@ -17,7 +17,7 @@ func New() *SessionServiceSpy {
 	return &SessionServiceSpy{CallsCount: make(map[string]int), Params: make(map[string]any), SuccessResult: make(map[string]any), ErrorResult: make(map[string]error)}
 }
 
-func (s *SessionServiceSpy) SaveSession(session *auth_dto.SessionDto) (string, error) {
+func (s *SessionServiceSpy) SaveSession(session *dto.SessionDto) (string, error) {
 	s.Params["SaveSession:session"] = session
 
 	s.CallsCount["SaveSession"]++

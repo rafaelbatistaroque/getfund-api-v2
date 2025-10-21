@@ -1,4 +1,4 @@
-package prizedraw_contract
+package contract
 
 import (
 	"getfund-api-v2/internal/domain/prizedraw/core/dto/prizedraw_dto"

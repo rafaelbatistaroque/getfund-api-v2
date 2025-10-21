@@ -53,8 +53,8 @@ type Hasher interface {
 type hasher struct {
 }
 
-// New creates and returns a new instance of the default Hasher implementation.
-func New() Hasher {
+// NewHasher creates and returns a new instance of the default Hasher implementation.
+func NewHasher() Hasher {
 	return &hasher{}
 }
 

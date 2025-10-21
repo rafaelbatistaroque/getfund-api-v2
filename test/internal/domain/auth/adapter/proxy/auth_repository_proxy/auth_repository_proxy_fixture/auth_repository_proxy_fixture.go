@@ -2,8 +2,8 @@ package auth_repository_proxy_fixture
 
 import (
 	"getfund-api-v2/internal/domain/auth/adapter/proxy/auth_repository_proxy"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/test/helper/repository_spy/auth_repository_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
@@ -30,12 +30,12 @@ func NewSut() (auth_contract.Repository, *authRepositoryProxyFixture) {
 		}
 }
 
-func GetEmptyActivationUserDto() *auth_dto.ActivationUserDto {
-	return &auth_dto.ActivationUserDto{}
+func GetEmptyActivationUserDto() *dto.ActivationUserDto {
+	return &dto.ActivationUserDto{}
 }
 
-func GetFilledActivationUserDto() *auth_dto.ActivationUserDto {
-	return &auth_dto.ActivationUserDto{
+func GetFilledActivationUserDto() *dto.ActivationUserDto {
+	return &dto.ActivationUserDto{
 		FirstName: "fake-first-name",
 		LastName:  "fake-last-name",
 		Username:  "fake@email.com",

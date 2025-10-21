@@ -3,19 +3,19 @@ package reset_password_application
 import (
 	"encoding/json"
 	"errors"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	"getfund-api-v2/internal/shared/cache"
 	shared_error "getfund-api-v2/internal/shared/error"
 )
 
 type resetPasswordApplication struct {
-	cache      cache.Contract
+	cache      cache.Service
 	repository auth_contract.Repository
 }
 
-func New(cache cache.Contract, repository auth_contract.Repository) *resetPasswordApplication {
+func New(cache cache.Service, repository auth_contract.Repository) *resetPasswordApplication {
 	return &resetPasswordApplication{
 		cache:      cache,
 		repository: repository,
@@ -33,7 +33,7 @@ func (r *resetPasswordApplication) Execute(input *reset_password.Input) (*reset_
 		return nil, shared_error.New(shared_error.NOT_FOUND_CODE, errors.New("recovery code not found"))
 	}
 
-	forgetPasswordDto := &auth_dto.ForgetPasswordDto{}
+	forgetPasswordDto := &dto.ForgetPasswordDto{}
 	errUnmarshal := json.Unmarshal([]byte(cacheData), forgetPasswordDto)
 	if errUnmarshal != nil {
 		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errors.New("error on get recovery password data"))

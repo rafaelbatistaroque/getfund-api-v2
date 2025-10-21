@@ -1,4 +1,4 @@
-package auth_composer
+package composer
 
 import (
 	"getfund-api-v2/internal/config/env"
@@ -45,12 +45,12 @@ type authComposer struct {
 
 func Compose(
 	env env.Variable,
-	cache cache.Contract,
+	cache cache.Service,
 	db *db.GetFund,
 	eventBus shared_bus.EventBus) authComposer {
 
 	//dependencies
-	hasher := security.New()
+	hasher := security.NewHasher()
 	signin_mapper := signin_mapper.New()
 	activate_user_mapper := activate_user_mapper.New()
 	repositoryProxy := auth_repository_proxy.New(authRepository.New(db), env, hasher)

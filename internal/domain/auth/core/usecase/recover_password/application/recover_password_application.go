@@ -2,8 +2,8 @@ package recover_password_application
 
 import (
 	"getfund-api-v2/internal/config/env"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password/event"
 	shared_bus "getfund-api-v2/internal/shared/bus"
@@ -21,7 +21,7 @@ type recoverPasswordApplication struct {
 	hasher         security.Hasher
 	env            env.Variable
 	authRepository auth_contract.Repository
-	cache          cache.Contract
+	cache          cache.Service
 	bus            shared_bus.EventBus
 }
 
@@ -29,7 +29,7 @@ func New(
 	hasher security.Hasher,
 	env env.Variable,
 	authRepository auth_contract.Repository,
-	cacheService cache.Contract,
+	cacheService cache.Service,
 	bus shared_bus.EventBus) recover_password.UseCase {
 
 	return &recoverPasswordApplication{
@@ -62,7 +62,7 @@ func (uc *recoverPasswordApplication) Execute(input *recover_password.Input) (*r
 		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errHash)
 	}
 
-	data := auth_dto.ForgetPasswordDto{
+	data := dto.ForgetPasswordDto{
 		Username:     input.Username,
 		FirstName:    authenticatedUser.FirstName,
 		RecoveryLink: buildRecoverLink(uc.env, recoveryCode.Data),

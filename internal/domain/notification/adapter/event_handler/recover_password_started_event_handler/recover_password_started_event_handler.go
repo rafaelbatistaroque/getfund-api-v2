@@ -12,10 +12,10 @@ import (
 type recoverPasswordStartedEventHandler struct {
 	logger                  shared_logger.Logger
 	sendRecoverPasswordMail send_recover_password_mail.UseCase
-	cache                   cache.Contract
+	cache                   cache.Service
 }
 
-func New(sendRecoverPasswordMail send_recover_password_mail.UseCase, cache cache.Contract) shared_bus.Handler {
+func New(sendRecoverPasswordMail send_recover_password_mail.UseCase, cache cache.Service) shared_bus.Handler {
 	return &recoverPasswordStartedEventHandler{
 		logger:                  *shared_logger.New("recoverPasswordStartedEventHandler"),
 		sendRecoverPasswordMail: sendRecoverPasswordMail,

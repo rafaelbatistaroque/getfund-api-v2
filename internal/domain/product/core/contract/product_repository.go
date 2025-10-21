@@ -1,7 +1,7 @@
-package product_contract
+package contract
 
-import "getfund-api-v2/internal/domain/product/core/dto/product_dto"
+import "getfund-api-v2/internal/domain/product/core/dto"
 
 type Repository interface {
-	GetProductById(productId int) (*product_dto.ProductDto, error)
+	GetProductById(productId int) (*dto.ProductDto, error)
 }

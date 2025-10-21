@@ -2,7 +2,7 @@ package auth_repository_proxy_spy
 
 import (
 	"errors"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 )
 
 type AuthRepositoryProxySpy struct {
@@ -17,17 +17,17 @@ func New() *AuthRepositoryProxySpy {
 	return &AuthRepositoryProxySpy{Params: make(map[string]any, 1), ErrorResult: make(map[string]error), SuccessResult: make(map[string]any, 1), CallsCount: make(map[string]int, 1)}
 }
 
-func (r *AuthRepositoryProxySpy) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
+func (r *AuthRepositoryProxySpy) GetAuthenticatedUserByUsername(username string) (*dto.AuthenticatedUserDto, error) {
 	r.Params["GetAuthenticatedUserByUsername:username"] = username
 
 	r.CallsCount["GetAuthenticatedUserByUsername"]++
 
 	sucess := r.SuccessResult["GetAuthenticatedUserByUsername"]
 	if sucess != nil {
-		return sucess.(*auth_dto.AuthenticatedUserDto), r.ErrorResult["GetAuthenticatedUserByUsername"]
+		return sucess.(*dto.AuthenticatedUserDto), r.ErrorResult["GetAuthenticatedUserByUsername"]
 	}
 	r.DefineGetAuthenticatedUserByUsernameSuccess()
-	return r.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto), r.ErrorResult["GetAuthenticatedUserByUsername"]
+	return r.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto), r.ErrorResult["GetAuthenticatedUserByUsername"]
 }
 
 func (r *AuthRepositoryProxySpy) UpdatePassword(id int, value string) error {
@@ -48,27 +48,27 @@ func (r *AuthRepositoryProxySpy) UpdateUsernameHash(id int, username string) err
 	return r.ErrorResult["UpdateUsernameHash"]
 }
 
-func (r *AuthRepositoryProxySpy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+func (r *AuthRepositoryProxySpy) Signup(user *dto.ActivationUserDto) (*dto.UserDto, error) {
 	r.Params["Signup:user"] = user
 
 	r.CallsCount["Signup"]++
 
 	sucess := r.SuccessResult["Signup"]
 	if sucess != nil {
-		return sucess.(*auth_dto.UserDto), nil
+		return sucess.(*dto.UserDto), nil
 	}
 
 	return nil, r.ErrorResult["Signup"]
 }
 
-func (r *AuthRepositoryProxySpy) UserExists(username string) (*auth_dto.UserDto, error) {
+func (r *AuthRepositoryProxySpy) UserExists(username string) (*dto.UserDto, error) {
 	r.Params["UserExists:username"] = username
 
 	r.CallsCount["UserExists"]++
 
 	sucess := r.SuccessResult["UserExists"]
 	if sucess != nil {
-		return sucess.(*auth_dto.UserDto), nil
+		return sucess.(*dto.UserDto), nil
 	}
 
 	return nil, r.ErrorResult["UserExists"]
@@ -79,5 +79,5 @@ func (r *AuthRepositoryProxySpy) DefineGetAuthenticatedUserByUsernameError() {
 }
 
 func (r *AuthRepositoryProxySpy) DefineGetAuthenticatedUserByUsernameSuccess() {
-	r.SuccessResult["GetAuthenticatedUserByUsername"] = &auth_dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
+	r.SuccessResult["GetAuthenticatedUserByUsername"] = &dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
 }

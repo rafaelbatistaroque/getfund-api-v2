@@ -2,7 +2,7 @@ package auth_repository_proxy_test
 
 import (
 	"bytes"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	fixture "getfund-api-v2/test/internal/domain/auth/adapter/proxy/auth_repository_proxy/auth_repository_proxy_fixture"
 	"testing"
 
@@ -146,7 +146,7 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackGetAuthenticatedUserBy
 	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
 	verify.Should(t, spies.RepoSpy.CallsCount["UpdateUsernameHash"]).Be(1)
 	verify.Should(t, spies.RepoSpy.Params["UpdateUsernameHash:id"]).Be(authenticatedUser.Id)
 	verify.Should(t, spies.RepoSpy.Params["UpdateUsernameHash:username"]).Be(spies.HasherSpy.SuccessResult["HashWithSalt"])
@@ -177,7 +177,7 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenFallBackUpdateUsernameHashSucc
 	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
 	verify.Should(t, spies.HasherSpy.CallsCount["DecryptMerged"]).Be(1)
 	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(authenticatedUser.FirstName)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
@@ -193,7 +193,7 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsername
 	sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
 	verify.Should(t, spies.HasherSpy.CallsCount["DecryptMerged"]).Be(1)
 	verify.Should(t, spies.HasherSpy.Params["DecryptMerged:mergedEncryptedData"]).Be(authenticatedUser.FirstName)
 	verify.Should(t, bytes.Equal(spies.HasherSpy.Params["DecryptMerged:secretKey"].([]byte), spies.SettingsSpy.GetSecretKey())).BeTrue()
@@ -210,7 +210,7 @@ func Test_GivenGetAuthenticatedUserByUsername_WhenGetAuthenticatedUserByUsername
 	result, _ := sut.GetAuthenticatedUserByUsername("fake-username")
 
 	// Assert
-	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
 	verify.Should(t, result.Id).Be(authenticatedUser.Id)
 	verify.Should(t, result.FirstName).Be(spies.HasherSpy.SuccessResult["DecryptMerged"])
 	verify.Should(t, result.IsAdmin).Be(authenticatedUser.IsAdmin)
@@ -344,7 +344,7 @@ func Test_GivenSignup_WhenHasherMethodsSuccess_ThenEnsureCallSignupWithCorrectPa
 	sut.Signup(fixture.GetEmptyActivationUserDto())
 
 	// Assert
-	SignupParams := spies.RepoSpy.Params["Signup:user"].(*auth_dto.ActivationUserDto)
+	SignupParams := spies.RepoSpy.Params["Signup:user"].(*dto.ActivationUserDto)
 	verify.Should(t, SignupParams.FirstName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][0])
 	verify.Should(t, SignupParams.LastName).Be(spies.HasherSpy.SuccessResultByCall["Encrypt"][1])
 	verify.Should(t, SignupParams.Password).Be(spies.HasherSpy.SuccessResult["HashAndMerge"])

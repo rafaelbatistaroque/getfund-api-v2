@@ -2,7 +2,7 @@ package reset_password_fixture
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	sut "getfund-api-v2/internal/domain/auth/core/usecase/reset_password/application"
 	"getfund-api-v2/test/helper/cache_spy"
@@ -24,8 +24,8 @@ func NewSut() (reset_password.UseCase, *ResetPasswordFixture) {
 	}
 }
 
-func GetForgetPasswordFromGetSuccessCache(cacheSpy *cache_spy.RedisCacheSpy) *auth_dto.ForgetPasswordDto {
-	expectedParam := &auth_dto.ForgetPasswordDto{}
+func GetForgetPasswordFromGetSuccessCache(cacheSpy *cache_spy.RedisCacheSpy) *dto.ForgetPasswordDto {
+	expectedParam := &dto.ForgetPasswordDto{}
 	json.Unmarshal([]byte(cacheSpy.SuccessResult["Get"].(string)), expectedParam)
 
 	return expectedParam

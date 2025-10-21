@@ -18,12 +18,12 @@ import (
 type SignupApplication struct {
 	repository auth_contract.Repository
 	hasher     security.Hasher
-	cache      cache.Contract
+	cache      cache.Service
 	bus        shared_bus.EventBus
 	env        env.Variable
 }
 
-func New(repository auth_contract.Repository, hasher security.Hasher, cache cache.Contract, bus shared_bus.EventBus, env env.Variable) signup.UseCase {
+func New(repository auth_contract.Repository, hasher security.Hasher, cache cache.Service, bus shared_bus.EventBus, env env.Variable) signup.UseCase {
 	return &SignupApplication{
 		repository: repository,
 		hasher:     hasher,

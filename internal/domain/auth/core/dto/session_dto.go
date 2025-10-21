@@ -1,4 +1,4 @@
-package auth_dto
+package dto
 
 type SessionDto struct {
 	ID        int    `json:"id"`

@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"getfund-api-v2/internal/config/env"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/activate_user_mapper"
-	"getfund-api-v2/internal/domain/auth/core/entity/user_entity"
+	"getfund-api-v2/internal/domain/auth/core/dto"
+	"getfund-api-v2/internal/domain/auth/core/entity"
 	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user/event"
 	shared_bus "getfund-api-v2/internal/shared/bus"
@@ -16,14 +16,14 @@ import (
 )
 
 type activateUserApplication struct {
-	cache      cache.Contract
+	cache      cache.Service
 	repository auth_contract.Repository
 	mapper     activate_user_mapper.Mapper
 	bus        shared_bus.EventBus
 	env        env.Variable
 }
 
-func New(cache cache.Contract, repository auth_contract.Repository, mapper activate_user_mapper.Mapper, bus shared_bus.EventBus, env env.Variable) activate_user.UseCase {
+func New(cache cache.Service, repository auth_contract.Repository, mapper activate_user_mapper.Mapper, bus shared_bus.EventBus, env env.Variable) activate_user.UseCase {
 	return &activateUserApplication{
 		cache:      cache,
 		repository: repository,
@@ -48,7 +48,7 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 		return nil, err
 	}
 
-	user := user_entity.New(
+	user := entity.NewUser(
 		userData.FirstName,
 		userData.LastName,
 		userData.Username,
@@ -80,13 +80,13 @@ func (a *activateUserApplication) Execute(input *activate_user.Input) (*activate
 	}, nil
 }
 
-func getUserData(input *activate_user.Input, cache cache.Contract) (*auth_dto.ActivationUserData, *shared_error.Error) {
+func getUserData(input *activate_user.Input, cache cache.Service) (*dto.ActivationUserData, *shared_error.Error) {
 	userSerialized, errCache := cache.Get(input.ActivationDataKey)
 	if errCache != nil {
 		return nil, shared_error.New(shared_error.NOT_FOUND_CODE, errors.New("activation code not found"))
 	}
 
-	var userData = auth_dto.ActivationUserData{}
+	var userData = dto.ActivationUserData{}
 	if err := json.Unmarshal([]byte(userSerialized), &userData); err != nil {
 		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, errors.New("error on get user data"))
 	}
@@ -94,7 +94,7 @@ func getUserData(input *activate_user.Input, cache cache.Contract) (*auth_dto.Ac
 	return &userData, nil
 }
 
-func checkForDuplicateUser(input *activate_user.Input, userData *auth_dto.ActivationUserData, cache cache.Contract, repository auth_contract.Repository) *shared_error.Error {
+func checkForDuplicateUser(input *activate_user.Input, userData *dto.ActivationUserData, cache cache.Service, repository auth_contract.Repository) *shared_error.Error {
 	userDuplicated, errRepo := repository.UserExists(userData.Username)
 	if errRepo != nil {
 		return shared_error.New(shared_error.SERVER_ERROR_CODE, errRepo)
@@ -108,7 +108,7 @@ func checkForDuplicateUser(input *activate_user.Input, userData *auth_dto.Activa
 	return nil
 }
 
-func signup(userDto *auth_dto.ActivationUserDto, repository auth_contract.Repository) (*auth_dto.UserDto, *shared_error.Error) {
+func signup(userDto *dto.ActivationUserDto, repository auth_contract.Repository) (*dto.UserDto, *shared_error.Error) {
 	userSaved, err := repository.Signup(userDto)
 	if err != nil {
 		return nil, shared_error.New(shared_error.SERVER_ERROR_CODE, err)

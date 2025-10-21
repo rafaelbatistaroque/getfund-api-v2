@@ -1,4 +1,4 @@
-package auth_dto
+package dto
 
 type ForgetPasswordDto struct {
 	Username     string `json:"username"`

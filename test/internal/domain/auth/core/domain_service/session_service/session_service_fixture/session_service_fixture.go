@@ -1,9 +1,9 @@
 package session_service_fixture
 
 import (
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/session_service"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/test/helper/cache_spy"
 	"getfund-api-v2/test/helper/security_spy"
 	"getfund-api-v2/test/helper/settings_spy"
@@ -28,9 +28,9 @@ func NewSut() (auth_contract.SessionService, *SessionServiceFixture) {
 		}
 }
 
-func GetSaveSessionInputNull() *auth_dto.SessionDto { return nil }
-func GetSaveSessionInputValid() *auth_dto.SessionDto {
-	return &auth_dto.SessionDto{}
+func GetSaveSessionInputNull() *dto.SessionDto { return nil }
+func GetSaveSessionInputValid() *dto.SessionDto {
+	return &dto.SessionDto{}
 }
 func GetSaveSessionInputValidSerialized() string {
 	return "{\"id\":0,\"first_name\":\"\",\"is_admin\":false}"

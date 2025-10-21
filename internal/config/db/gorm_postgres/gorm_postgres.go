@@ -1,6 +1,7 @@
 package config_gorm_postgres
 
 import (
+	"database/sql"
 	"fmt"
 	"getfund-api-v2/internal/config/env"
 	"getfund-api-v2/internal/infra/db"
@@ -10,7 +11,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func New(env env.Variable) *db.GetFund {
+func New(env env.Variable) (*db.GetFund, *sql.DB) {
 	logger := logger.New("Gorm Postgres config")
 
 	dsn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
@@ -24,7 +25,7 @@ func New(env env.Variable) *db.GetFund {
 	gorm_db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		logger.Errorf("Erro ao conectar ao banco de dados: %v", err)
-		return nil
+		return nil, nil
 	}
 
 	logger.Info("Database connected")
@@ -34,5 +35,7 @@ func New(env env.Variable) *db.GetFund {
 	get_fund_db.AutoMigrate()
 	//get_fund_db.Seed()
 
-	return get_fund_db
+	opened_db, _ := get_fund_db.DB.DB()
+
+	return get_fund_db, opened_db
 }

@@ -1,13 +1,13 @@
 package signin_mapper
 
 import (
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
 
 type SigninMapper interface {
-	ToOutput(token string, session *auth_dto.SessionDto) *signin.Output
-	ToSessionModel(authenticatedUser *auth_dto.AuthenticatedUserDto) *auth_dto.SessionDto
+	ToOutput(token string, session *dto.SessionDto) *signin.Output
+	ToSessionModel(authenticatedUser *dto.AuthenticatedUserDto) *dto.SessionDto
 }
 
 type signinMapper struct {
@@ -18,7 +18,7 @@ func New() SigninMapper {
 	return &signinMapper{}
 }
 
-func (m *signinMapper) ToOutput(token string, session *auth_dto.SessionDto) *signin.Output {
+func (m *signinMapper) ToOutput(token string, session *dto.SessionDto) *signin.Output {
 	return &signin.SigninOutput{
 		Token: token,
 		Session: signin.SessionOutput{
@@ -29,8 +29,8 @@ func (m *signinMapper) ToOutput(token string, session *auth_dto.SessionDto) *sig
 	}
 }
 
-func (m *signinMapper) ToSessionModel(authenticatedUser *auth_dto.AuthenticatedUserDto) *auth_dto.SessionDto {
-	return &auth_dto.SessionDto{
+func (m *signinMapper) ToSessionModel(authenticatedUser *dto.AuthenticatedUserDto) *dto.SessionDto {
+	return &dto.SessionDto{
 		ID:        authenticatedUser.Id,
 		FirstName: authenticatedUser.FirstName,
 		IsAdmin:   authenticatedUser.IsAdmin,

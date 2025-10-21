@@ -3,8 +3,8 @@ package activate_user_test
 import (
 	"encoding/json"
 	"fmt"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/domain/auth/core/entity/user_entity"
+	"getfund-api-v2/internal/domain/auth/core/dto"
+	"getfund-api-v2/internal/domain/auth/core/entity"
 	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user/event"
 	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/activate_user/activate_user_fixture"
@@ -120,7 +120,7 @@ func Test_GivenExecute_WhenUnmarshalSuccess_ThenEnsureCallUserExistsWithCorrectP
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.RepoSpy.DefineSignupSuccess()
-	var expectedParam = auth_dto.ActivationUserData{}
+	var expectedParam = dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
 	// Act
@@ -180,14 +180,14 @@ func Test_GivenExecute_WhenUserExistsNotFound_ThenEnsureCallMapperToDtoWithCorre
 	sut, spies := fixture.NewSut()
 	spies.CacheSpy.DefineCacheGetSuccess(fixture.GetUserDataWithCouponSerialized())
 	spies.RepoSpy.DefineSignupSuccess()
-	var expectedParam = auth_dto.ActivationUserData{}
+	var expectedParam = dto.ActivationUserData{}
 	json.Unmarshal([]byte(spies.CacheSpy.SuccessResult["Get"].(string)), &expectedParam)
 
 	// Act
 	sut.Execute(fixture.GetInput())
 
 	// Assert
-	entityParam := spies.MapperSpy.Params["ToDto:entity"].(*user_entity.User)
+	entityParam := spies.MapperSpy.Params["ToDto:entity"].(*entity.User)
 	verify.Should(t, entityParam.GetFirstName()).Be(expectedParam.FirstName)
 	verify.Should(t, entityParam.GetLastName()).Be(expectedParam.LastName)
 	verify.Should(t, entityParam.GetUsername()).Be(expectedParam.Username)
@@ -275,7 +275,7 @@ func Test_GivenExecute_WhenUserSavedAndThereIsCouponCode_ThenEnsureCallPublishWi
 	spies.RepoSpy.DefineSignupSuccess()
 	userData := fixture.GetUserDataWithCoupon()
 	expectedPaylod := &event.ActivateUserWithCouponConfirmedPayload{
-		UserId:     spies.RepoSpy.SuccessResult["Signup"].(*auth_dto.UserDto).Id,
+		UserId:     spies.RepoSpy.SuccessResult["Signup"].(*dto.UserDto).Id,
 		CouponCode: userData.CouponCode,
 		Email:      userData.Username,
 	}

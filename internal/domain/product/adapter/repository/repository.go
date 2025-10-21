@@ -2,8 +2,8 @@ package product_repository
 
 import (
 	"errors"
-	product_contract "getfund-api-v2/internal/domain/product/core/contract"
-	"getfund-api-v2/internal/domain/product/core/dto/product_dto"
+	"getfund-api-v2/internal/domain/product/core/contract"
+	"getfund-api-v2/internal/domain/product/core/dto"
 	"getfund-api-v2/internal/infra/db"
 	"getfund-api-v2/internal/infra/db/schema"
 
@@ -14,11 +14,11 @@ type productRepository struct {
 	db *db.GetFund
 }
 
-func New(db *db.GetFund) product_contract.Repository {
+func New(db *db.GetFund) contract.Repository {
 	return &productRepository{db: db}
 }
 
-func (p *productRepository) GetProductById(productId int) (*product_dto.ProductDto, error) {
+func (p *productRepository) GetProductById(productId int) (*dto.ProductDto, error) {
 	var product = &schema.Product{}
 
 	result := p.db.
@@ -34,5 +34,5 @@ func (p *productRepository) GetProductById(productId int) (*product_dto.ProductD
 		return nil, result.Error
 	}
 
-	return product_dto.MapFromSchema(product), nil
+	return dto.MapFromSchema(product), nil
 }

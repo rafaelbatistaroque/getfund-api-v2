@@ -2,7 +2,7 @@ package reset_password_test
 
 import (
 	"fmt"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/usecase/reset_password/reset_password_fixture"
 	"testing"
@@ -260,7 +260,7 @@ func Test_GivenExecute_WhenGetAuthenticatedUserByUsernameInvoked_ThenEnsureCallU
 	sut.Execute(expectedParamPassword)
 
 	// Assert
-	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.RepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
 	verify.Should(t, spies.RepoSpy.Params["UpdatePassword:id"]).Be(authenticatedUser.Id)
 	verify.Should(t, spies.RepoSpy.Params["UpdatePassword:value"]).Be(expectedParamPassword.Password)
 }

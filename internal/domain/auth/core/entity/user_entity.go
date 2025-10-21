@@ -1,4 +1,4 @@
-package user_entity
+package entity
 
 import (
 	"time"
@@ -15,7 +15,7 @@ type User struct {
 	updatedAt time.Time
 }
 
-func New(firstName, lastName, username, password string) *User {
+func NewUser(firstName, lastName, username, password string) *User {
 	return &User{
 		firstName: getValidValue(firstName),
 		lastName:  getValidValue(lastName),

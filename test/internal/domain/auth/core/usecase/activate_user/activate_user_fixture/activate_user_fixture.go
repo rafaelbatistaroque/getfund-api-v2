@@ -2,8 +2,8 @@ package activate_user_fixture
 
 import (
 	"encoding/json"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	"getfund-api-v2/internal/domain/auth/core/entity/user_entity"
+	"getfund-api-v2/internal/domain/auth/core/dto"
+	"getfund-api-v2/internal/domain/auth/core/entity"
 	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
 	activate_user_application "getfund-api-v2/internal/domain/auth/core/usecase/activate_user/application"
 	"getfund-api-v2/test/helper/cache_spy"
@@ -78,8 +78,8 @@ func WithInvalidActivationDataKey() Option {
 	}
 }
 
-func GetActivateUserEntity() *user_entity.User {
-	return user_entity.New(
+func GetActivateUserEntity() *entity.User {
+	return entity.NewUser(
 		"fake-first-name",
 		"fake-last-name",
 		"fake@email.com",
@@ -105,15 +105,15 @@ func GetOutput() *activate_user.Output {
 	return output
 }
 
-func GetUserDataWithCoupon() *auth_dto.ActivationUserData {
-	var user = &auth_dto.ActivationUserData{}
+func GetUserDataWithCoupon() *dto.ActivationUserData {
+	var user = &dto.ActivationUserData{}
 	json.Unmarshal([]byte(GetUserDataWithCouponSerialized()), user)
 
 	return user
 }
 
-func (s *ActivateUserFixture) GetActivationUserData() *auth_dto.ActivationUserData {
-	var user = auth_dto.ActivationUserData{}
+func (s *ActivateUserFixture) GetActivationUserData() *dto.ActivationUserData {
+	var user = dto.ActivationUserData{}
 	json.Unmarshal([]byte(s.CacheSpy.SuccessResult["Get"].(string)), &user)
 
 	return &user

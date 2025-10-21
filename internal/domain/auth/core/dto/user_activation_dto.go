@@ -1,4 +1,4 @@
-package auth_dto
+package dto
 
 type ActivationUserDto struct {
 	FirstName string `json:"first_name"`

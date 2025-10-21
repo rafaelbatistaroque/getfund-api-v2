@@ -13,7 +13,7 @@ import (
 	"getfund-api-v2/internal/shared/cache"
 )
 
-func Compose(env env.Variable, eventBus shared_bus.EventBus, cacheService cache.Contract) {
+func Compose(env env.Variable, eventBus shared_bus.EventBus, cacheService cache.Service) {
 
 	//Services
 	mailService := config_mail.New(env)
@@ -26,7 +26,7 @@ func Compose(env env.Variable, eventBus shared_bus.EventBus, cacheService cache.
 	//Event Handler
 	handlers := map[string]shared_bus.Handler{
 		"recover.password.started": recover_password_started_event_handler.New(sendRecoverPasswordMailApplication, cacheService),
-		"signup.started":      signup_process_started_event_handler.New(sendActivationAccountMailApplication),
+		"signup.started":           signup_process_started_event_handler.New(sendActivationAccountMailApplication),
 	}
 
 	for eventName, handler := range handlers {

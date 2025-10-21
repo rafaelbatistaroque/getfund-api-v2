@@ -5,7 +5,7 @@ import (
 )
 
 func NewSut() security.Hasher {
-	return security.New()
+	return security.NewHasher()
 }
 
 func GetSecretKey() []byte {

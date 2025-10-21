@@ -3,7 +3,7 @@ package validate_prizedraw_coupon_started_event_handler
 import (
 	"encoding/json"
 	product_contract "getfund-api-v2/internal/domain/product/core/contract"
-	"getfund-api-v2/internal/domain/product/core/dto/product_dto"
+	"getfund-api-v2/internal/domain/product/core/dto"
 	shared_bus "getfund-api-v2/internal/shared/bus"
 	shared_constant "getfund-api-v2/internal/shared/constant"
 	shared_logger "getfund-api-v2/internal/shared/log"
@@ -37,7 +37,7 @@ func (h *validatePrizeDrawCouponStartedEventHandler) Handle(event shared_bus.Eve
 		return
 	}
 
-	var productDto *product_dto.ProductDto
+	var productDto *dto.ProductDto
 	if productDto, err = h.repository.GetProductById(payload.ProductId); err != nil {
 		h.logger.Error("IsOk: False | get product failed")
 		event.ResolvePromise(shared_constant.BYTE_EMPTY)

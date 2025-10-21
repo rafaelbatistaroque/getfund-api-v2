@@ -2,7 +2,7 @@ package product_repository_spy
 
 import (
 	"errors"
-	"getfund-api-v2/internal/domain/product/core/dto/product_dto"
+	"getfund-api-v2/internal/domain/product/core/dto"
 )
 
 type ProductRepositorySpy struct {
@@ -21,14 +21,14 @@ func New() *ProductRepositorySpy {
 		CallsCount:    make(map[string]int, 1)}
 }
 
-func (r *ProductRepositorySpy) GetProductById(productId int) (*product_dto.ProductDto, error) {
+func (r *ProductRepositorySpy) GetProductById(productId int) (*dto.ProductDto, error) {
 	r.Params["GetProductById:productId"] = productId
 
 	r.CallsCount["GetProductById"]++
 
 	sucess := r.SuccessResult["GetProductById"]
 	if sucess != nil {
-		return sucess.(*product_dto.ProductDto), nil
+		return sucess.(*dto.ProductDto), nil
 	}
 
 	return nil, r.ErrorResult["GetProductById"]
@@ -38,11 +38,11 @@ func (r *ProductRepositorySpy) DefineGetProductByIdError() {
 	r.ErrorResult["GetProductById"] = errors.New("fake-error")
 }
 
-func (r *ProductRepositorySpy) DefineGetProductByIdSuccess(product *product_dto.ProductDto) {
+func (r *ProductRepositorySpy) DefineGetProductByIdSuccess(product *dto.ProductDto) {
 	if product != nil {
 		r.SuccessResult["GetProductById"] = product
 		return
 	}
 
-	r.SuccessResult["GetProductById"] = &product_dto.ProductDto{}
+	r.SuccessResult["GetProductById"] = &dto.ProductDto{}
 }

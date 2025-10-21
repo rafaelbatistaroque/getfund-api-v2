@@ -2,7 +2,7 @@ package auth_service_test
 
 import (
 	"errors"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	shared_error "getfund-api-v2/internal/shared/error"
 	fixture "getfund-api-v2/test/internal/domain/auth/core/domain_service/auth_service/auth_service_fixture"
 	"testing"
@@ -58,7 +58,7 @@ func Test_GivenAuthenticate_WhenGetAuthenticatedUserByUsernameSuccess_ThenCallIs
 	sut.Authenticate("fake-username", expectedPassword)
 
 	// Assert
-	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
 	verify.Should(t, spies.HasherSpy.Params["IsMatch:inputHashed"]).Be(authenticatedUser.Password)
 	verify.Should(t, spies.HasherSpy.Params["IsMatch:inputText"]).Be(expectedPassword)
 }
@@ -109,7 +109,7 @@ func Test_GivenAuthenticate_WhenSuccess_ThenEnsureReturnoSessionModelFilled(t *t
 	sut, spies := fixture.NewSut()
 	spies.AuthRepoSpy.DefineGetAuthenticatedUserByUsernameSuccess()
 	spies.HasherSpy.DefineIsMatchSuccess()
-	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*auth_dto.AuthenticatedUserDto)
+	authenticatedUser := spies.AuthRepoSpy.SuccessResult["GetAuthenticatedUserByUsername"].(*dto.AuthenticatedUserDto)
 	spies.MapperSpy.DefineToSessionModelSuccess(authenticatedUser)
 
 	// Act

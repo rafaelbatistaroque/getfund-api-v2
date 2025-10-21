@@ -1,4 +1,4 @@
-package prizedraw_repository
+package repository
 
 import (
 	"errors"

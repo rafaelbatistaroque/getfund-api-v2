@@ -15,11 +15,11 @@ type activateUserWithCouponConfirmedEventHandler struct {
 	repository              prizedraw_contract.Repository
 	validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase
 	applyPrizeDrawCoupon    apply_prizedraw_coupon.UseCase
-	cache                   cache.Contract
+	cache                   cache.Service
 	logger                  shared_logger.Logger
 }
 
-func New(repository prizedraw_contract.Repository, validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase, applyPrizeDrawCoupon apply_prizedraw_coupon.UseCase, cache cache.Contract) shared_bus.Handler {
+func New(repository prizedraw_contract.Repository, validatePrizeDrawCoupon validate_prizedraw_coupon.UseCase, applyPrizeDrawCoupon apply_prizedraw_coupon.UseCase, cache cache.Service) shared_bus.Handler {
 	return &activateUserWithCouponConfirmedEventHandler{
 		logger:                  *shared_logger.New("activateUserWithCouponConfirmedEventHandler"),
 		repository:              repository,

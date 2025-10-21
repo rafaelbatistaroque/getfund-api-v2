@@ -1,12 +1,12 @@
-package auth_contract
+package contract
 
-import "getfund-api-v2/internal/domain/auth/core/auth_dto"
+import "getfund-api-v2/internal/domain/auth/core/dto"
 
 type SessionKey struct{}
 type TokenKey struct{}
 
 type SessionService interface {
-	SaveSession(session *auth_dto.SessionDto) (string, error)
+	SaveSession(session *dto.SessionDto) (string, error)
 	GetSession(token string) (string, error)
 	DeleteSession(token string) error
 }

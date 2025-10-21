@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"getfund-api-v2/internal/config/env"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/shared/cache"
 	"getfund-api-v2/internal/shared/security"
 	"time"
@@ -16,12 +16,12 @@ var (
 )
 
 type sessionService struct {
-	cache  cache.Contract
+	cache  cache.Service
 	hasher security.Hasher
 	env    env.Variable
 }
 
-func New(cache cache.Contract, hasher security.Hasher, env env.Variable) auth_contract.SessionService {
+func New(cache cache.Service, hasher security.Hasher, env env.Variable) auth_contract.SessionService {
 	return &sessionService{
 		cache:  cache,
 		hasher: hasher,
@@ -29,7 +29,7 @@ func New(cache cache.Contract, hasher security.Hasher, env env.Variable) auth_co
 	}
 }
 
-func (s *sessionService) SaveSession(session *auth_dto.SessionDto) (string, error) {
+func (s *sessionService) SaveSession(session *dto.SessionDto) (string, error) {
 	if session == nil {
 		return "", errors.New("save-session: session cannot be null or empty")
 	}

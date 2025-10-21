@@ -3,15 +3,15 @@ package auth_service
 import (
 	"errors"
 	"getfund-api-v2/internal/config/env"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/domain_service/signin_mapper"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	shared_error "getfund-api-v2/internal/shared/error"
 	"getfund-api-v2/internal/shared/security"
 )
 
 type AuthService interface {
-	Authenticate(username string, password string) (*auth_dto.SessionDto, *shared_error.Error)
+	Authenticate(username string, password string) (*dto.SessionDto, *shared_error.Error)
 }
 
 type authService struct {
@@ -35,7 +35,7 @@ func New(
 	}
 }
 
-func (a *authService) Authenticate(username string, password string) (*auth_dto.SessionDto, *shared_error.Error) {
+func (a *authService) Authenticate(username string, password string) (*dto.SessionDto, *shared_error.Error) {
 	authenticatedUser, repoErr := a.authRepository.GetAuthenticatedUserByUsername(username)
 	if repoErr != nil {
 		return nil, shared_error.New(shared_error.UNAUTHORIZED_CODE, repoErr)

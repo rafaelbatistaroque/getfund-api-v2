@@ -2,7 +2,7 @@ package auth_repository_spy
 
 import (
 	"errors"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 )
 
 type AuthRepositorySpy struct {
@@ -22,7 +22,7 @@ func New() *AuthRepositorySpy {
 	}
 }
 
-func (r *AuthRepositorySpy) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
+func (r *AuthRepositorySpy) GetAuthenticatedUserByUsername(username string) (*dto.AuthenticatedUserDto, error) {
 	r.Params["GetAuthenticatedUserByUsername:username"] = username
 
 	r.CallsCount["GetAuthenticatedUserByUsername"]++
@@ -33,7 +33,7 @@ func (r *AuthRepositorySpy) GetAuthenticatedUserByUsername(username string) (*au
 
 	sucess := r.SuccessResult["GetAuthenticatedUserByUsername"]
 	if sucess != nil {
-		return sucess.(*auth_dto.AuthenticatedUserDto), nil
+		return sucess.(*dto.AuthenticatedUserDto), nil
 	}
 
 	return nil, r.ErrorResult["GetAuthenticatedUserByUsername"]
@@ -57,27 +57,27 @@ func (r *AuthRepositorySpy) UpdateUsernameHash(id int, username string) error {
 	return r.ErrorResult["UpdateUsernameHash"]
 }
 
-func (r *AuthRepositorySpy) Signup(user *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+func (r *AuthRepositorySpy) Signup(user *dto.ActivationUserDto) (*dto.UserDto, error) {
 	r.Params["Signup:user"] = user
 
 	r.CallsCount["Signup"]++
 
 	sucess := r.SuccessResult["Signup"]
 	if sucess != nil {
-		return sucess.(*auth_dto.UserDto), nil
+		return sucess.(*dto.UserDto), nil
 	}
 
 	return nil, r.ErrorResult["Signup"]
 }
 
-func (r *AuthRepositorySpy) UserExists(username string) (*auth_dto.UserDto, error) {
+func (r *AuthRepositorySpy) UserExists(username string) (*dto.UserDto, error) {
 	r.Params["UserExists:username"] = username
 
 	r.CallsCount["UserExists"]++
 
 	sucess := r.SuccessResult["UserExists"]
 	if sucess != nil {
-		return sucess.(*auth_dto.UserDto), nil
+		return sucess.(*dto.UserDto), nil
 	}
 
 	return nil, r.ErrorResult["UserExists"]
@@ -92,12 +92,12 @@ func (r *AuthRepositorySpy) DefineGetAuthenticatedUserByUsernameErrorNotFound() 
 }
 
 func (r *AuthRepositorySpy) DefineGetAuthenticatedUserByUsernameSuccess() {
-	r.SuccessResult["GetAuthenticatedUserByUsername"] = &auth_dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
+	r.SuccessResult["GetAuthenticatedUserByUsername"] = &dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
 }
 
 func (r *AuthRepositorySpy) DefineGetAuthenticatedUserByUsernameFallback() {
 	r.ErrorResult["GetAuthenticatedUserByUsername"] = errors.New("user not found")
-	r.SuccessResult["GetAuthenticatedUserByUsername"] = &auth_dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
+	r.SuccessResult["GetAuthenticatedUserByUsername"] = &dto.AuthenticatedUserDto{Password: "fake-password-hashed", FirstName: "fake-username", Id: 1, IsAdmin: false}
 }
 
 func (r *AuthRepositorySpy) DefineUpdatePasswordError() {
@@ -109,7 +109,7 @@ func (r *AuthRepositorySpy) DefineSignupError() {
 }
 
 func (r *AuthRepositorySpy) DefineSignupSuccess() {
-	r.SuccessResult["Signup"] = &auth_dto.UserDto{Id: 1}
+	r.SuccessResult["Signup"] = &dto.UserDto{Id: 1}
 }
 
 func (r *AuthRepositorySpy) DefineUserExistsError() {
@@ -117,7 +117,7 @@ func (r *AuthRepositorySpy) DefineUserExistsError() {
 }
 
 func (r *AuthRepositorySpy) DefineUserExistsSuccessUserFound() {
-	r.SuccessResult["UserExists"] = &auth_dto.UserDto{Id: 1}
+	r.SuccessResult["UserExists"] = &dto.UserDto{Id: 1}
 }
 
 func (r *AuthRepositorySpy) DefineUserExistsSuccess() {

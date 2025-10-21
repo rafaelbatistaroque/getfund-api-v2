@@ -12,11 +12,11 @@ import (
 	"getfund-api-v2/internal/shared/security"
 )
 
-func Compose(env env.Variable, eventBus shared_bus.EventBus, cacheService cache.Contract, db *db.GetFund) {
+func Compose(env env.Variable, eventBus shared_bus.EventBus, cacheService cache.Service, db *db.GetFund) {
 
 	//Services
 	prizedrawRepository := prizedraw_repository.New(db)
-	hasher := security.New()
+	hasher := security.NewHasher()
 
 	//Applications
 	validatePrizedrawCouponApplication := validate_prizedraw_coupon_application.New(prizedrawRepository, eventBus, env)

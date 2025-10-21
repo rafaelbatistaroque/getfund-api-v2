@@ -1,9 +1,9 @@
-package auth_repository
+package repository
 
 import (
 	"errors"
-	"getfund-api-v2/internal/domain/auth/core/auth_dto"
-	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/contract"
+	"getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/infra/db"
 	"getfund-api-v2/internal/infra/db/schema"
 
@@ -14,11 +14,11 @@ type authRepository struct {
 	db *db.GetFund
 }
 
-func New(db *db.GetFund) auth_contract.Repository {
+func New(db *db.GetFund) contract.Repository {
 	return &authRepository{db: db}
 }
 
-func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*auth_dto.AuthenticatedUserDto, error) {
+func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*dto.AuthenticatedUserDto, error) {
 	var user = schema.User{}
 	result := r.db.
 		Select("id, first_name, is_admin, username, password").
@@ -33,7 +33,7 @@ func (r *authRepository) GetAuthenticatedUserByUsername(username string) (*auth_
 		return nil, result.Error
 	}
 
-	return &auth_dto.AuthenticatedUserDto{
+	return &dto.AuthenticatedUserDto{
 		Id:        int(user.ID),
 		FirstName: user.FirstName,
 		Password:  user.Password,
@@ -54,16 +54,16 @@ func (r *authRepository) UpdatePassword(id int, value string) error {
 	return nil
 }
 
-func (u *authRepository) Signup(dto *auth_dto.ActivationUserDto) (*auth_dto.UserDto, error) {
+func (u *authRepository) Signup(auDto *dto.ActivationUserDto) (*dto.UserDto, error) {
 	var user = schema.User{
-		FirstName: dto.FirstName,
-		LastName:  dto.LastName,
-		Username:  dto.Username,
-		Password:  dto.Password,
-		IsAdmin:   dto.IsAdmin,
-		IsActive:  dto.IsActive,
-		CreatedAt: dto.CreatedAt,
-		UpdatedAt: dto.UpdatedAt,
+		FirstName: auDto.FirstName,
+		LastName:  auDto.LastName,
+		Username:  auDto.Username,
+		Password:  auDto.Password,
+		IsAdmin:   auDto.IsAdmin,
+		IsActive:  auDto.IsActive,
+		CreatedAt: auDto.CreatedAt,
+		UpdatedAt: auDto.UpdatedAt,
 	}
 
 	result := u.db.Create(&user)
@@ -72,12 +72,12 @@ func (u *authRepository) Signup(dto *auth_dto.ActivationUserDto) (*auth_dto.User
 		return nil, result.Error
 	}
 
-	return &auth_dto.UserDto{
+	return &dto.UserDto{
 		Id: int(user.ID),
 	}, nil
 }
 
-func (u *authRepository) UserExists(username string) (*auth_dto.UserDto, error) {
+func (u *authRepository) UserExists(username string) (*dto.UserDto, error) {
 	var user = schema.User{}
 	result := u.db.
 		Select("id").
@@ -92,7 +92,7 @@ func (u *authRepository) UserExists(username string) (*auth_dto.UserDto, error) 
 		return nil, result.Error
 	}
 
-	return &auth_dto.UserDto{
+	return &dto.UserDto{
 		Id: int(user.ID),
 	}, nil
 }

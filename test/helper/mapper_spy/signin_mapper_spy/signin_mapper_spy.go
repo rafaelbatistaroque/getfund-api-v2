@@ -1,7 +1,7 @@
 package signin_mapper_spy
 
 import (
-	model "getfund-api-v2/internal/domain/auth/core/auth_dto"
+	model "getfund-api-v2/internal/domain/auth/core/dto"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 )
 
