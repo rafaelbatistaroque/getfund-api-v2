@@ -6,8 +6,8 @@ import (
 	"getfund-api-v2/internal/config/env"
 	config_redis_cache "getfund-api-v2/internal/config/redis_cache"
 	auth_composer "getfund-api-v2/internal/domain/auth/main/composer"
-	"getfund-api-v2/internal/domain/notification/main/notification_composer"
-	"getfund-api-v2/internal/domain/prizedraw/main/prizedraw_composer"
+	notification_composer "getfund-api-v2/internal/domain/notification/main/composer"
+	prizedraw_composer "getfund-api-v2/internal/domain/prizedraw/main/composer"
 	shared_bus "getfund-api-v2/internal/shared/bus"
 
 	"net/http"
@@ -17,16 +17,15 @@ import (
 
 func main() {
 	//general dependences
-	ctx := context.Background()
 	env_loaded := env.Load()
 	bus := shared_bus.New(env_loaded.GetTimeoutResponseEvent())
 	get_fund_db, opened_db := config_gorm_postgres.New(env_loaded)
-	cache := config_redis_cache.New(ctx, env_loaded)
+	cache := config_redis_cache.New(context.Background(), env_loaded)
 
 	defer cache.Close()
 	defer opened_db.Close()
 
-	//Composer
+	//Composers
 	notification_composer.Compose(env_loaded, bus, cache)
 	prizedraw_composer.Compose(env_loaded, bus, cache, get_fund_db)
 	authEndpoint := auth_composer.Compose(env_loaded, cache, get_fund_db, bus)

@@ -1,4 +1,4 @@
-package prizedraw_composer
+package composer
 
 import (
 	"getfund-api-v2/internal/config/env"

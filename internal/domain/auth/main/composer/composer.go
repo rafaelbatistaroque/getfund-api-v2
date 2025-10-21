@@ -29,9 +29,7 @@ import (
 	"net/http"
 )
 
-type middlewareFunc = func(http.Handler) http.Handler
-
-type authComposer struct {
+type Composer struct {
 	Signin          http.HandlerFunc
 	Signout         http.HandlerFunc
 	RecoverPassword http.HandlerFunc
@@ -39,15 +37,15 @@ type authComposer struct {
 	Signup          http.HandlerFunc
 	ActivateUser    http.HandlerFunc
 
-	MiddlewareAutenticate      middlewareFunc
-	MiddlewareAutenticateAdmin middlewareFunc
+	MiddlewareAutenticate      func(http.Handler) http.Handler
+	MiddlewareAutenticateAdmin func(http.Handler) http.Handler
 }
 
 func Compose(
 	env env.Variable,
 	cache cache.Service,
 	db *db.GetFund,
-	eventBus shared_bus.EventBus) authComposer {
+	eventBus shared_bus.EventBus) Composer {
 
 	//dependencies
 	hasher := security.NewHasher()
@@ -78,7 +76,7 @@ func Compose(
 
 	//Event Handler
 
-	return authComposer{
+	return Composer{
 		Signin:          shared_response_proxy.New(signinGateway.Signin),
 		Signout:         shared_response_proxy.New(signoutGateway.Signout),
 		RecoverPassword: shared_response_proxy.New(recoverPasswordGateway.RecoverPassword),
