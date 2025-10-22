@@ -7,12 +7,20 @@ import (
 	auth_contract "getfund-api-v2/internal/domain/auth/core/contract"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signout"
 	shared_error "getfund-api-v2/internal/shared/error"
+	"getfund-api-v2/test/helper/fixture"
 	"net/http"
-	"net/http/httptest"
 )
 
 type SignoutGatewayFixture struct {
+	fixture.BaseFixture
 	SignoutUsecaseSpy *signoutUsecaseSpy
+}
+
+func (f *SignoutGatewayFixture) GetHttpRequestResponseWithContext() (w http.ResponseWriter, r *http.Request) {
+	w, r = f.GetHttpRequestResponse("")
+	ctx := context.WithValue(context.Background(), auth_contract.TokenKey{}, GetSignoutHeaderToken())
+	r = r.WithContext(ctx)
+	return w, r
 }
 
 type signoutUsecaseSpy struct {
@@ -37,25 +45,6 @@ func (s *signoutUsecaseSpy) Execute(input *signout.Input) (*signout.Output, *sha
 	s.CallsCount["Execute"]++
 
 	return s.SuccessResult["Execute"], s.ErrorResult["Execute"]
-}
-
-func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.Request) {
-	token := ""
-
-	switch {
-	case bodyString == "":
-		token = GetSignoutHeaderToken()
-	case bodyString == "not-found":
-		token = ""
-	default:
-		token = bodyString
-	}
-
-	ctx := context.WithValue(context.Background(), auth_contract.TokenKey{}, token)
-	req := httptest.NewRequest("FAKE", "/", nil).WithContext(ctx)
-	res := httptest.NewRecorder()
-
-	return res, req
 }
 
 func GetSignoutInput() *signout.Input {

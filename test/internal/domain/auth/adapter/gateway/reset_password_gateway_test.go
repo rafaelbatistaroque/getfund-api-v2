@@ -11,8 +11,8 @@ import (
 
 func Test_GivenResetPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestWithError(t *testing.T) {
 	// Arrange
-	sut, _ := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("with-body-error")
+	sut, spies := fixture.NewSut()
+	res, req := spies.GetHttpRequestResponse("with-body-error")
 
 	// Act
 	_, code, err := sut.ResetPassword(res, req)
@@ -26,7 +26,7 @@ func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallCacheGetWithCorrect
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetResetPasswordInput()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetResetPasswordInputSerialized())
 
 	// Act
 	sut.ResetPassword(res, req)
@@ -39,7 +39,7 @@ func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectP
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetResetPasswordInput()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetResetPasswordInputSerialized())
 
 	// Act
 	sut.ResetPassword(res, req)
@@ -51,7 +51,7 @@ func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectP
 func Test_GivenResetPassword_WhenDecodeSuccess_ThenEnsureCallUsecaseOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetResetPasswordInputSerialized())
 
 	// Act
 	sut.ResetPassword(res, req)
@@ -64,7 +64,7 @@ func Test_GivenResetPassword_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.ResetPasswordUsecaseSpy.DefineError()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetResetPasswordInputSerialized())
 
 	// Act
 	_, code, err := sut.ResetPassword(res, req)
@@ -78,7 +78,7 @@ func Test_GivenResetPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSucces
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.ResetPasswordUsecaseSpy.DefineSuccess()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetResetPasswordInputSerialized())
 
 	// Act
 	result, code, _ := sut.ResetPassword(res, req)

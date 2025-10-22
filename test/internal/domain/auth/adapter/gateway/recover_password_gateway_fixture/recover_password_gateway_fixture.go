@@ -1,16 +1,15 @@
 package recover_password_gateway_fixture
 
 import (
-	"bytes"
 	"errors"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/recover_password_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/recover_password"
 	shared_error "getfund-api-v2/internal/shared/error"
-	"net/http"
-	"net/http/httptest"
+	"getfund-api-v2/test/helper/fixture"
 )
 
 type RecoverPasswordGatewayFixture struct {
+	fixture.BaseFixture
 	RecoverPasswordUsecaseSpy *recoverPasswordUsecaseSpy
 }
 
@@ -40,17 +39,6 @@ func (s *recoverPasswordUsecaseSpy) Execute(input *recover_password.Input) (*rec
 	s.CallsCount["Execute"]++
 
 	return s.SuccessResult["Execute"], s.ErrorResult["Execute"]
-}
-
-func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.Request) {
-	body := bytes.NewBufferString(GetRecoverPasswordInputSerialized())
-	if bodyString != "" {
-		body = bytes.NewBufferString(bodyString)
-	}
-	req := httptest.NewRequest("FAKE", "/", body)
-	res := httptest.NewRecorder()
-
-	return res, req
 }
 
 func GetRecoverPasswordInputSerialized() string {

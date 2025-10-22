@@ -11,8 +11,8 @@ import (
 
 func Test_GivenRecoverPassword_WhenDecodeError_ThenEnsureReturnStatusBadRequestWithError(t *testing.T) {
 	// Arrange
-	sut, _ := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("with-body-error")
+	sut, spies := fixture.NewSut()
+	res, req := spies.GetHttpRequestResponse("with-body-error")
 
 	// Act
 	_, code, err := sut.RecoverPassword(res, req)
@@ -26,7 +26,7 @@ func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrec
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetRecoverPasswordInput()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetRecoverPasswordInputSerialized())
 
 	// Act
 	sut.RecoverPassword(res, req)
@@ -38,7 +38,7 @@ func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrec
 func Test_GivenRecoverPassword_WhenDecodeSuccess_ThenEnsureCallOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetRecoverPasswordInputSerialized())
 
 	// Act
 	sut.RecoverPassword(res, req)
@@ -51,7 +51,7 @@ func Test_GivenRecoverPassword_WhenExecuteError_ThenEnsureReturnCodeAndMessageFr
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RecoverPasswordUsecaseSpy.DefineError()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetRecoverPasswordInputSerialized())
 
 	// Act
 	_, code, err := sut.RecoverPassword(res, req)
@@ -65,7 +65,7 @@ func Test_GivenRecoverPassword_WhenExecuteSuccess_ThenEnsureReturnOutputWithSucc
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.RecoverPasswordUsecaseSpy.DefineSuccess()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetRecoverPasswordInputSerialized())
 
 	// Act
 	result, code, _ := sut.RecoverPassword(res, req)

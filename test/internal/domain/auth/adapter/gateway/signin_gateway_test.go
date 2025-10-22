@@ -11,8 +11,8 @@ import (
 
 func Test_GivenSignin_WhenDecodeError_ThenEnsureReturnBadRequestWithError(t *testing.T) {
 	// Arrange
-	sut, _ := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("body-with-error")
+	sut, spies := fixture.NewSut()
+	res, req := spies.GetHttpRequestResponse("body-with-error")
 
 	// Act
 	_, code, err := sut.Signin(res, req)
@@ -26,7 +26,7 @@ func Test_GivenSignin_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParamete
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetSigninInput()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetSigninInputSerialized())
 
 	// Act
 	sut.Signin(res, req)
@@ -38,7 +38,7 @@ func Test_GivenSignin_WhenDecodeSuccess_ThenEnsureCallExecuteWithCorrectParamete
 func Test_GivenSignin_WhenDecodeSuccess_ThenEnsureCallOnce(t *testing.T) {
 	// Arrange
 	sut, spies := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetSigninInputSerialized())
 
 	// Act
 	sut.Signin(res, req)
@@ -51,7 +51,7 @@ func Test_GivenSignin_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *tes
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.SigninUsecaseSpy.DefineError()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetSigninInputSerialized())
 
 	// Act
 	_, code, err := sut.Signin(res, req)
@@ -65,7 +65,7 @@ func Test_GivenSignin_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(t
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.SigninUsecaseSpy.DefineSuccess()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponse(fixture.GetSigninInputSerialized())
 
 	// Act
 	signed, code, _ := sut.Signin(res, req)

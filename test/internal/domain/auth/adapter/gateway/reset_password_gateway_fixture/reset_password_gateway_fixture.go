@@ -1,16 +1,15 @@
 package reset_password_gateway_fixture
 
 import (
-	"bytes"
 	"errors"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/reset_password_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/reset_password"
 	shared_error "getfund-api-v2/internal/shared/error"
-	"net/http"
-	"net/http/httptest"
+	"getfund-api-v2/test/helper/fixture"
 )
 
 type ResetPasswordGatewayFixture struct {
+	fixture.BaseFixture
 	ResetPasswordUsecaseSpy *resetPasswordUsecaseSpy
 }
 
@@ -39,17 +38,6 @@ func (s *resetPasswordUsecaseSpy) Execute(input *reset_password.Input) (*reset_p
 	s.CallsCount["Execute"]++
 
 	return s.SuccessResult["Execute"], s.ErrorResult["Execute"]
-}
-
-func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.Request) {
-	body := bytes.NewBufferString(GetResetPasswordInputSerialized())
-	if bodyString != "" {
-		body = bytes.NewBufferString(bodyString)
-	}
-	req := httptest.NewRequest("FAKE", "/", body)
-	res := httptest.NewRecorder()
-
-	return res, req
 }
 
 func GetResetPasswordInputSerialized() string {

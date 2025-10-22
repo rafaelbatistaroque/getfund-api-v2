@@ -2,16 +2,15 @@ package activate_user_gateway_fixture
 
 import (
 	"errors"
-	"fmt"
 	"getfund-api-v2/internal/domain/auth/adapter/gateway/activate_user_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/activate_user"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	shared_error "getfund-api-v2/internal/shared/error"
-	"net/http"
-	"net/http/httptest"
+	"getfund-api-v2/test/helper/fixture"
 )
 
 type ActivateUserUsecaseFixture struct {
+	fixture.BaseFixture
 	ActivateUserUsecaseSpy *activateUserUsecaseSpy
 	SigninUsecaseSpy       *signinUsecaseSpy
 }
@@ -52,26 +51,14 @@ func NewSut() (activate_user_gateway.ActiveUserGateway, *ActivateUserUsecaseFixt
 
 func (s *activateUserUsecaseSpy) Execute(input *activate_user.Input) (*activate_user.Output, *shared_error.Error) {
 	s.Params["Execute:input"] = input
-
 	s.CallsCount["Execute"]++
-
 	return s.SuccessResult["Execute"], s.ErrorResult["Execute"]
 }
 
 func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *shared_error.Error) {
 	s.Params["Execute:input"] = input
-
 	s.CallsCount["Execute"]++
-
 	return s.SuccessResult["Execute"], s.ErrorResult["Execute"]
-}
-
-func GetHttpRequestResponse(activationCode string) (w http.ResponseWriter, r *http.Request) {
-	url := fmt.Sprintf("/user/activate/%s", activationCode)
-	req := httptest.NewRequest("FAKE", url, nil)
-	res := httptest.NewRecorder()
-
-	return res, req
 }
 
 func GetActivateUserInput() *activate_user.Input {

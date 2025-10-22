@@ -11,8 +11,8 @@ import (
 
 func Test_GivenSignout_WhenSessionNotFound_ThenEnsureReturnServerErrorWithError(t *testing.T) {
 	// Arrange
-	sut, _ := fixture.NewSut()
-	res, req := fixture.GetHttpRequestResponse("not-found")
+	sut, spies := fixture.NewSut()
+	res, req := spies.GetHttpRequestResponse("")
 
 	// Act
 	_, code, err := sut.Signout(res, req)
@@ -26,7 +26,7 @@ func Test_GivenSignout_WhenTokenFound_ThenEnsureCallExecuteWithCorrectParameter(
 	// Arrange
 	sut, spies := fixture.NewSut()
 	expectedInput := fixture.GetSignoutInput()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponseWithContext()
 
 	// Act
 	sut.Signout(res, req)
@@ -39,7 +39,7 @@ func Test_GivenSignout_WhenExecuteError_ThenEnsureReturnCodeAndMessageFrom(t *te
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.SignoutUsecaseSpy.DefineError()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponseWithContext()
 
 	// Act
 	_, code, err := sut.Signout(res, req)
@@ -53,7 +53,7 @@ func Test_GivenSignout_WhenExecuteSuccess_ThenEnsureReturnOutputWithSuccessCode(
 	// Arrange
 	sut, spies := fixture.NewSut()
 	spies.SignoutUsecaseSpy.DefineSuccess()
-	res, req := fixture.GetHttpRequestResponse("")
+	res, req := spies.GetHttpRequestResponseWithContext()
 
 	// Act
 	result, code, _ := sut.Signout(res, req)

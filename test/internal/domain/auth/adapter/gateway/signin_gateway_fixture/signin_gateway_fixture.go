@@ -1,16 +1,15 @@
 package signin_gateway_fixture
 
 import (
-	"bytes"
 	"errors"
 	signin_gateway "getfund-api-v2/internal/domain/auth/adapter/gateway/signin_auth_gateway"
 	"getfund-api-v2/internal/domain/auth/core/usecase/signin"
 	shared_error "getfund-api-v2/internal/shared/error"
-	"net/http"
-	"net/http/httptest"
+	"getfund-api-v2/test/helper/fixture"
 )
 
 type SigninGatewayFixture struct {
+	fixture.BaseFixture
 	SigninUsecaseSpy *signinUsecaseSpy
 }
 
@@ -40,17 +39,6 @@ func (s *signinUsecaseSpy) Execute(input *signin.Input) (*signin.Output, *shared
 	s.CallsCount["Execute"]++
 
 	return s.SuccessResult["Execute"], s.ErrorResult["Execute"]
-}
-
-func GetHttpRequestResponse(bodyString string) (w http.ResponseWriter, r *http.Request) {
-	body := bytes.NewBufferString(GetSigninInputSerialized())
-	if bodyString != "" {
-		body = bytes.NewBufferString(bodyString)
-	}
-	req := httptest.NewRequest("FAKE", "/", body)
-	res := httptest.NewRecorder()
-
-	return res, req
 }
 
 func GetSigninInput() *signin.Input {
